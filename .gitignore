@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.iml
 .gradle
 /local.properties
@@ -7,3 +8,9 @@
 /build
 /captures
 *.ai
+*.apk
+*.ap_
+*.dex
+*.class
+*.log
+captures/
