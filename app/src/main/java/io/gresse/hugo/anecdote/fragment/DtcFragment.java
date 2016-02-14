@@ -1,8 +1,5 @@
 package io.gresse.hugo.anecdote.fragment;
 
-import android.os.Bundle;
-import android.view.View;
-
 import com.squareup.otto.Subscribe;
 
 import io.gresse.hugo.anecdote.MainActivity;
@@ -19,16 +16,11 @@ import io.gresse.hugo.anecdote.service.AnecdoteService;
  *
  * Created by Hugo Gresse on 13/02/16.
  */
-public class DtcFragment extends QuoteFragment {
+public class DtcFragment extends AnecdoteFragment {
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-
-        if(mAnecdoteService.getAnecdotes().isEmpty()){
-            BusProvider.getInstance().post(new LoadNewAnecdoteDtcEvent(0));
-        }
-    }
+    /***************************
+     * Implement super abstract methods
+     ***************************/
 
     @Override
     protected AnecdoteService getService() {
@@ -47,13 +39,12 @@ public class DtcFragment extends QuoteFragment {
     @Subscribe
     public void onRequestFailedEvent(RequestFailedEvent event) {
         if(!(event instanceof RequestFailedDtcEvent)) return;
-        mIsLoadingNewItems = false;
+        afterRequestFinished(false);
     }
 
     @Subscribe
     public void  onAnecdoteReceived(OnAnecdoteLoadedEvent event){
         if(!(event instanceof OnAnecdoteLoadedDtcEvent)) return;
-        mIsLoadingNewItems = false;
-        mAdapter.setData(mAnecdoteService.getAnecdotes());
+        afterRequestFinished(true);
     }
 }

@@ -41,6 +41,13 @@ public abstract class AnecdoteService {
     }
 
     /**
+     * Remvoe all anecdotes
+     */
+    public void cleanAnecdotes(){
+        mAnecdotes.clear();
+    }
+
+    /**
      * Post an Event ot UI Thread
      *
      * @param event the event to post on Bus
