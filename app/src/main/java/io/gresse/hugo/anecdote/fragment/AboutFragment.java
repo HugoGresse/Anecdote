@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import io.gresse.hugo.anecdote.R;
+import io.gresse.hugo.anecdote.event.BusProvider;
+import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 
 /**
  * About fragment
@@ -24,6 +26,12 @@ public class AboutFragment extends Fragment {
                              Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView");
         return inflater.inflate(R.layout.fragment_about, container, false);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        BusProvider.getInstance().post(new ChangeTitleEvent(getString(R.string.action_about)));
     }
 
 }

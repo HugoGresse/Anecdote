@@ -22,6 +22,7 @@ import com.squareup.otto.Subscribe;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.event.BusProvider;
+import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.Event;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteDtcEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedDtcEvent;
@@ -57,9 +58,6 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
-        // Set default title to DTC
-        mToolbar.setTitle(getString(R.string.dans_ton_chat));
 
         setSupportActionBar(mToolbar);
 
@@ -130,11 +128,9 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.nav_dtc:
-                mToolbar.setTitle(getString(R.string.dans_ton_chat));
                 changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
                 break;
             case R.id.nav_vdm:
-                mToolbar.setTitle(getString(R.string.vie_de_merde));
                 changeFragment(Fragment.instantiate(this, VdmFragment.class.getName()), true, false);
                 break;
         }
@@ -235,4 +231,8 @@ public class MainActivity extends AppCompatActivity
                 .show();
     }
 
+    @Subscribe
+    public void changeTitle(ChangeTitleEvent event){
+        mToolbar.setTitle(event.title);
+    }
 }

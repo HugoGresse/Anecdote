@@ -3,7 +3,9 @@ package io.gresse.hugo.anecdote.fragment;
 import com.squareup.otto.Subscribe;
 
 import io.gresse.hugo.anecdote.MainActivity;
+import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.event.BusProvider;
+import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteVdmEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedVdmEvent;
@@ -17,6 +19,12 @@ import io.gresse.hugo.anecdote.service.AnecdoteService;
  * Created by Hugo Gresse on 13/02/16.
  */
 public class VdmFragment extends AnecdoteFragment {
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        BusProvider.getInstance().post(new ChangeTitleEvent(getString(R.string.vie_de_merde)));
+    }
 
     /***************************
      * Implement super abstract methods
