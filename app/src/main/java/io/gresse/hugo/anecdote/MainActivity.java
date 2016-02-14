@@ -24,9 +24,10 @@ import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.Event;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteDtcEvent;
-import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedDtcEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.fragment.AboutFragment;
+import io.gresse.hugo.anecdote.fragment.DtcFragment;
 import io.gresse.hugo.anecdote.fragment.VdmFragment;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.DtcService;
@@ -74,7 +75,7 @@ public class MainActivity extends AppCompatActivity
 
         // Default fragment to DTC
         mNavigationView.setCheckedItem(R.id.nav_dtc);
-        changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
+        changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), false, false);
     }
 
     @Override
@@ -115,17 +116,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()) {
+            case R.id.action_about:
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+                changeFragment(Fragment.instantiate(this, AboutFragment.class.getName()), true, false);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
