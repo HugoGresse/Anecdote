@@ -84,8 +84,6 @@ public class DtcService extends AnecdoteService {
             }
 
             postOnUiThread(new OnAnecdoteLoadedDtcEvent(elements.size(), pageNumber));
-
-            Log.d(TAG, "quote received:" + mAnecdotes.toString());
         } else {
             Log.d(TAG, "No more elements from this");
             mEnd = true;

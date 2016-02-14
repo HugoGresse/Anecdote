@@ -21,7 +21,7 @@ public abstract class AnecdoteService {
 
     protected Context mContext;
     protected OkHttpClient mOkHttpClient;
-    protected static List<Anecdote> mAnecdotes;
+    protected List<Anecdote> mAnecdotes;
     protected boolean mEnd = false;
 
     public AnecdoteService(Context context) {

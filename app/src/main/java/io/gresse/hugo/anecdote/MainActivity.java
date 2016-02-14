@@ -97,6 +97,11 @@ public class MainActivity extends AppCompatActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
+            int fragments = getFragmentManager().getBackStackEntryCount();
+            if (fragments == 1) {
+                finish();
+            }
+
             super.onBackPressed();
         }
     }
@@ -123,18 +128,16 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-    @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        switch (id) {
+        switch (item.getItemId()) {
             case R.id.nav_dtc:
                 mToolbar.setTitle(getString(R.string.dans_ton_chat));
+                changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
                 break;
             case R.id.nav_vdm:
                 mToolbar.setTitle(getString(R.string.vie_de_merde));
+                changeFragment(Fragment.instantiate(this, VdmFragment.class.getName()), true, false);
                 break;
         }
 
@@ -142,6 +145,13 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /**
+     * Change tu current displayed fragment by a new one.
+     *
+     * @param frag            the new fragment to display
+     * @param saveInBackstack if we want the fragment to be in backstack
+     * @param animate         if we want a nice animation or not
+     */
     private void changeFragment(Fragment frag, boolean saveInBackstack, boolean animate) {
         String backStateName = ((Object) frag).getClass().getName();
 
@@ -152,7 +162,6 @@ public class MainActivity extends AppCompatActivity
             if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null) { //fragment not in back stack, create it.
                 FragmentTransaction transaction = manager.beginTransaction();
 
-
                 if (animate) {
                     Log.d(TAG, "Change Fragment: animate");
                     transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
@@ -161,7 +170,7 @@ public class MainActivity extends AppCompatActivity
                 transaction.replace(R.id.fragment_container, frag, ((Object) frag).getClass().getName());
 
                 if (saveInBackstack) {
-                    Log.d(TAG, "Change Fragment: addToBackTack " + frag.getClass().getSimpleName());
+                    Log.d(TAG, "Change Fragment: addToBackTack " + frag.getClass().getName());
                     transaction.addToBackStack(backStateName);
                 } else {
                     Log.d(TAG, "Change Fragment: NO addToBackTack");
@@ -169,12 +178,11 @@ public class MainActivity extends AppCompatActivity
 
                 transaction.commit();
             } else {
-                Log.d(TAG, "Change Fragment : nothing to do");
+                Log.d(TAG, "Change Fragment: nothing to do");
                 // custom effect if fragment is already instanciated
             }
         } catch (IllegalStateException exception) {
-            Log.e(TAG, "Unable to commit fragment, could be activity as been killed in background. " + exception.toString());
-
+            Log.w(TAG, "Unable to commit fragment, could be activity as been killed in background. " + exception.toString());
         }
     }
 
@@ -183,7 +191,7 @@ public class MainActivity extends AppCompatActivity
      *
      * @return the DTC Service
      */
-    public AnecdoteService getDtcService(){
+    public AnecdoteService getDtcService() {
         return mServiceProvider.getDtcService();
     }
 
@@ -192,7 +200,7 @@ public class MainActivity extends AppCompatActivity
      *
      * @return the VDM Service
      */
-    public AnecdoteService getVdmService(){
+    public AnecdoteService getVdmService() {
         return mServiceProvider.getVdmService();
     }
 
@@ -206,15 +214,15 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection WrongConstant
         Snackbar
-                .make(mCoordinatorLayout,event.message, Snackbar.LENGTH_LONG)
+                .make(mCoordinatorLayout, event.message, Snackbar.LENGTH_LONG)
                 .setDuration(8000)
                 .setAction("Retry", new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
-                        if(event instanceof RequestFailedDtcEvent){
+                        if (event instanceof RequestFailedDtcEvent) {
                             Event eventToSend;
-                            if(event.pageNumber <= 1){
+                            if (event.pageNumber <= 1) {
                                 eventToSend = new LoadNewAnecdoteDtcEvent(0);
                             } else {
                                 eventToSend = new LoadNewAnecdoteDtcEvent(event.pageNumber * DtcService.ITEM_PER_PAGE);
@@ -228,11 +236,5 @@ public class MainActivity extends AppCompatActivity
                 })
                 .show();
     }
-
-    @Subscribe
-    public void onAnecdoteLoaded(OnAnecdoteLoadedEvent event){
-        Log.d(TAG, "onAnecdoteLoaded ");
-    }
-
 
 }
