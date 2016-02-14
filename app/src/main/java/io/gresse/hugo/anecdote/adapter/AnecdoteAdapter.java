@@ -20,9 +20,12 @@ import io.gresse.hugo.anecdote.model.dtc.Anecdote;
  *
  * Created by Hugo Gresse on 13/02/16.
  */
-public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.AnecdoteViewHolder> {
+public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAnecdoteViewHolder> {
 
     public static final String TAG = AnecdoteAdapter.class.getSimpleName();
+
+    public static final int VIEW_TYPE_CONTENT = 0;
+    public static final int VIEW_TYPE_LOAD = 1;
 
     private List<Anecdote> mAnecdotes;
 
@@ -36,22 +39,50 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.Anecdo
     }
 
     @Override
-    public AnecdoteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote, parent, false);
-        return new AnecdoteViewHolder(v);
+    public BaseAnecdoteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View v;
+        switch (viewType){
+            default:
+            case VIEW_TYPE_CONTENT:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote, parent, false);
+                return new AnecdoteViewHolder(v);
+            case VIEW_TYPE_LOAD:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_loader, parent, false);
+                return new LoadViewHolder(v);
+        }
     }
 
     @Override
-    public void onBindViewHolder(AnecdoteViewHolder holder, int position) {
-        holder.textView.setText(Html.fromHtml(mAnecdotes.get(position).content));
+    public void onBindViewHolder(BaseAnecdoteViewHolder holder, int position) {
+        if(position < mAnecdotes.size()){
+            holder.setData(mAnecdotes.get(position));
+        }
     }
 
     @Override
     public int getItemCount() {
-        return mAnecdotes.size();
+        return mAnecdotes.size() + 1;
     }
 
-    public class AnecdoteViewHolder extends RecyclerView.ViewHolder {
+    @Override
+    public int getItemViewType(int position) {
+        if(position +1 <= mAnecdotes.size()){
+            return VIEW_TYPE_CONTENT;
+        } else {
+            return VIEW_TYPE_LOAD;
+        }
+    }
+
+    public abstract class BaseAnecdoteViewHolder extends RecyclerView.ViewHolder {
+
+        public BaseAnecdoteViewHolder(View itemView) {
+            super(itemView);
+        }
+
+        public abstract void setData(Anecdote anecdote);
+    }
+
+    public class AnecdoteViewHolder extends BaseAnecdoteViewHolder {
 
         @Bind(R.id.contentTextView)
         TextView textView;
@@ -60,6 +91,24 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.Anecdo
             super(itemView);
 
             ButterKnife.bind(this, itemView);
+        }
+
+        @Override
+        public void setData(Anecdote anecdote) {
+            textView.setText(Html.fromHtml(anecdote.content));
+        }
+    }
+    public class LoadViewHolder extends BaseAnecdoteViewHolder {
+
+        public LoadViewHolder(View itemView) {
+            super(itemView);
+
+            ButterKnife.bind(this, itemView);
+        }
+
+        @Override
+        public void setData(Anecdote anecdote) {
+
         }
     }
 

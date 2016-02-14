@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onRequestFailed(final RequestFailedEvent event) {
         Log.d(TAG, "requestFailed:  " + event.getClass().getCanonicalName());
+
         //noinspection WrongConstant
         Snackbar
                 .make(mCoordinatorLayout,event.message, Snackbar.LENGTH_LONG)

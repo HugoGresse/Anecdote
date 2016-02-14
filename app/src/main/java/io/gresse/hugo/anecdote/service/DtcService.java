@@ -45,7 +45,8 @@ public class DtcService extends AnecdoteService {
 
         mOkHttpClient.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, final IOException e) {
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
                 postOnUiThread(new RequestFailedDtcEvent("Unable to load DTC", e, pageNumber));
             }
 
@@ -61,13 +62,10 @@ public class DtcService extends AnecdoteService {
         Document document;
         try {
             document = Jsoup.parse(response.body().string());
-//            document.select("br").append("\\n");
-//            document = Jsoup.parse(document.html());
         } catch (IOException e) {
             postOnUiThread(new RequestFailedDtcEvent("Unable to parse DTC website", null, pageNumber));
             return;
         }
-
 
         final Elements elements = document.select("div > div > div > p > a");
 
