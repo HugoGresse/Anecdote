@@ -12,6 +12,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
+import io.gresse.hugo.anecdote.Utils;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteVdmEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedVdmEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedVdmEvent;
@@ -43,6 +44,7 @@ public class VdmService extends AnecdoteService {
         Log.d(TAG, "Downloading page " + pageNumber);
         Request request = new Request.Builder()
                 .url(VDM_LATEST + (pageNumber - 1))
+                .header("User-Agent", Utils.getUserAgent())
                 .build();
 
         mOkHttpClient.newCall(request).enqueue(new Callback() {

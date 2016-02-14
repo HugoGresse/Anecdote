@@ -12,6 +12,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
+import io.gresse.hugo.anecdote.Utils;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteDtcEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedDtcEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedDtcEvent;
@@ -42,6 +43,7 @@ public class DtcService extends AnecdoteService {
         Log.d(TAG, "Downloading page " + pageNumber);
         Request request = new Request.Builder()
                 .url(DTC_LATEST + pageNumber + DTC_PAGE_SUFFIX)
+                .header("User-Agent", Utils.getUserAgent())
                 .build();
 
         mOkHttpClient.newCall(request).enqueue(new Callback() {

@@ -1,27 +1,25 @@
 package io.gresse.hugo.anecdote;
 
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.safety.Whitelist;
+import android.os.Build;
 
 /**
+ * Generals utils
+ *
  * Created by Hugo Gresse on 13/02/16.
  */
 public class Utils {
 
     /**
-     * Preserve linebreaks with Jsoup
-     * @param html enter html
-     * @return html with correct linebreak
+     * Return the user agent sent on all request. It's not default Android user agent as we don't really want that
+     * websites see the app trafic (for now at least).
+     *
+     * Be only replace the device by the correct one.
+     *
+     * @return the user agent
      */
-    public static String br2nl(String html) {
-        if (html == null) return html;
-        Document document = Jsoup.parse(html);
-        document.outputSettings(new Document.OutputSettings().prettyPrint(false));//makes html() preserve linebreaks and spacing
-        document.select("br").append("\\n");
-        document.select("p").prepend("\\n\\n");
-        String s = document.html().replaceAll("\\\\n", "\n");
-        return Jsoup.clean(s, "", Whitelist.none(), new Document.OutputSettings().prettyPrint(false));
+    public static String getUserAgent(){
+        return "Mozilla/5.0 (Linux; Android 5.1; " + Build.MODEL +
+                ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.95 Mobile Safari/537.36";
     }
 
 }
