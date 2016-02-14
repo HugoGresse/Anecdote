@@ -5,7 +5,7 @@ package io.gresse.hugo.anecdote.event;
  *
  * Created by Hugo Gresse on 13/02/16.
  */
-public abstract class LoadNewAnecdoteEvent {
+public abstract class LoadNewAnecdoteEvent implements Event {
 
     public int start;
     public int count;

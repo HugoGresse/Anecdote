@@ -1,7 +1,9 @@
 package io.gresse.hugo.anecdote.service;
 
-import android.app.Activity;
+import android.content.Context;
 import android.util.Log;
+
+import com.squareup.otto.Subscribe;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -10,7 +12,7 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
-import io.gresse.hugo.anecdote.event.BusProvider;
+import io.gresse.hugo.anecdote.event.LoadNewAnecdoteDtcEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedDtcEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedDtcEvent;
 import io.gresse.hugo.anecdote.model.dtc.Anecdote;
@@ -31,11 +33,12 @@ public class DtcService extends AnecdoteService {
     public static final  String DTC_PAGE_SUFFIX = ".html";
     public static final  int    ITEM_PER_PAGE   = 25;
 
-    public DtcService(Activity activity) {
-        super(activity);
+    public DtcService(Context context) {
+        super(context);
     }
 
     public void downloadLatest(final int pageNumber) {
+        Log.d(TAG, "Downloading page " + pageNumber);
         Request request = new Request.Builder()
                 .url(DTC_LATEST + pageNumber + DTC_PAGE_SUFFIX)
                 .build();
@@ -43,12 +46,7 @@ public class DtcService extends AnecdoteService {
         mOkHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
-                mActivity.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        BusProvider.getInstance().post(new RequestFailedDtcEvent("Unable to load DTC", e));
-                    }
-                });
+                postOnUiThread(new RequestFailedDtcEvent("Unable to load DTC", e, pageNumber));
             }
 
             @Override
@@ -60,18 +58,13 @@ public class DtcService extends AnecdoteService {
     }
 
     private void processResponse(final int pageNumber, Response response) {
-        Document document = null;
+        Document document;
         try {
             document = Jsoup.parse(response.body().string());
 //            document.select("br").append("\\n");
 //            document = Jsoup.parse(document.html());
         } catch (IOException e) {
-            mActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    BusProvider.getInstance().post(new RequestFailedDtcEvent("Unable to parse DTC website", null));
-                }
-            });
+            postOnUiThread(new RequestFailedDtcEvent("Unable to parse DTC website", null, pageNumber));
             return;
         }
 
@@ -88,12 +81,8 @@ public class DtcService extends AnecdoteService {
                         .replaceAll("</span>", "</b>");
                 mAnecdotes.add(new Anecdote(content, element.attr("href")));
             }
-            mActivity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    BusProvider.getInstance().post(new OnAnecdoteLoadedDtcEvent(elements.size(), pageNumber));
-                }
-            });
+
+            postOnUiThread(new OnAnecdoteLoadedDtcEvent(elements.size(), pageNumber));
 
             Log.d(TAG, "quote received:" + mAnecdotes.toString());
         } else {
@@ -101,4 +90,22 @@ public class DtcService extends AnecdoteService {
             mEnd = true;
         }
     }
+
+
+    /***************************
+     * Event
+     ***************************/
+
+    @Subscribe
+    public void loadNexAnecdoteEvent(LoadNewAnecdoteDtcEvent event){
+        int page = 1;
+        int estimatedCurrentPage = event.start/ ITEM_PER_PAGE;
+        if(estimatedCurrentPage >= 1){
+            page += estimatedCurrentPage;
+        }
+        Log.d(TAG, "loadNexAnecdoteEvent start:" + event.start + " page:" + page);
+        downloadLatest(page);
+    }
+
+
 }

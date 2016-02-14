@@ -1,10 +1,14 @@
 package io.gresse.hugo.anecdote.service;
 
-import android.app.Activity;
+import android.content.Context;
+import android.os.Handler;
+import android.os.Looper;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.gresse.hugo.anecdote.event.BusProvider;
+import io.gresse.hugo.anecdote.event.Event;
 import io.gresse.hugo.anecdote.model.dtc.Anecdote;
 import okhttp3.OkHttpClient;
 
@@ -15,19 +19,38 @@ import okhttp3.OkHttpClient;
  */
 public abstract class AnecdoteService {
 
-    protected Activity mActivity;
+    protected Context mContext;
     protected OkHttpClient mOkHttpClient;
-    protected List<Anecdote> mAnecdotes;
+    protected static List<Anecdote> mAnecdotes;
     protected boolean mEnd = false;
 
-    public AnecdoteService(Activity activity) {
-        mActivity = activity;
+    public AnecdoteService(Context context) {
+        mContext = context;
 
         mOkHttpClient = new OkHttpClient();
         mAnecdotes = new ArrayList<>();
     }
 
+    /**
+     * Return the list of anecdotes already loaded by the service
+     *
+     * @return list of anecdote
+     */
     public List<Anecdote> getAnecdotes(){
         return mAnecdotes;
+    }
+
+    /**
+     * Post an Event ot UI Thread
+     *
+     * @param event the event to post on Bus
+     */
+    protected void postOnUiThread(final Event event){
+        new Handler(Looper.getMainLooper()).post(new Runnable() {
+            @Override
+            public void run() {
+                BusProvider.getInstance().post(event);
+            }
+        });
     }
 }

@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
  * Created by Hugo Gresse on 13/02/16.
  */
 public class RequestFailedDtcEvent extends RequestFailedEvent {
-    public RequestFailedDtcEvent(String message, @Nullable Exception exception) {
-        super(message, exception);
+    public RequestFailedDtcEvent(String message, @Nullable Exception exception, int pageNumber) {
+        super(message, exception, pageNumber);
     }
 }

@@ -5,7 +5,7 @@ package io.gresse.hugo.anecdote.event;
  *
  * Created by Hugo Gresse on 13/02/16.
  */
-public abstract class OnAnecdoteLoadedEvent {
+public abstract class OnAnecdoteLoadedEvent implements Event {
 
     public int numberOfItemLoaded;
 

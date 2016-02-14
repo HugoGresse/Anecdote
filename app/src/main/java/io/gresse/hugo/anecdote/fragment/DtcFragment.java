@@ -1,6 +1,7 @@
 package io.gresse.hugo.anecdote.fragment;
 
-import android.util.Log;
+import android.os.Bundle;
+import android.view.View;
 
 import com.squareup.otto.Subscribe;
 
@@ -21,6 +22,15 @@ import io.gresse.hugo.anecdote.service.AnecdoteService;
 public class DtcFragment extends QuoteFragment {
 
     @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if(mAnecdoteService.getAnecdotes().isEmpty()){
+            BusProvider.getInstance().post(new LoadNewAnecdoteDtcEvent(0));
+        }
+    }
+
+    @Override
     protected AnecdoteService getService() {
         return ((MainActivity) getActivity()).getDtcService();
     }
@@ -36,7 +46,6 @@ public class DtcFragment extends QuoteFragment {
 
     @Subscribe
     public void onRequestFailedEvent(RequestFailedEvent event) {
-        Log.d("dtcfrag", "onRequestFailedEvent");
         if(!(event instanceof RequestFailedDtcEvent)) return;
         mIsLoadingNewItems = false;
     }
@@ -44,9 +53,7 @@ public class DtcFragment extends QuoteFragment {
     @Subscribe
     public void  onAnecdoteReceived(OnAnecdoteLoadedEvent event){
         if(!(event instanceof OnAnecdoteLoadedDtcEvent)) return;
-
-
-        Log.d("dtcfrag", "onAnecdoteReceived 2");
+        mIsLoadingNewItems = false;
         mAdapter.setData(mAnecdoteService.getAnecdotes());
     }
 }

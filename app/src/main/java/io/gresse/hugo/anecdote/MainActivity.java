@@ -15,16 +15,22 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.squareup.otto.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.event.BusProvider;
-import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedDtcEvent;
+import io.gresse.hugo.anecdote.event.Event;
+import io.gresse.hugo.anecdote.event.LoadNewAnecdoteDtcEvent;
+import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
+import io.gresse.hugo.anecdote.event.RequestFailedDtcEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.fragment.DtcFragment;
+import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.DtcService;
+import io.gresse.hugo.anecdote.service.ServiceProvider;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -43,8 +49,7 @@ public class MainActivity extends AppCompatActivity
     @Bind(R.id.nav_view)
     public NavigationView mNavigationView;
 
-
-    private DtcService mDtcService;
+    protected ServiceProvider mServiceProvider;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,12 +69,12 @@ public class MainActivity extends AppCompatActivity
 
         mNavigationView.setNavigationItemSelectedListener(this);
 
+        mServiceProvider = new ServiceProvider();
+        mServiceProvider.register(this, BusProvider.getInstance());
+
         // Default fragment to DTC
         mNavigationView.setCheckedItem(R.id.nav_dtc);
         changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
-
-        mDtcService = new DtcService(this);
-        mDtcService.downloadLatest(1);
     }
 
     @Override
@@ -173,8 +178,8 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public DtcService getDtcService(){
-        return mDtcService;
+    public AnecdoteService getDtcService(){
+        return mServiceProvider.getDtcService();
     }
 
     /***************************
@@ -182,13 +187,37 @@ public class MainActivity extends AppCompatActivity
      ***************************/
 
     @Subscribe
-    public void onRequestFailed(RequestFailedEvent event) {
-        Snackbar.make(mCoordinatorLayout,event.message, Snackbar.LENGTH_LONG).show();
+    public void onRequestFailed(final RequestFailedEvent event) {
+        Log.d(TAG, "requestFailed:  " + event.getClass().getCanonicalName());
+        //noinspection WrongConstant
+        Snackbar
+                .make(mCoordinatorLayout,event.message, Snackbar.LENGTH_LONG)
+                .setDuration(8000)
+                .setAction("Retry", new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View v) {
+                        if(event instanceof RequestFailedDtcEvent){
+                            Event eventToSend;
+                            if(event.pageNumber <= 1){
+                                eventToSend = new LoadNewAnecdoteDtcEvent(0);
+                            } else {
+                                eventToSend = new LoadNewAnecdoteDtcEvent(event.pageNumber * DtcService.ITEM_PER_PAGE);
+                            }
+
+                            BusProvider.getInstance().post(eventToSend);
+                        }
+
+                    }
+
+                })
+                .show();
     }
 
     @Subscribe
-    public void onNewDtcEvent(OnAnecdoteLoadedDtcEvent event){
-        Log.d(TAG, event.page + " ");
+    public void onAnecdoteLoaded(OnAnecdoteLoadedEvent event){
+        Log.d(TAG, "onAnecdoteLoaded ");
     }
+
 
 }
