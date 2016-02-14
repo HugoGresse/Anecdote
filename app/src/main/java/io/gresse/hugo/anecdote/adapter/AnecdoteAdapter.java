@@ -13,7 +13,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.model.dtc.Anecdote;
+import io.gresse.hugo.anecdote.model.Anecdote;
 
 /**
  * A generic adapters for all anecdotes

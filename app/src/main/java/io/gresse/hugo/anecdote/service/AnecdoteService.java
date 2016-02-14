@@ -9,7 +9,7 @@ import java.util.List;
 
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.Event;
-import io.gresse.hugo.anecdote.model.dtc.Anecdote;
+import io.gresse.hugo.anecdote.model.Anecdote;
 import okhttp3.OkHttpClient;
 
 /**
@@ -46,6 +46,8 @@ public abstract class AnecdoteService {
     public void cleanAnecdotes(){
         mAnecdotes.clear();
     }
+
+    public abstract void downloadLatest(int pageNumber);
 
     /**
      * Post an Event ot UI Thread

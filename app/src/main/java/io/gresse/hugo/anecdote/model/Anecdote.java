@@ -1,4 +1,4 @@
-package io.gresse.hugo.anecdote.model.dtc;
+package io.gresse.hugo.anecdote.model;
 
 /**
  * A single DTC quote

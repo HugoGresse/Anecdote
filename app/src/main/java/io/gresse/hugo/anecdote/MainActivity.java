@@ -27,7 +27,7 @@ import io.gresse.hugo.anecdote.event.LoadNewAnecdoteDtcEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedDtcEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
-import io.gresse.hugo.anecdote.fragment.DtcFragment;
+import io.gresse.hugo.anecdote.fragment.VdmFragment;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.DtcService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
@@ -178,8 +178,22 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Get the DTC Service to be used by fragments
+     *
+     * @return the DTC Service
+     */
     public AnecdoteService getDtcService(){
         return mServiceProvider.getDtcService();
+    }
+
+    /**
+     * Get the VDM Service to be used by fragments
+     *
+     * @return the VDM Service
+     */
+    public AnecdoteService getVdmService(){
+        return mServiceProvider.getVdmService();
     }
 
     /***************************
