@@ -10,6 +10,7 @@
         android:id="@+id/libTextView"
         android:text="@string/using"
         android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:fontFamily="sans-serif-thin"
         android:textAlignment="center"/>
 
 
