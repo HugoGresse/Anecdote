@@ -6,7 +6,7 @@ import com.squareup.otto.Bus;
 
 /**
  * Provide different services
- *
+ * <p/>
  * Created by Hugo Gresse on 14/02/16.
  */
 public class ServiceProvider {
@@ -14,7 +14,7 @@ public class ServiceProvider {
     protected DtcService mDtcService;
     protected VdmService mVdmService;
 
-    public void register(Context context, Bus bus){
+    public void register(Context context, Bus bus) {
         mDtcService = new DtcService(context);
         mVdmService = new VdmService(context);
 
@@ -22,11 +22,11 @@ public class ServiceProvider {
         bus.register(mVdmService);
     }
 
-    public AnecdoteService getDtcService(){
+    public AnecdoteService getDtcService() {
         return mDtcService;
     }
 
-    public AnecdoteService getVdmService(){
+    public AnecdoteService getVdmService() {
         return mVdmService;
     }
 

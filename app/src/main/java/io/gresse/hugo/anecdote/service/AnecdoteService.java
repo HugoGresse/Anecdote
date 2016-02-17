@@ -19,8 +19,8 @@ import okhttp3.OkHttpClient;
  */
 public abstract class AnecdoteService {
 
-    protected Context mContext;
-    protected OkHttpClient mOkHttpClient;
+    protected Context        mContext;
+    protected OkHttpClient   mOkHttpClient;
     protected List<Anecdote> mAnecdotes;
     protected boolean mEnd = false;
 
@@ -36,14 +36,14 @@ public abstract class AnecdoteService {
      *
      * @return list of anecdote
      */
-    public List<Anecdote> getAnecdotes(){
+    public List<Anecdote> getAnecdotes() {
         return mAnecdotes;
     }
 
     /**
      * Remvoe all anecdotes
      */
-    public void cleanAnecdotes(){
+    public void cleanAnecdotes() {
         mAnecdotes.clear();
     }
 
@@ -54,7 +54,7 @@ public abstract class AnecdoteService {
      *
      * @param event the event to post on Bus
      */
-    protected void postOnUiThread(final Event event){
+    protected void postOnUiThread(final Event event) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {

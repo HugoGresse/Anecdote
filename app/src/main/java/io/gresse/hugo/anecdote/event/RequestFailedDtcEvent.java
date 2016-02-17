@@ -4,7 +4,7 @@ import android.support.annotation.Nullable;
 
 /**
  * A DTC failed event
- *
+ * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
 public class RequestFailedDtcEvent extends RequestFailedEvent {

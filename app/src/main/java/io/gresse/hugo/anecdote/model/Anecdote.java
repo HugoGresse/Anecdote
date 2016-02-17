@@ -2,7 +2,7 @@ package io.gresse.hugo.anecdote.model;
 
 /**
  * A single DTC quote
- *
+ * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
 public class Anecdote {

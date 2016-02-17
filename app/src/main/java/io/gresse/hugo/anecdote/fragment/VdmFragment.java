@@ -15,7 +15,7 @@ import io.gresse.hugo.anecdote.service.AnecdoteService;
 
 /**
  * Display VDM quotes
- *
+ * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
 public class VdmFragment extends AnecdoteFragment {
@@ -46,13 +46,13 @@ public class VdmFragment extends AnecdoteFragment {
 
     @Subscribe
     public void onRequestFailedEvent(RequestFailedEvent event) {
-        if(!(event instanceof RequestFailedVdmEvent)) return;
+        if (!(event instanceof RequestFailedVdmEvent)) return;
         afterRequestFinished(false);
     }
 
     @Subscribe
-    public void  onAnecdoteReceived(OnAnecdoteLoadedEvent event){
-        if(!(event instanceof OnAnecdoteLoadedVdmEvent)) return;
+    public void onAnecdoteReceived(OnAnecdoteLoadedEvent event) {
+        if (!(event instanceof OnAnecdoteLoadedVdmEvent)) return;
         afterRequestFinished(true);
     }
 }

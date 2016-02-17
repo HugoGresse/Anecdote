@@ -4,12 +4,12 @@ import android.support.annotation.Nullable;
 
 /**
  * When a request failed
- *
+ * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
 public abstract class RequestFailedEvent implements Event {
 
-    public String message;
+    public String    message;
     @Nullable
     public Exception exception;
 

@@ -52,7 +52,7 @@ public class MainActivity extends AppCompatActivity
     public NavigationView mNavigationView;
 
     protected ServiceProvider mServiceProvider;
-    protected boolean mDrawerBackOpen;
+    protected boolean         mDrawerBackOpen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             int fragments = getSupportFragmentManager().getBackStackEntryCount();
             if (fragments == 1) {
-                if(!mDrawerBackOpen){
+                if (!mDrawerBackOpen) {
                     mDrawerBackOpen = true;
                     mDrawerLayout.openDrawer(GravityCompat.START);
                     return;
@@ -244,10 +244,10 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Subscribe
-    public void changeTitle(ChangeTitleEvent event){
-        if(event.className.equals(VdmFragment.class.getName())){
+    public void changeTitle(ChangeTitleEvent event) {
+        if (event.className.equals(VdmFragment.class.getName())) {
             mNavigationView.setCheckedItem(R.id.nav_vdm);
-        } else if (event.className.equals(DtcFragment.class.getName())){
+        } else if (event.className.equals(DtcFragment.class.getName())) {
             mNavigationView.setCheckedItem(R.id.nav_dtc);
         }
         mToolbar.setTitle(event.title);

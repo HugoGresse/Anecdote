@@ -15,7 +15,7 @@ import io.gresse.hugo.anecdote.service.AnecdoteService;
 
 /**
  * Display DTC quotes
- *
+ * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
 public class DtcFragment extends AnecdoteFragment {
@@ -46,13 +46,13 @@ public class DtcFragment extends AnecdoteFragment {
 
     @Subscribe
     public void onRequestFailedEvent(RequestFailedEvent event) {
-        if(!(event instanceof RequestFailedDtcEvent)) return;
+        if (!(event instanceof RequestFailedDtcEvent)) return;
         afterRequestFinished(false);
     }
 
     @Subscribe
-    public void  onAnecdoteReceived(OnAnecdoteLoadedEvent event){
-        if(!(event instanceof OnAnecdoteLoadedDtcEvent)) return;
+    public void onAnecdoteReceived(OnAnecdoteLoadedEvent event) {
+        if (!(event instanceof OnAnecdoteLoadedDtcEvent)) return;
         afterRequestFinished(true);
     }
 }

@@ -4,7 +4,7 @@ import android.support.annotation.Nullable;
 
 /**
  * A VDM failed event
- *
+ * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
 public class RequestFailedVdmEvent extends RequestFailedEvent {

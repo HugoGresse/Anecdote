@@ -96,10 +96,10 @@ public class DtcService extends AnecdoteService {
      ***************************/
 
     @Subscribe
-    public void loadNexAnecdoteEvent(LoadNewAnecdoteDtcEvent event){
+    public void loadNexAnecdoteEvent(LoadNewAnecdoteDtcEvent event) {
         int page = 1;
-        int estimatedCurrentPage = event.start/ ITEM_PER_PAGE;
-        if(estimatedCurrentPage >= 1){
+        int estimatedCurrentPage = event.start / ITEM_PER_PAGE;
+        if (estimatedCurrentPage >= 1) {
             page += estimatedCurrentPage;
         }
         // Log.d(TAG, "loadNexAnecdoteEvent start:" + event.start + " page:" + page);
