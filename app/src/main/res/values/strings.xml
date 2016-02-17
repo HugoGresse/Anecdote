@@ -13,10 +13,10 @@
     <string name="about_title">About</string>
 
     <string name="about_made">Made with love by</string>
-    <string name="about_made_person">Hugo Gresse https://twitter.com/HugoGresse</string>
+    <string name="about_made_person">Hugo Gresse http://hugo.gresse.io/</string>
 
-    <string name="using"  translatable="false">Third-party libraries</string>
-    <string name="open_intent_browser">Opening browser...</string>
+    <string name="using" translatable="false">Third-party libraries</string>
+    <string name="open_intent_browser" translatable="false">Opening browser…</string>
     <string-array name="about_libraries"  translatable="false">
         <item>OkHttp by Square http://square.github.io/okhttp/</item>
         <item>Otto by Square http://square.github.io/otto/</item>

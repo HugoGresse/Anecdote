@@ -97,7 +97,7 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
         public void setData(String text) {
             text = authorTextView.getText().toString();
 
-            int lastUrl = text.lastIndexOf("https://");
+            int lastUrl = text.lastIndexOf("http://");
             if (lastUrl == -1) {
                 authorTextView.setText(text);
             } else try {
