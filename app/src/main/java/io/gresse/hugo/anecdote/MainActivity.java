@@ -52,6 +52,7 @@ public class MainActivity extends AppCompatActivity
     public NavigationView mNavigationView;
 
     protected ServiceProvider mServiceProvider;
+    protected boolean mDrawerBackOpen;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +74,7 @@ public class MainActivity extends AppCompatActivity
 
         // Default fragment to DTC
         mNavigationView.setCheckedItem(R.id.nav_dtc);
-        changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), false, false);
+        changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
     }
 
     @Override
@@ -92,13 +93,20 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        Log.d(TAG, "entryCount: " + getFragmentManager().getBackStackEntryCount());
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START) && !mDrawerBackOpen) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            int fragments = getFragmentManager().getBackStackEntryCount();
+            int fragments = getSupportFragmentManager().getBackStackEntryCount();
             if (fragments == 1) {
-                finish();
+                if(!mDrawerBackOpen){
+                    mDrawerBackOpen = true;
+                    mDrawerLayout.openDrawer(GravityCompat.START);
+                    return;
+                } else {
+                    mDrawerBackOpen = false;
+                    finish();
+                }
             }
 
             super.onBackPressed();
@@ -172,7 +180,11 @@ public class MainActivity extends AppCompatActivity
 
                 transaction.commit();
             } else {
-                Log.d(TAG, "Change Fragment: nothing to do");
+                Log.d(TAG, "Change Fragment: nothing to do : " + backStateName);
+//                if(manager.findFragmentByTag(backStateName) != null){
+//                    Log.d(TAG, "Try to remove the backStack");
+//                    manager.popBackStackImmediate();
+//                }
                 // custom effect if fragment is already instanciated
             }
         } catch (IllegalStateException exception) {
@@ -233,6 +245,11 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeTitle(ChangeTitleEvent event){
+        if(event.className.equals(VdmFragment.class.getName())){
+            mNavigationView.setCheckedItem(R.id.nav_vdm);
+        } else if (event.className.equals(DtcFragment.class.getName())){
+            mNavigationView.setCheckedItem(R.id.nav_dtc);
+        }
         mToolbar.setTitle(event.title);
     }
 }

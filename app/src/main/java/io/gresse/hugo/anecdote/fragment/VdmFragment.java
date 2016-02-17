@@ -23,7 +23,7 @@ public class VdmFragment extends AnecdoteFragment {
     @Override
     public void onResume() {
         super.onResume();
-        BusProvider.getInstance().post(new ChangeTitleEvent(getString(R.string.vie_de_merde)));
+        BusProvider.getInstance().post(new ChangeTitleEvent(getString(R.string.vie_de_merde), this.getClass().getName()));
     }
 
     /***************************

@@ -23,7 +23,7 @@ public class DtcFragment extends AnecdoteFragment {
     @Override
     public void onResume() {
         super.onResume();
-        BusProvider.getInstance().post(new ChangeTitleEvent(getString(R.string.dans_ton_chat)));
+        BusProvider.getInstance().post(new ChangeTitleEvent(getString(R.string.dans_ton_chat), this.getClass().getName()));
     }
 
     /***************************

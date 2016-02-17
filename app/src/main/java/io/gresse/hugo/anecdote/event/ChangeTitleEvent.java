@@ -8,8 +8,10 @@ package io.gresse.hugo.anecdote.event;
 public class ChangeTitleEvent implements Event {
 
     public String title;
+    public String className;
 
-    public ChangeTitleEvent(String title) {
+    public ChangeTitleEvent(String title, String className) {
         this.title = title;
+        this.className = className;
     }
 }

@@ -102,7 +102,7 @@ public class DtcService extends AnecdoteService {
         if(estimatedCurrentPage >= 1){
             page += estimatedCurrentPage;
         }
-        Log.d(TAG, "loadNexAnecdoteEvent start:" + event.start + " page:" + page);
+        // Log.d(TAG, "loadNexAnecdoteEvent start:" + event.start + " page:" + page);
         downloadLatest(page);
     }
 

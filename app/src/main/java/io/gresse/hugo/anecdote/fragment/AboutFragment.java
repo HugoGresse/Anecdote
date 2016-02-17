@@ -54,7 +54,7 @@ public class AboutFragment extends Fragment implements AboutAdapter.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
-        BusProvider.getInstance().post(new ChangeTitleEvent(getString(R.string.action_about)));
+        BusProvider.getInstance().post(new ChangeTitleEvent(getString(R.string.action_about), this.getClass().getName()));
     }
 
     @Override
