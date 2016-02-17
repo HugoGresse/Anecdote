@@ -1,5 +1,7 @@
 package io.gresse.hugo.anecdote.fragment;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -9,12 +11,15 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.AnecdoteAdapter;
+import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
 import io.gresse.hugo.anecdote.event.BusProvider;
+import io.gresse.hugo.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 
 /**
@@ -22,7 +27,9 @@ import io.gresse.hugo.anecdote.service.AnecdoteService;
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
-public abstract class AnecdoteFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener {
+public abstract class AnecdoteFragment extends Fragment implements
+        SwipeRefreshLayout.OnRefreshListener,
+        ViewHolderListener {
 
     private static final String TAG = AnecdoteFragment.class.getSimpleName();
 
@@ -34,13 +41,13 @@ public abstract class AnecdoteFragment extends Fragment implements SwipeRefreshL
 
     protected AnecdoteAdapter mAdapter;
     protected AnecdoteService mAnecdoteService;
-    protected boolean             mIsLoadingNewItems;
+    protected boolean         mIsLoadingNewItems;
 
-    private   LinearLayoutManager mLayoutManager;
-    private   int                 mTotalItemCount;
-    private   int                 mLastVisibleItem;
+    private LinearLayoutManager mLayoutManager;
+    private int                 mTotalItemCount;
+    private int                 mLastVisibleItem;
     // TODO: check all loaded
-    private boolean mAllBillLoaded;
+    private boolean             mAllBillLoaded;
 
     // Inflate the view for the fragment based on layout XML
     @Override
@@ -64,7 +71,7 @@ public abstract class AnecdoteFragment extends Fragment implements SwipeRefreshL
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new AnecdoteAdapter();
+        mAdapter = new AnecdoteAdapter(this);
 
         mAdapter.setData(mAnecdoteService.getAnecdotes());
         mRecyclerView.setAdapter(mAdapter);
@@ -110,16 +117,17 @@ public abstract class AnecdoteFragment extends Fragment implements SwipeRefreshL
      *
      * @param dataChanged true if the dataSet has changed, like new Anecdote is here!
      */
-    protected void afterRequestFinished(boolean dataChanged){
+    protected void afterRequestFinished(boolean dataChanged) {
         mIsLoadingNewItems = false;
         mSwipeRefreshLayout.setRefreshing(false);
 
-        if(dataChanged){
+        if (dataChanged) {
             mAdapter.setData(mAnecdoteService.getAnecdotes());
         }
     }
 
     protected abstract AnecdoteService getService();
+
     protected abstract void loadNewAnecdotes(int start);
 
     /***************************
@@ -131,4 +139,16 @@ public abstract class AnecdoteFragment extends Fragment implements SwipeRefreshL
         mAnecdoteService.cleanAnecdotes();
         loadNewAnecdotes(0);
     }
+
+
+    /***************************
+     * Implement ViewHolderListener
+     **************************/
+
+    @Override
+    public void onLongClick(Anecdote anecdote) {
+        Toast.makeText(getActivity(), R.string.open_intent_browser, Toast.LENGTH_SHORT).show();
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(anecdote.permalink)));
+    }
+
 }

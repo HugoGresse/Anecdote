@@ -1,5 +1,6 @@
 package io.gresse.hugo.anecdote.adapter;
 
+import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
@@ -17,7 +18,7 @@ import io.gresse.hugo.anecdote.model.Anecdote;
 
 /**
  * A generic adapters for all anecdotes
- *
+ * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
 public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAnecdoteViewHolder> {
@@ -25,15 +26,18 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
     public static final String TAG = AnecdoteAdapter.class.getSimpleName();
 
     public static final int VIEW_TYPE_CONTENT = 0;
-    public static final int VIEW_TYPE_LOAD = 1;
+    public static final int VIEW_TYPE_LOAD    = 1;
 
-    private List<Anecdote> mAnecdotes;
+    private List<Anecdote>     mAnecdotes;
+    @Nullable
+    private ViewHolderListener mViewHolderListener;
 
-    public AnecdoteAdapter() {
+    public AnecdoteAdapter(@Nullable ViewHolderListener viewHolderListener) {
         mAnecdotes = new ArrayList<>();
+        mViewHolderListener = viewHolderListener;
     }
 
-    public void setData(List<Anecdote> quotes){
+    public void setData(List<Anecdote> quotes) {
         mAnecdotes = quotes;
         notifyDataSetChanged();
     }
@@ -41,7 +45,7 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
     @Override
     public BaseAnecdoteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v;
-        switch (viewType){
+        switch (viewType) {
             default:
             case VIEW_TYPE_CONTENT:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote, parent, false);
@@ -54,7 +58,7 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
 
     @Override
     public void onBindViewHolder(BaseAnecdoteViewHolder holder, int position) {
-        if(position < mAnecdotes.size()){
+        if (position < mAnecdotes.size()) {
             holder.setData(mAnecdotes.get(position));
         }
     }
@@ -66,12 +70,16 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
 
     @Override
     public int getItemViewType(int position) {
-        if(position +1 <= mAnecdotes.size()){
+        if (position + 1 <= mAnecdotes.size()) {
             return VIEW_TYPE_CONTENT;
         } else {
             return VIEW_TYPE_LOAD;
         }
     }
+
+    /***************************
+     * ViewHolder
+     ***************************/
 
     public abstract class BaseAnecdoteViewHolder extends RecyclerView.ViewHolder {
 
@@ -82,7 +90,7 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
         public abstract void setData(Anecdote anecdote);
     }
 
-    public class AnecdoteViewHolder extends BaseAnecdoteViewHolder {
+    public class AnecdoteViewHolder extends BaseAnecdoteViewHolder implements View.OnLongClickListener {
 
         @Bind(R.id.contentTextView)
         TextView textView;
@@ -91,13 +99,24 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
             super(itemView);
 
             ButterKnife.bind(this, itemView);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void setData(Anecdote anecdote) {
             textView.setText(Html.fromHtml(anecdote.content));
         }
+
+        @Override
+        public boolean onLongClick(View v) {
+            if (mViewHolderListener != null) {
+                mViewHolderListener.onLongClick(mAnecdotes.get(getAdapterPosition()));
+                return true;
+            }
+            return false;
+        }
     }
+
     public class LoadViewHolder extends BaseAnecdoteViewHolder {
 
         public LoadViewHolder(View itemView) {

@@ -20,7 +20,7 @@ import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 
 /**
  * About fragment
- *
+ * <p/>
  * Created by Hugo Gresse on 14/02/16.
  */
 public class AboutFragment extends Fragment implements AboutAdapter.OnClickListener {
@@ -33,7 +33,7 @@ public class AboutFragment extends Fragment implements AboutAdapter.OnClickListe
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v =  inflater.inflate(R.layout.fragment_about, container, false);
+        View v = inflater.inflate(R.layout.fragment_about, container, false);
         ButterKnife.bind(this, v);
         return v;
     }
