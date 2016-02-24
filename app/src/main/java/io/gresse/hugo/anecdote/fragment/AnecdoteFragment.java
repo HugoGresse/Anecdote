@@ -1,10 +1,12 @@
 package io.gresse.hugo.anecdote.fragment;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -16,6 +18,7 @@ import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
+import io.gresse.hugo.anecdote.Utils;
 import io.gresse.hugo.anecdote.adapter.AnecdoteAdapter;
 import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
 import io.gresse.hugo.anecdote.event.BusProvider;
@@ -146,9 +149,40 @@ public abstract class AnecdoteFragment extends Fragment implements
      **************************/
 
     @Override
-    public void onLongClick(Anecdote anecdote) {
-        Toast.makeText(getActivity(), R.string.open_intent_browser, Toast.LENGTH_SHORT).show();
-        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(anecdote.permalink)));
+    public void onLongClick(final Anecdote anecdote) {
+        // Open a dialog picker on item long click to choose between Open details, Share or copy the content
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setItems(R.array.anecdote_dialog, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                // The 'which' argument contains the index position
+                // of the selected item
+                switch (which){
+                    // Share
+                    case 0:
+                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                        sharingIntent.setType("text/plain");
+                        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
+                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, anecdote.getPlainTextContent());
+                        startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.anecdote_share_title)));
+                        break;
+                    // Open details
+                    case 1:
+                        Toast.makeText(getActivity(), R.string.open_intent_browser, Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(anecdote.permalink)));
+                        break;
+                    // Copy
+                    case 2:
+                        Toast.makeText(getActivity(), R.string.copied, Toast.LENGTH_SHORT).show();
+                        Utils.copyToClipboard(getActivity(), getString(R.string.app_name), anecdote.getPlainTextContent());
+                        break;
+                    default:
+                        Toast.makeText(getActivity(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
+        builder.show();
     }
 
 }

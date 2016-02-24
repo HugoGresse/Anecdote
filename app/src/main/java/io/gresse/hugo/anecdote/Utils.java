@@ -1,6 +1,8 @@
 package io.gresse.hugo.anecdote;
 
+import android.content.Context;
 import android.os.Build;
+import android.support.annotation.NonNull;
 
 /**
  * Generals utils
@@ -20,6 +22,24 @@ public class Utils {
     public static String getUserAgent() {
         return "Mozilla/5.0 (Linux; Android 5.1; " + Build.MODEL +
                 ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.95 Mobile Safari/537.36";
+    }
+
+    /**
+     * Copy given context to device clipboard
+     *
+     * @param context app context
+     * @param title   title/label of this clipboard
+     * @param content content to be copied
+     */
+    public static void copyToClipboard(@NonNull Context context, String title, String content){
+        if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(content);   // Assuming that you are copying the text from a TextView
+        } else {
+            android.content.ClipboardManager clipboard = (android.content.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            android.content.ClipData clip = android.content.ClipData.newPlainText(title, content);
+            clipboard.setPrimaryClip(clip);
+        }
     }
 
 }

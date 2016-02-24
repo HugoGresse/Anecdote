@@ -19,7 +19,6 @@ Features
 
 TODO
 --------
-- long click should open a dialog to choose between: share, copy content, open in website
 - better network management: auto retry if device connection is recovered, fail message replacing infinit loader on RecyclerView
 - allow changing parsing options on each website, which linked to allow more website to be parsed
 

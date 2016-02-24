@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 *.iml
 .gradle
 /local.properties
@@ -14,3 +13,4 @@
 *.class
 *.log
 captures/
+app/fabric.properties
