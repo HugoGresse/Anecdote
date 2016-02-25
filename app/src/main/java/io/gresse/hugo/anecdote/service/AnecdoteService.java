@@ -3,13 +3,16 @@ package io.gresse.hugo.anecdote.service;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.Event;
+import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import okhttp3.OkHttpClient;
 
 /**
@@ -22,6 +25,7 @@ public abstract class AnecdoteService {
     protected Context        mContext;
     protected OkHttpClient   mOkHttpClient;
     protected List<Anecdote> mAnecdotes;
+    protected List<Event>    mFailEvents;
     protected boolean mEnd = false;
 
     public AnecdoteService(Context context) {
@@ -29,6 +33,7 @@ public abstract class AnecdoteService {
 
         mOkHttpClient = new OkHttpClient();
         mAnecdotes = new ArrayList<>();
+        mFailEvents = new ArrayList<>();
     }
 
     /**
@@ -47,7 +52,31 @@ public abstract class AnecdoteService {
         mAnecdotes.clear();
     }
 
-    public abstract void downloadLatest(int pageNumber);
+    /**
+     * Called by child service
+     *
+     * @param connectivityEvent an event fired when the network connectivity change
+     */
+    public void onConnectivityChangeListener(NetworkConnectivityChangeEvent connectivityEvent) {
+        if(connectivityEvent.state != NetworkConnectivityListener.State.CONNECTED){
+            return;
+        }
+
+        if(!mFailEvents.isEmpty()){
+            for(Event event : mFailEvents){
+                BusProvider.getInstance().post(event);
+            }
+            mFailEvents.clear();
+        }
+    }
+
+    /**
+     * Download the given page and parse it
+     *
+     * @param event      original event
+     * @param pageNumber the page to download
+     */
+    public abstract void downloadLatest(@NonNull Event event, int pageNumber);
 
     /**
      * Post an Event ot UI Thread

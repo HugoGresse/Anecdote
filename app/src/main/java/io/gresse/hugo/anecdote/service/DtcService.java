@@ -1,6 +1,7 @@
 package io.gresse.hugo.anecdote.service;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.squareup.otto.Subscribe;
@@ -12,11 +13,13 @@ import org.jsoup.select.Elements;
 
 import java.io.IOException;
 
-import io.gresse.hugo.anecdote.Utils;
+import io.gresse.hugo.anecdote.event.Event;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteDtcEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedDtcEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedDtcEvent;
+import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.util.Utils;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Request;
@@ -39,7 +42,7 @@ public class DtcService extends AnecdoteService {
     }
 
     @Override
-    public void downloadLatest(final int pageNumber) {
+    public void downloadLatest(@NonNull final Event event, final int pageNumber) {
         Log.d(TAG, "Downloading page " + pageNumber);
         Request request = new Request.Builder()
                 .url(DTC_LATEST + pageNumber + DTC_PAGE_SUFFIX)
@@ -50,6 +53,7 @@ public class DtcService extends AnecdoteService {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
+                mFailEvents.add(event);
                 postOnUiThread(new RequestFailedDtcEvent("Unable to load DTC", e, pageNumber));
             }
 
@@ -103,8 +107,12 @@ public class DtcService extends AnecdoteService {
             page += estimatedCurrentPage;
         }
         // Log.d(TAG, "loadNexAnecdoteEvent start:" + event.start + " page:" + page);
-        downloadLatest(page);
+        downloadLatest(event, page);
     }
 
+    @Subscribe
+    public void onConnectivityChangeListener(NetworkConnectivityChangeEvent connectivityEvent){
+        super.onConnectivityChangeListener(connectivityEvent);
+    }
 
 }

@@ -22,6 +22,11 @@ public class ServiceProvider {
         bus.register(mVdmService);
     }
 
+    public void unregister(Bus bus){
+        bus.unregister(mDtcService);
+        bus.unregister(mVdmService);
+    }
+
     public AnecdoteService getDtcService() {
         return mDtcService;
     }

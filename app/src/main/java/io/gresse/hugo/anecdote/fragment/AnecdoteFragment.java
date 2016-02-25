@@ -18,7 +18,7 @@ import android.widget.Toast;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.Utils;
+import io.gresse.hugo.anecdote.util.Utils;
 import io.gresse.hugo.anecdote.adapter.AnecdoteAdapter;
 import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
 import io.gresse.hugo.anecdote.event.BusProvider;

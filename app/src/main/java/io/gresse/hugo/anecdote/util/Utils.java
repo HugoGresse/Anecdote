@@ -1,4 +1,4 @@
-package io.gresse.hugo.anecdote;
+package io.gresse.hugo.anecdote.util;
 
 import android.content.Context;
 import android.os.Build;

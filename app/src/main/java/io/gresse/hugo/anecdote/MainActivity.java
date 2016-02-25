@@ -29,15 +29,18 @@ import io.gresse.hugo.anecdote.event.Event;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteDtcEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedDtcEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
 import io.gresse.hugo.anecdote.fragment.DtcFragment;
 import io.gresse.hugo.anecdote.fragment.VdmFragment;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.DtcService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
+import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
+
 
 public class MainActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener {
+        implements NavigationView.OnNavigationItemSelectedListener, NetworkConnectivityListener.ConnectivityListener {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
@@ -55,6 +58,7 @@ public class MainActivity extends AppCompatActivity
 
     protected ServiceProvider mServiceProvider;
     protected boolean         mDrawerBackOpen;
+    protected NetworkConnectivityListener mNetworkConnectivityListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +84,9 @@ public class MainActivity extends AppCompatActivity
         // Default fragment to DTC
         mNavigationView.setCheckedItem(R.id.nav_dtc);
         changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
+
+        mNetworkConnectivityListener = new NetworkConnectivityListener();
+        mNetworkConnectivityListener.startListening(this, this);
     }
 
     @Override
@@ -94,6 +101,12 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
 
         BusProvider.getInstance().unregister(this);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mServiceProvider.unregister(BusProvider.getInstance());
     }
 
     @Override
@@ -256,5 +269,15 @@ public class MainActivity extends AppCompatActivity
             mNavigationView.setCheckedItem(R.id.nav_dtc);
         }
         mToolbar.setTitle(event.title);
+    }
+
+    /***************************
+     * Impelemnts NetworkConnectivityListener.ConnectivityListener
+     ***************************/
+
+    @Override
+    public void onConnectivityChange(NetworkConnectivityListener.State state) {
+        Log.d(TAG, "onConnectivityChange: " + state);
+        BusProvider.getInstance().post(new NetworkConnectivityChangeEvent(state));
     }
 }
