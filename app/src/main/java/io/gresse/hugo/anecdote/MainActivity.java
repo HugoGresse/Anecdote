@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity
     protected ServiceProvider             mServiceProvider;
     protected boolean                     mDrawerBackOpen;
     protected NetworkConnectivityListener mNetworkConnectivityListener;
+    protected List<Website>               mWebsites;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,7 +109,6 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        Log.d(TAG, "entryCount: " + getFragmentManager().getBackStackEntryCount());
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START) && !mDrawerBackOpen) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
@@ -150,12 +150,14 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-
-
         switch (item.getGroupId()) {
             case R.id.group_content:
-                // TODO: change fragment
-                // changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
+                for(Website website : mWebsites){
+                    if(website.name.equals(item.getTitle())){
+                        changeAnecdoteFragment(website);
+                        break;
+                    }
+                }
                 break;
             default:
                 Toast.makeText(this, "NavigationGroup not managed", Toast.LENGTH_SHORT).show();
@@ -176,6 +178,10 @@ public class MainActivity extends AppCompatActivity
     private void changeFragment(Fragment frag, boolean saveInBackstack, boolean animate) {
         String backStateName = ((Object) frag).getClass().getName();
 
+        if(frag instanceof AnecdoteFragment){
+            backStateName += frag.getArguments().getString(AnecdoteFragment.ARGS_WEBSITE_NAME);
+        }
+
         try {
             FragmentManager manager = getSupportFragmentManager();
             boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
@@ -191,7 +197,7 @@ public class MainActivity extends AppCompatActivity
                 transaction.replace(R.id.fragment_container, frag, ((Object) frag).getClass().getName());
 
                 if (saveInBackstack) {
-                    Log.d(TAG, "Change Fragment: addToBackTack " + frag.getClass().getName());
+                    Log.d(TAG, "Change Fragment: addToBackTack " + backStateName);
                     transaction.addToBackStack(backStateName);
                 } else {
                     Log.d(TAG, "Change Fragment: NO addToBackTack");
@@ -211,25 +217,35 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    /**
+     * Change the current fragment to a new one displaying given website spec
+     *
+     * @param website the website specification to be displayed in the fragment
+     */
+    private void changeAnecdoteFragment(Website website){
+
+        Fragment fragment = Fragment.instantiate(this, AnecdoteFragment.class.getName());
+        Bundle bundle = new Bundle();
+        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, website.name);
+        fragment.setArguments(bundle);
+        changeFragment(fragment, true, false);
+    }
+
     private void setupServices() {
         // Setup NavigationView
         Menu navigationViewMenu = mNavigationView.getMenu();
 
-        List<Website> websites = SharedPreferencesStorage.getContentProvider(this);
-        for (Website website : websites) {
+        mWebsites = SharedPreferencesStorage.getContentProvider(this);
+        for (Website website : mWebsites) {
             navigationViewMenu.add(R.id.group_content, Menu.NONE, Menu.NONE, website.name);
         }
 
-        mServiceProvider = new ServiceProvider(websites);
+        mServiceProvider = new ServiceProvider(mWebsites);
         mServiceProvider.register(this, BusProvider.getInstance());
 
-        // TODO : finish checkedItem
-        // mNavigationView.setCheckedItem(R.id.nav_dtc);
-        Fragment fragment = Fragment.instantiate(this, AnecdoteFragment.class.getName());
-        Bundle bundle = new Bundle();
-        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, websites.get(0).name);
-        fragment.setArguments(bundle);
-        changeFragment(fragment, true, false);
+        mNavigationView.getMenu().getItem(0).setChecked(true);
+        mNavigationView.getMenu().setGroupCheckable(R.id.group_content, true, true);
+        changeAnecdoteFragment(mWebsites.get(0));
     }
 
     /**
@@ -260,7 +276,7 @@ public class MainActivity extends AppCompatActivity
                     @Override
                     public void onClick(View v) {
                         AnecdoteService service = MainActivity.this.getAnecdoteService(event.websiteName);
-                        if(service != null){
+                        if (service != null) {
                             service.retryFailedEvent();
                         }
                     }
@@ -271,7 +287,15 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeTitle(ChangeTitleEvent event) {
-        // TODO : set checked item
+        if(event.className.equals(AnecdoteFragment.class.getName())){
+            for(int i = 0; i < mWebsites.size(); i++){
+                if(mWebsites.get(i).name.equals(event.title)){
+                    Log.d(TAG, "setChecked : " + i);
+                    mNavigationView.getMenu().getItem(i).setChecked(true);
+                    break;
+                }
+            }
+        }
 //        if (event.className.equals(VdmFragment.class.getName())) {
 //            mNavigationView.setCheckedItem(R.id.nav_vdm);
 //        } else if (event.className.equals(DtcFragment.class.getName())) {
