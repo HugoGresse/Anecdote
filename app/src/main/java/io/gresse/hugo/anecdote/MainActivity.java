@@ -140,7 +140,6 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_about:
-
                 changeFragment(Fragment.instantiate(this, AboutFragment.class.getName()), true, false);
                 return true;
             default:
@@ -290,17 +289,11 @@ public class MainActivity extends AppCompatActivity
         if(event.className.equals(AnecdoteFragment.class.getName())){
             for(int i = 0; i < mWebsites.size(); i++){
                 if(mWebsites.get(i).name.equals(event.title)){
-                    Log.d(TAG, "setChecked : " + i);
                     mNavigationView.getMenu().getItem(i).setChecked(true);
                     break;
                 }
             }
         }
-//        if (event.className.equals(VdmFragment.class.getName())) {
-//            mNavigationView.setCheckedItem(R.id.nav_vdm);
-//        } else if (event.className.equals(DtcFragment.class.getName())) {
-//            mNavigationView.setCheckedItem(R.id.nav_dtc);
-//        }
         mToolbar.setTitle(event.title);
     }
 

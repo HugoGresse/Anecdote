@@ -46,26 +46,30 @@ public class SharedPreferencesStorage {
         Website website = new Website(
                 "Dans ton chat",
                 "http://danstonchat.com/latest/",
-                "http://danstonchat.com/latest/",
                 "div > div > div > p > a",
                 ".html",
                 25,
                 false
         );
-        website.replaceMap.put("<span class=\"decoration\">", "<b>");
-        website.replaceMap.put("</span>", "</b>");
+        website.replaceContentMap.put("<span class=\"decoration\">", "<b>");
+        website.replaceContentMap.put("</span>", "</b>");
+        website.urlAttribute = "href";
 
         websites.add(website);
 
         website = new Website(
                 "Vie de merde",
                 "http://m.viedemerde.fr/?page=",
-                "http://m.viedemerde.fr/",
                 "ul.content > li",
                 "",
                 13,
                 true
         );
+
+        website.contentSelector = "p.text";
+        website.urlPrefix = "http://m.viedemerde.fr/";
+        website.urlAttribute = "id";
+        website.replaceUrlMap.put("fml-", "");
 
         websites.add(website);
         return new Gson().toJson(websites);

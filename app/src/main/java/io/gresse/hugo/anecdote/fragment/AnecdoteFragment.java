@@ -42,7 +42,7 @@ public class AnecdoteFragment extends Fragment implements
         ViewHolderListener {
 
     private static final String TAG               = AnecdoteFragment.class.getSimpleName();
-    public static final String  ARGS_WEBSITE_NAME = "key_website_name";
+    public static final  String ARGS_WEBSITE_NAME = "key_website_name";
 
     @Bind(R.id.swipeRefreshLayout)
     public SwipeRefreshLayout mSwipeRefreshLayout;
@@ -84,7 +84,7 @@ public class AnecdoteFragment extends Fragment implements
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mAnecdoteService = ((MainActivity) getActivity()).getAnecdoteService(mWebsiteName);
 
-        if(mAnecdoteService == null){
+        if (mAnecdoteService == null) {
             Log.e(TAG, "Unable to get an AnecdoteService");
             return;
         }
@@ -182,8 +182,15 @@ public class AnecdoteFragment extends Fragment implements
                     case 0:
                         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                         sharingIntent.setType("text/plain");
-                        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Subject Here");
-                        sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, anecdote.getPlainTextContent());
+
+                        sharingIntent.putExtra(
+                                android.content.Intent.EXTRA_SUBJECT,
+                                getString(R.string.app_name));
+
+                        sharingIntent.putExtra(
+                                android.content.Intent.EXTRA_TEXT,
+                                anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
+
                         startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.anecdote_share_title)));
                         break;
                     // Open details
@@ -194,7 +201,10 @@ public class AnecdoteFragment extends Fragment implements
                     // Copy
                     case 2:
                         Toast.makeText(getActivity(), R.string.copied, Toast.LENGTH_SHORT).show();
-                        Utils.copyToClipboard(getActivity(), getString(R.string.app_name), anecdote.getPlainTextContent());
+                        Utils.copyToClipboard(
+                                getActivity(),
+                                getString(R.string.app_name),
+                                anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
                         break;
                     default:
                         Toast.makeText(getActivity(), R.string.not_implemented, Toast.LENGTH_SHORT).show();

@@ -9,8 +9,7 @@
     <string name="copied">Copied to clipboard</string>
     <string name="not_implemented">Not implemented</string>
 
-    <string name="dans_ton_chat">Dans ton chat</string>
-    <string name="vie_de_merde">Vie de merde</string>
+    <string name="app_share_credits"> - via Anecdote http://bit.ly/anecdoteapp </string>
 
     <string name="anecdote_share_title">Share using</string>
     <string-array name="anecdote_dialog"  translatable="false">

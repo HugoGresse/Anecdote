@@ -79,7 +79,7 @@ public class AnecdoteService {
     /**
      * Retry to send failed event
      */
-    public void retryFailedEvent(){
+    public void retryFailedEvent() {
         if (!mFailEvents.isEmpty()) {
             for (Event event : mFailEvents) {
                 BusProvider.getInstance().post(event);
@@ -97,7 +97,7 @@ public class AnecdoteService {
     private void downloadLatest(@NonNull final Event event, final int pageNumber) {
         Log.d(mServiceName, "Downloading page " + pageNumber);
         Request request = new Request.Builder()
-                .url(   mWebsite.pageUrl +
+                .url(mWebsite.pageUrl +
                         ((mWebsite.isFirstPageZero) ? pageNumber - 1 : pageNumber) +
                         mWebsite.pageSuffix)
                 .header("User-Agent", Utils.getUserAgent())
@@ -129,27 +129,61 @@ public class AnecdoteService {
             return;
         }
 
-        final Elements elements = document.select(mWebsite.contentSelector);
+        final Elements elements = document.select(mWebsite.itemSelector);
 
         if (elements != null && !elements.isEmpty()) {
-            String content;
-            String url;
+            Element tempElement;
+            String content = "";
+            String url = "";
 
             for (Element element : elements) {
-                content = element
-                        .html();
-                if(TextUtils.isEmpty(mWebsite.urlSelector)){
-                    url = element.attr("href");
+
+
+                /////////////////////////
+                // Step 1: create content
+                if (TextUtils.isEmpty(mWebsite.contentSelector)) {
+                    tempElement = element;
                 } else {
-                    url = element.select(mWebsite.urlSelector).html();
+                    tempElement = element.select(mWebsite.contentSelector).get(0);
                 }
 
-                // Replacement if the rempalceMap is not empty
-                for(Map.Entry<String, String> entry : mWebsite.replaceMap.entrySet()) {
+                if(tempElement != null){
+                    if (TextUtils.isEmpty(mWebsite.contentAttribute)) {
+                        content = tempElement.html();
+                    } else {
+                        content = tempElement.attr(mWebsite.contentAttribute);
+                    }
+                }
+
+                // Replacement if the replaceContentMap is not empty
+                for (Map.Entry<String, String> entry : mWebsite.replaceContentMap.entrySet()) {
                     content = content.replaceAll(entry.getKey(), entry.getValue());
                 }
 
+                ////////////////////////
+                // Step 2: create url
+
+                if (TextUtils.isEmpty(mWebsite.urlSelector)) {
+                    tempElement = element;
+                } else {
+                    tempElement = element.select(mWebsite.urlSelector).get(0);
+                }
+
+                if(tempElement != null){
+                    if (TextUtils.isEmpty(mWebsite.urlAttribute)) {
+                        url = tempElement.html();
+                    } else {
+                        url = tempElement.attr(mWebsite.urlAttribute);
+                    }
+                }
+
+                ////////////////////////
+                // Step 3: create the anecdote
                 mAnecdotes.add(new Anecdote(content, url));
+
+                // reset var
+                content = "";
+                url = "";
             }
 
             postOnUiThread(new OnAnecdoteLoadedEvent(mWebsite.name, elements.size(), pageNumber));
