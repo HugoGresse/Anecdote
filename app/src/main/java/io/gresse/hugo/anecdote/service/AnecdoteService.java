@@ -141,44 +141,65 @@ public class AnecdoteService {
 
                 /////////////////////////
                 // Step 1: create content
-                if (TextUtils.isEmpty(mWebsite.contentSelector)) {
-                    tempElement = element;
-                } else {
-                    tempElement = element.select(mWebsite.contentSelector).get(0);
+
+                if (!TextUtils.isEmpty(mWebsite.contentItem.prefix)) {
+                    content = mWebsite.contentItem.prefix;
                 }
 
-                if(tempElement != null){
-                    if (TextUtils.isEmpty(mWebsite.contentAttribute)) {
+                if (TextUtils.isEmpty(mWebsite.contentItem.selector)) {
+                    tempElement = element;
+                } else {
+                    tempElement = element.select(mWebsite.contentItem.selector).get(0);
+                }
+
+                if (tempElement != null) {
+                    if (TextUtils.isEmpty(mWebsite.contentItem.attribute)) {
                         content = tempElement.html();
                     } else {
-                        content = tempElement.attr(mWebsite.contentAttribute);
+                        content = tempElement.attr(mWebsite.contentItem.attribute);
                     }
                 }
 
-                // Replacement if the replaceContentMap is not empty
-                for (Map.Entry<String, String> entry : mWebsite.replaceContentMap.entrySet()) {
+                if (!TextUtils.isEmpty(mWebsite.contentItem.suffix)) {
+                    content += mWebsite.contentItem.suffix;
+                }
+
+                for (Map.Entry<String, String> entry : mWebsite.contentItem.replaceMap.entrySet()) {
                     content = content.replaceAll(entry.getKey(), entry.getValue());
                 }
 
                 ////////////////////////
                 // Step 2: create url
 
-                if (TextUtils.isEmpty(mWebsite.urlSelector)) {
-                    tempElement = element;
-                } else {
-                    tempElement = element.select(mWebsite.urlSelector).get(0);
+                if (!TextUtils.isEmpty(mWebsite.urlItem.prefix)) {
+                    url = mWebsite.urlItem.prefix;
                 }
 
-                if(tempElement != null){
-                    if (TextUtils.isEmpty(mWebsite.urlAttribute)) {
-                        url = tempElement.html();
+                if (TextUtils.isEmpty(mWebsite.urlItem.selector)) {
+                    tempElement = element;
+                } else {
+                    tempElement = element.select(mWebsite.urlItem.selector).get(0);
+                }
+
+                if (tempElement != null) {
+                    if (TextUtils.isEmpty(mWebsite.urlItem.attribute)) {
+                        url += tempElement.html();
                     } else {
-                        url = tempElement.attr(mWebsite.urlAttribute);
+                        url += tempElement.attr(mWebsite.urlItem.attribute);
                     }
+                }
+
+                if (!TextUtils.isEmpty(mWebsite.urlItem.suffix)) {
+                    url += mWebsite.urlItem.suffix;
+                }
+
+                for (Map.Entry<String, String> entry : mWebsite.urlItem.replaceMap.entrySet()) {
+                    url = url.replaceAll(entry.getKey(), entry.getValue());
                 }
 
                 ////////////////////////
                 // Step 3: create the anecdote
+
                 mAnecdotes.add(new Anecdote(content, url));
 
                 // reset var

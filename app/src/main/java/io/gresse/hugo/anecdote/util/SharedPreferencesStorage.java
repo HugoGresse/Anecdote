@@ -1,4 +1,4 @@
-package io.gresse.hugo.anecdote.model;
+package io.gresse.hugo.anecdote.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,6 +9,8 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.gresse.hugo.anecdote.model.Website;
 
 /**
  * Utility class to store stuff in sharedPreferences
@@ -51,9 +53,10 @@ public class SharedPreferencesStorage {
                 25,
                 false
         );
-        website.replaceContentMap.put("<span class=\"decoration\">", "<b>");
-        website.replaceContentMap.put("</span>", "</b>");
-        website.urlAttribute = "href";
+
+        website.contentItem.replaceMap.put("<span class=\"decoration\">", "<b>");
+        website.contentItem.replaceMap.put("</span>", "</b>");
+        website.urlItem.attribute = "href";
 
         websites.add(website);
 
@@ -66,10 +69,11 @@ public class SharedPreferencesStorage {
                 true
         );
 
-        website.contentSelector = "p.text";
-        website.urlPrefix = "http://m.viedemerde.fr/";
-        website.urlAttribute = "id";
-        website.replaceUrlMap.put("fml-", "");
+
+        website.contentItem.selector = "p.text";
+        website.urlItem.prefix = "http://m.viedemerde.fr/";
+        website.urlItem.attribute = "id";
+        website.urlItem.replaceMap.put("fml-", "");
 
         websites.add(website);
         return new Gson().toJson(websites);
