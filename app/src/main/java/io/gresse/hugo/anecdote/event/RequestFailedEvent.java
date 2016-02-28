@@ -7,7 +7,7 @@ import android.support.annotation.Nullable;
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
-public abstract class RequestFailedEvent implements Event {
+public class RequestFailedEvent extends AnecdoteEvent {
 
     public String    message;
     @Nullable
@@ -15,11 +15,10 @@ public abstract class RequestFailedEvent implements Event {
 
     public int pageNumber;
 
-    public RequestFailedEvent(String message, @Nullable Exception exception, int pageNumber) {
+    public RequestFailedEvent(String websiteName, String message, @Nullable  Exception exception, int pageNumber) {
+        super(websiteName);
         this.message = message;
         this.exception = exception;
         this.pageNumber = pageNumber;
     }
-
-
 }

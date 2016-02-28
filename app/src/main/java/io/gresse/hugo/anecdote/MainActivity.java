@@ -1,6 +1,7 @@
 package io.gresse.hugo.anecdote;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -16,25 +17,25 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.squareup.otto.Subscribe;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.fabric.sdk.android.Fabric;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
-import io.gresse.hugo.anecdote.event.Event;
-import io.gresse.hugo.anecdote.event.LoadNewAnecdoteDtcEvent;
-import io.gresse.hugo.anecdote.event.RequestFailedDtcEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
-import io.gresse.hugo.anecdote.fragment.DtcFragment;
-import io.gresse.hugo.anecdote.fragment.VdmFragment;
+import io.gresse.hugo.anecdote.fragment.AnecdoteFragment;
+import io.gresse.hugo.anecdote.model.SharedPreferencesStorage;
+import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
-import io.gresse.hugo.anecdote.service.DtcService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 
@@ -56,14 +57,14 @@ public class MainActivity extends AppCompatActivity
     @Bind(R.id.nav_view)
     public NavigationView mNavigationView;
 
-    protected ServiceProvider mServiceProvider;
-    protected boolean         mDrawerBackOpen;
+    protected ServiceProvider             mServiceProvider;
+    protected boolean                     mDrawerBackOpen;
     protected NetworkConnectivityListener mNetworkConnectivityListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(!BuildConfig.DEBUG){
+        if (!BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());
         }
         setContentView(R.layout.activity_main);
@@ -78,12 +79,7 @@ public class MainActivity extends AppCompatActivity
 
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        mServiceProvider = new ServiceProvider();
-        mServiceProvider.register(this, BusProvider.getInstance());
-
-        // Default fragment to DTC
-        mNavigationView.setCheckedItem(R.id.nav_dtc);
-        changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
+        setupServices();
 
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.startListening(this, this);
@@ -107,6 +103,7 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         mServiceProvider.unregister(BusProvider.getInstance());
+        mNetworkConnectivityListener.stopListening();
     }
 
     @Override
@@ -124,6 +121,7 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     mDrawerBackOpen = false;
                     finish();
+                    return;
                 }
             }
 
@@ -152,12 +150,15 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_dtc:
-                changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
+
+
+        switch (item.getGroupId()) {
+            case R.id.group_content:
+                // TODO: change fragment
+                // changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
                 break;
-            case R.id.nav_vdm:
-                changeFragment(Fragment.instantiate(this, VdmFragment.class.getName()), true, false);
+            default:
+                Toast.makeText(this, "NavigationGroup not managed", Toast.LENGTH_SHORT).show();
                 break;
         }
 
@@ -210,22 +211,36 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /**
-     * Get the DTC Service to be used by fragments
-     *
-     * @return the DTC Service
-     */
-    public AnecdoteService getDtcService() {
-        return mServiceProvider.getDtcService();
+    private void setupServices() {
+        // Setup NavigationView
+        Menu navigationViewMenu = mNavigationView.getMenu();
+
+        List<Website> websites = SharedPreferencesStorage.getContentProvider(this);
+        for (Website website : websites) {
+            navigationViewMenu.add(R.id.group_content, Menu.NONE, Menu.NONE, website.name);
+        }
+
+        mServiceProvider = new ServiceProvider(websites);
+        mServiceProvider.register(this, BusProvider.getInstance());
+
+        // TODO : finish checkedItem
+        // mNavigationView.setCheckedItem(R.id.nav_dtc);
+        Fragment fragment = Fragment.instantiate(this, AnecdoteFragment.class.getName());
+        Bundle bundle = new Bundle();
+        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, websites.get(0).name);
+        fragment.setArguments(bundle);
+        changeFragment(fragment, true, false);
     }
 
     /**
-     * Get the VDM Service to be used by fragments
+     * Get the anecdote Service corresponding to the given name
      *
-     * @return the VDM Service
+     * @param serviceName the service to get
+     * @return an anecdote Service, if one is find
      */
-    public AnecdoteService getVdmService() {
-        return mServiceProvider.getVdmService();
+    @Nullable
+    public AnecdoteService getAnecdoteService(String serviceName) {
+        return mServiceProvider.getAnecdoteService(serviceName);
     }
 
     /***************************
@@ -244,17 +259,10 @@ public class MainActivity extends AppCompatActivity
 
                     @Override
                     public void onClick(View v) {
-                        if (event instanceof RequestFailedDtcEvent) {
-                            Event eventToSend;
-                            if (event.pageNumber <= 1) {
-                                eventToSend = new LoadNewAnecdoteDtcEvent(0);
-                            } else {
-                                eventToSend = new LoadNewAnecdoteDtcEvent(event.pageNumber * DtcService.ITEM_PER_PAGE);
-                            }
-
-                            BusProvider.getInstance().post(eventToSend);
+                        AnecdoteService service = MainActivity.this.getAnecdoteService(event.websiteName);
+                        if(service != null){
+                            service.retryFailedEvent();
                         }
-
                     }
 
                 })
@@ -263,11 +271,12 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeTitle(ChangeTitleEvent event) {
-        if (event.className.equals(VdmFragment.class.getName())) {
-            mNavigationView.setCheckedItem(R.id.nav_vdm);
-        } else if (event.className.equals(DtcFragment.class.getName())) {
-            mNavigationView.setCheckedItem(R.id.nav_dtc);
-        }
+        // TODO : set checked item
+//        if (event.className.equals(VdmFragment.class.getName())) {
+//            mNavigationView.setCheckedItem(R.id.nav_vdm);
+//        } else if (event.className.equals(DtcFragment.class.getName())) {
+//            mNavigationView.setCheckedItem(R.id.nav_dtc);
+//        }
         mToolbar.setTitle(event.title);
     }
 

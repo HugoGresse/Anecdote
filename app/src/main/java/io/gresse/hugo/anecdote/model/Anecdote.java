@@ -27,6 +27,25 @@ public class Anecdote {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Anecdote anecdote = (Anecdote) o;
+
+        return content.equals(anecdote.content) && (permalink != null ?
+                permalink.equals(anecdote.permalink) : anecdote.permalink == null);
+
+    }
+
+    @Override
+    public int hashCode() {
+        int result = content.hashCode();
+        result = 31 * result + (permalink != null ? permalink.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public String toString() {
         return "DtcQuote{" +
                 "content='" + content + '\'' +

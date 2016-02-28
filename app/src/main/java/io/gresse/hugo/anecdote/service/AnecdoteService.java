@@ -4,32 +4,56 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
+import android.util.Log;
 
+import com.squareup.otto.Subscribe;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.Event;
+import io.gresse.hugo.anecdote.event.LoadNewAnecdoteEvent;
+import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
+import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
+import io.gresse.hugo.anecdote.util.Utils;
+import okhttp3.Call;
+import okhttp3.Callback;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 /**
- * A base service for all that will load anecdote
+ * A generic service for all that will load anecdote
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
-public abstract class AnecdoteService {
+public class AnecdoteService {
 
     protected Context        mContext;
     protected OkHttpClient   mOkHttpClient;
+    protected String         mServiceName;
+    protected Website        mWebsite;
     protected List<Anecdote> mAnecdotes;
     protected List<Event>    mFailEvents;
     protected boolean mEnd = false;
 
-    public AnecdoteService(Context context) {
+    public AnecdoteService(Context context, Website website) {
         mContext = context;
+        mWebsite = website;
+        mServiceName = mWebsite.name + AnecdoteService.class.getSimpleName();
 
         mOkHttpClient = new OkHttpClient();
         mAnecdotes = new ArrayList<>();
@@ -53,17 +77,11 @@ public abstract class AnecdoteService {
     }
 
     /**
-     * Called by child service
-     *
-     * @param connectivityEvent an event fired when the network connectivity change
+     * Retry to send failed event
      */
-    public void onConnectivityChangeListener(NetworkConnectivityChangeEvent connectivityEvent) {
-        if(connectivityEvent.state != NetworkConnectivityListener.State.CONNECTED){
-            return;
-        }
-
-        if(!mFailEvents.isEmpty()){
-            for(Event event : mFailEvents){
+    public void retryFailedEvent(){
+        if (!mFailEvents.isEmpty()) {
+            for (Event event : mFailEvents) {
                 BusProvider.getInstance().post(event);
             }
             mFailEvents.clear();
@@ -76,7 +94,70 @@ public abstract class AnecdoteService {
      * @param event      original event
      * @param pageNumber the page to download
      */
-    public abstract void downloadLatest(@NonNull Event event, int pageNumber);
+    private void downloadLatest(@NonNull final Event event, final int pageNumber) {
+        Log.d(mServiceName, "Downloading page " + pageNumber);
+        Request request = new Request.Builder()
+                .url(   mWebsite.pageUrl +
+                        ((mWebsite.isFirstPageZero) ? pageNumber - 1 : pageNumber) +
+                        mWebsite.pageSuffix)
+                .header("User-Agent", Utils.getUserAgent())
+                .build();
+
+        mOkHttpClient.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+                mFailEvents.add(event);
+                postOnUiThread(new RequestFailedEvent(mWebsite.name, "Unable to load " + mWebsite.name, e, pageNumber));
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                // We are not on main thread
+                processResponse(pageNumber, response);
+            }
+        });
+    }
+
+
+    private void processResponse(final int pageNumber, Response response) {
+        Document document;
+        try {
+            document = Jsoup.parse(response.body().string());
+        } catch (IOException e) {
+            postOnUiThread(new RequestFailedEvent(mWebsite.name, "Unable to parse " + mWebsite.name + " website", null, pageNumber));
+            return;
+        }
+
+        final Elements elements = document.select(mWebsite.contentSelector);
+
+        if (elements != null && !elements.isEmpty()) {
+            String content;
+            String url;
+
+            for (Element element : elements) {
+                content = element
+                        .html();
+                if(TextUtils.isEmpty(mWebsite.urlSelector)){
+                    url = element.attr("href");
+                } else {
+                    url = element.select(mWebsite.urlSelector).html();
+                }
+
+                // Replacement if the rempalceMap is not empty
+                for(Map.Entry<String, String> entry : mWebsite.replaceMap.entrySet()) {
+                    content = content.replaceAll(entry.getKey(), entry.getValue());
+                }
+
+                mAnecdotes.add(new Anecdote(content, url));
+            }
+
+            postOnUiThread(new OnAnecdoteLoadedEvent(mWebsite.name, elements.size(), pageNumber));
+        } else {
+            Log.d(mServiceName, "No more elements from this");
+            mEnd = true;
+        }
+    }
 
     /**
      * Post an Event ot UI Thread
@@ -90,5 +171,36 @@ public abstract class AnecdoteService {
                 BusProvider.getInstance().post(event);
             }
         });
+    }
+
+    /***************************
+     * Event
+     ***************************/
+
+    @Subscribe
+    public void loadNexAnecdoteEvent(LoadNewAnecdoteEvent event) {
+        if (!(event.websiteName.equals(mWebsite.name))) return;
+
+        int page = 1;
+        int estimatedCurrentPage = event.start / mWebsite.itemPerPage;
+        if (estimatedCurrentPage >= 1) {
+            page += estimatedCurrentPage;
+        }
+        // Log.d(TAG, "loadNexAnecdoteEvent start:" + event.start + " page:" + page);
+        downloadLatest(event, page);
+    }
+
+
+    /**
+     * Called by child service
+     *
+     * @param connectivityEvent an event fired when the network connectivity change
+     */
+    @Subscribe
+    public void onConnectivityChangeListener(NetworkConnectivityChangeEvent connectivityEvent) {
+        if (connectivityEvent.state != NetworkConnectivityListener.State.CONNECTED) {
+            return;
+        }
+        retryFailedEvent();
     }
 }
