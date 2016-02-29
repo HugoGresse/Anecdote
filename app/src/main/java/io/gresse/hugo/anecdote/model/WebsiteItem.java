@@ -10,7 +10,7 @@ import java.util.Map;
  *
  * Created by Hugo Gresse on 28/02/16.
  */
-public class ScrapItem {
+public class WebsiteItem {
 
     /**
      * The DOM selector to fetch the item
@@ -42,7 +42,7 @@ public class ScrapItem {
      */
     public Map<String, String> replaceMap;
 
-    public ScrapItem() {
+    public WebsiteItem() {
         replaceMap = new HashMap<>();
     }
 }

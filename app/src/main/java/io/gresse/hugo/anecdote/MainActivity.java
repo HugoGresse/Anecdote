@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -17,6 +18,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -38,6 +40,7 @@ import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
+import io.gresse.hugo.anecdote.util.WebsiteDialogFragment;
 
 
 public class MainActivity extends AppCompatActivity
@@ -235,8 +238,22 @@ public class MainActivity extends AppCompatActivity
         Menu navigationViewMenu = mNavigationView.getMenu();
 
         mWebsites = SharedPreferencesStorage.getContentProvider(this);
-        for (Website website : mWebsites) {
-            navigationViewMenu.add(R.id.group_content, Menu.NONE, Menu.NONE, website.name);
+        for (final Website website : mWebsites) {
+            ImageButton imageButton = (ImageButton) navigationViewMenu
+                    .add(R.id.group_content, Menu.NONE, Menu.NONE, website.name)
+                    .setActionView(R.layout.navigationview_actionlayout)
+                    .getActionView();
+
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    FragmentManager fm = getSupportFragmentManager();
+                    DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(website);
+                    dialogFragment.show(fm, website.name + dialogFragment.getClass().getSimpleName());
+
+                }
+            });
         }
 
         mServiceProvider = new ServiceProvider(mWebsites);

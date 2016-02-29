@@ -7,17 +7,21 @@ package io.gresse.hugo.anecdote.model;
  */
 public class Website {
 
-    public String    name;
-    public String    pageUrl;
-    public String    itemSelector;
-    public String    pageSuffix;
-    public ScrapItem contentItem;
-    public ScrapItem urlItem;
-    public int       itemPerPage;
-    public boolean   isFirstPageZero;
+    public String      name;
+    public String      pageUrl;
+    public String      itemSelector;
+    public String      pageSuffix;
+    public WebsiteItem contentItem;
+    public WebsiteItem urlItem;
+    public int         itemPerPage;
+    public boolean     isFirstPageZero;
+    public int         color;
 
     // Advanced settings
 
+
+    public Website() {
+    }
 
     public Website(String name,
                    String pageUrl,
@@ -31,7 +35,7 @@ public class Website {
         this.pageSuffix = pageSuffix;
         this.itemPerPage = itemPerPage;
         this.isFirstPageZero = isFirstPageZero;
-        this.contentItem = new ScrapItem();
-        this.urlItem = new ScrapItem();
+        this.contentItem = new WebsiteItem();
+        this.urlItem = new WebsiteItem();
     }
 }
