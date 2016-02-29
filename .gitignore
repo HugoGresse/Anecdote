@@ -14,3 +14,4 @@
 *.log
 captures/
 app/fabric.properties
+signing.properties
