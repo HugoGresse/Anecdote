@@ -7,4 +7,11 @@ android:
     - extra-google-m2repository
     - extra-android-m2repository
     - addon-google_apis-google-19
-    - sys-img-armeabi-v7a-android-23
+    # - sys-img-armeabi-v7a-android-23
+
+script: ./gradlew build
+
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -y python2.7
+after_success: ./scripts/travis_upload_release_to_github.py
