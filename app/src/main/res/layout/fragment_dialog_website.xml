@@ -20,7 +20,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/nameEditText"
             android:inputType="textAutoCorrect"
-            android:hint="The website name"/>
+            android:hint="Website name"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -34,7 +34,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/urlEditText"
             android:inputType="textUri"
-            android:hint="The website url"/>
+            android:hint="Website url"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -48,7 +48,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/urlSuffixEditText"
             android:inputType="text"
-            android:hint="Additional text to add after the page number"/>
+            android:hint="(optional) Page number suffix"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -62,7 +62,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/selectorEditText"
             android:inputType="text"
-            android:hint="DOM selector of the content"/>
+            android:hint="DOM selector"/>
 
     </android.support.design.widget.TextInputLayout>
 
@@ -90,19 +90,19 @@
             android:layout_height="wrap_content"
             android:id="@+id/firstPageZeroSwitchCompat"
             android:inputType="text"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
             android:hint="If the first page number is 0"/>
 
     </android.support.design.widget.TextInputLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <Button
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
-
-
-
-    </LinearLayout>
-
+        android:id="@+id/saveButton"
+        android:text="@string/dialog_website_save"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:layout_gravity="right"
+        style="?attr/borderlessButtonStyle"/>
 
 
 </LinearLayout>

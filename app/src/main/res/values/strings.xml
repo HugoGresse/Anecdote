@@ -24,6 +24,14 @@
     <string name="using" translatable="false">Third-party libraries</string>
     <string name="open_intent_browser" translatable="false">Opening browser…</string>
     <string name="edit_website_setting">Edit website setting</string>
+    <string name="dialog_website_new_title">New website</string>
+    <string name="dialog_website_edit_title">Edit</string>
+    <string name="dialog_website_add">Add</string>
+    <string name="dialog_website_error_itemperpage">The item per page must be more than 0</string>
+    <string name="dialog_website_error_name">Don\'t you want to add a name?</string>
+    <string name="dialog_website_error_url">Missing website url :(</string>
+    <string name="dialog_website_error_selector">Missing content selector</string>
+    <string name="dialog_website_save">Save</string>
     <string-array name="about_libraries"  translatable="false">
         <item>OkHttp by Square http://square.github.io/okhttp/</item>
         <item>Otto by Square http://square.github.io/otto/</item>

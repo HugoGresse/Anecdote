@@ -32,6 +32,7 @@ import io.fabric.sdk.android.Fabric;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
 import io.gresse.hugo.anecdote.fragment.AnecdoteFragment;
@@ -40,7 +41,7 @@ import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
-import io.gresse.hugo.anecdote.util.WebsiteDialogFragment;
+import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
 
 
 public class MainActivity extends AppCompatActivity
@@ -83,6 +84,7 @@ public class MainActivity extends AppCompatActivity
 
         mNavigationView.setNavigationItemSelectedListener(this);
 
+        populateNavigationView();
         setupServices();
 
         mNetworkConnectivityListener = new NetworkConnectivityListener();
@@ -234,10 +236,23 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setupServices() {
+        if(mServiceProvider != null){
+            mServiceProvider.unregister(BusProvider.getInstance());
+        }
+        mServiceProvider = new ServiceProvider(mWebsites);
+        mServiceProvider.register(this, BusProvider.getInstance());
+
+        mNavigationView.getMenu().getItem(0).setChecked(true);
+        mNavigationView.getMenu().setGroupCheckable(R.id.group_content, true, true);
+        changeAnecdoteFragment(mWebsites.get(0));
+    }
+
+    private void populateNavigationView(){
         // Setup NavigationView
         Menu navigationViewMenu = mNavigationView.getMenu();
+        navigationViewMenu.clear();
 
-        mWebsites = SharedPreferencesStorage.getContentProvider(this);
+        mWebsites = SharedPreferencesStorage.getWebsites(this);
         for (final Website website : mWebsites) {
             ImageButton imageButton = (ImageButton) navigationViewMenu
                     .add(R.id.group_content, Menu.NONE, Menu.NONE, website.name)
@@ -255,13 +270,6 @@ public class MainActivity extends AppCompatActivity
                 }
             });
         }
-
-        mServiceProvider = new ServiceProvider(mWebsites);
-        mServiceProvider.register(this, BusProvider.getInstance());
-
-        mNavigationView.getMenu().getItem(0).setChecked(true);
-        mNavigationView.getMenu().setGroupCheckable(R.id.group_content, true, true);
-        changeAnecdoteFragment(mWebsites.get(0));
     }
 
     /**
@@ -314,8 +322,14 @@ public class MainActivity extends AppCompatActivity
         mToolbar.setTitle(event.title);
     }
 
+    @Subscribe
+    public void onWebsitesChangeEvent(WebsitesChangeEvent event){
+        populateNavigationView();
+        getSupportFragmentManager().popBackStackImmediate();
+    }
+
     /***************************
-     * Impelemnts NetworkConnectivityListener.ConnectivityListener
+     * Implements NetworkConnectivityListener.ConnectivityListener
      ***************************/
 
     @Override

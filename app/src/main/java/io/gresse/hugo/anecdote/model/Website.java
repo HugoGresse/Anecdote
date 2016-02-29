@@ -7,6 +7,7 @@ package io.gresse.hugo.anecdote.model;
  */
 public class Website {
 
+    public int         id;
     public String      name;
     public String      pageUrl;
     public String      itemSelector;
@@ -17,18 +18,17 @@ public class Website {
     public boolean     isFirstPageZero;
     public int         color;
 
-    // Advanced settings
-
-
     public Website() {
     }
 
-    public Website(String name,
+    public Website(int id,
+                   String name,
                    String pageUrl,
                    String itemSelector,
                    String pageSuffix,
                    int itemPerPage,
                    boolean isFirstPageZero) {
+        this.id = id;
         this.name = name;
         this.pageUrl = pageUrl;
         this.itemSelector = itemSelector;
@@ -37,5 +37,21 @@ public class Website {
         this.isFirstPageZero = isFirstPageZero;
         this.contentItem = new WebsiteItem();
         this.urlItem = new WebsiteItem();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Website website = (Website) o;
+
+        return id == website.id;
+
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
     }
 }
