@@ -20,6 +20,8 @@ public class Website {
     public int         color;
 
     public Website() {
+        this.contentItem = new WebsiteItem();
+        this.urlItem = new WebsiteItem();
     }
 
     public Website(int id,
@@ -29,6 +31,7 @@ public class Website {
                    String pageSuffix,
                    int itemPerPage,
                    boolean isFirstPageZero) {
+        this();
         this.id = id;
         this.name = name;
         this.pageUrl = pageUrl;
@@ -36,8 +39,6 @@ public class Website {
         this.pageSuffix = pageSuffix;
         this.itemPerPage = itemPerPage;
         this.isFirstPageZero = isFirstPageZero;
-        this.contentItem = new WebsiteItem();
-        this.urlItem = new WebsiteItem();
     }
 
     @Override

@@ -62,9 +62,11 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
 
     public static WebsiteDialogFragment newInstance(@Nullable Website website) {
         WebsiteDialogFragment frag = new WebsiteDialogFragment();
-        Bundle args = new Bundle();
-        args.putString(ARGS_WEBSITE, new Gson().toJson(website));
-        frag.setArguments(args);
+        if(website != null){
+            Bundle args = new Bundle();
+            args.putString(ARGS_WEBSITE, new Gson().toJson(website));
+            frag.setArguments(args);
+        }
         return frag;
     }
 

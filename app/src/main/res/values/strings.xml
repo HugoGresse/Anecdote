@@ -32,6 +32,7 @@
     <string name="dialog_website_error_url">Missing website url :(</string>
     <string name="dialog_website_error_selector">Missing content selector</string>
     <string name="dialog_website_save">Save</string>
+    <string name="open_intent_browser_error">Unable to open details, check url configuration</string>
     <string-array name="about_libraries"  translatable="false">
         <item>OkHttp by Square http://square.github.io/okhttp/</item>
         <item>Otto by Square http://square.github.io/otto/</item>

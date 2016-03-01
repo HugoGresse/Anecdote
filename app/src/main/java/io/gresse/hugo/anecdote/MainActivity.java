@@ -156,13 +156,16 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getGroupId()) {
-            case R.id.group_content:
+            case R.id.drawer_group_content:
                 for(Website website : mWebsites){
                     if(website.name.equals(item.getTitle())){
                         changeAnecdoteFragment(website);
                         break;
                     }
                 }
+                break;
+            case R.id.drawer_group_action:
+                openWebsiteDialog(null);
                 break;
             default:
                 Toast.makeText(this, "NavigationGroup not managed", Toast.LENGTH_SHORT).show();
@@ -254,24 +257,29 @@ public class MainActivity extends AppCompatActivity
 
         for (final Website website : mWebsites) {
             ImageButton imageButton = (ImageButton) navigationViewMenu
-                    .add(R.id.group_content, Menu.NONE, Menu.NONE, website.name)
+                    .add(R.id.drawer_group_content, Menu.NONE, Menu.NONE, website.name)
                     .setActionView(R.layout.navigationview_actionlayout)
                     .getActionView();
 
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
-                    FragmentManager fm = getSupportFragmentManager();
-                    DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(website);
-                    dialogFragment.show(fm, website.name + dialogFragment.getClass().getSimpleName());
-
+                    openWebsiteDialog(website);
                 }
             });
         }
 
-        navigationViewMenu.setGroupCheckable(R.id.group_content, true, true);
+        navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, "Add website")
+                .setIcon(R.drawable.ic_action_content_add);
+
+        navigationViewMenu.setGroupCheckable(R.id.drawer_group_content, true, true);
         navigationViewMenu.getItem(0).setChecked(true);
+    }
+
+    private void openWebsiteDialog(@Nullable Website website){
+        FragmentManager fm = getSupportFragmentManager();
+        DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(website);
+        dialogFragment.show(fm, dialogFragment.getClass().getSimpleName());
     }
 
     /**
