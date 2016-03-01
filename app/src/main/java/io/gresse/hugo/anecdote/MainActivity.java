@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity
         String backStateName = ((Object) frag).getClass().getName();
 
         if(frag instanceof AnecdoteFragment){
-            backStateName += frag.getArguments().getString(AnecdoteFragment.ARGS_WEBSITE_NAME);
+            backStateName += frag.getArguments().getInt(AnecdoteFragment.ARGS_WEBSITE_ID);
         }
 
         try {
@@ -230,7 +230,7 @@ public class MainActivity extends AppCompatActivity
 
         Fragment fragment = Fragment.instantiate(this, AnecdoteFragment.class.getName());
         Bundle bundle = new Bundle();
-        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, website.name);
+        bundle.putInt(AnecdoteFragment.ARGS_WEBSITE_ID, website.id);
         fragment.setArguments(bundle);
         changeFragment(fragment, true, false);
     }
@@ -275,12 +275,12 @@ public class MainActivity extends AppCompatActivity
     /**
      * Get the anecdote Service corresponding to the given name
      *
-     * @param serviceName the service to get
+     * @param websiteId the website id to get the service from
      * @return an anecdote Service, if one is find
      */
     @Nullable
-    public AnecdoteService getAnecdoteService(String serviceName) {
-        return mServiceProvider.getAnecdoteService(serviceName);
+    public AnecdoteService getAnecdoteService(int websiteId) {
+        return mServiceProvider.getAnecdoteService(websiteId);
     }
 
     /***************************
@@ -299,7 +299,7 @@ public class MainActivity extends AppCompatActivity
 
                     @Override
                     public void onClick(View v) {
-                        AnecdoteService service = MainActivity.this.getAnecdoteService(event.websiteName);
+                        AnecdoteService service = MainActivity.this.getAnecdoteService(event.websiteId);
                         if (service != null) {
                             service.retryFailedEvent();
                         }
@@ -311,21 +311,23 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeTitle(ChangeTitleEvent event) {
-        if(event.className.equals(AnecdoteFragment.class.getName())){
+        if(event.websiteId != null){
             for(int i = 0; i < mWebsites.size(); i++){
-                if(mWebsites.get(i).name.equals(event.title)){
+                if(mWebsites.get(i).id == event.websiteId){
+                    mToolbar.setTitle(mWebsites.get(i).name);
                     mNavigationView.getMenu().getItem(i).setChecked(true);
                     break;
                 }
             }
+        } else {
+            mToolbar.setTitle(event.title);
         }
-        mToolbar.setTitle(event.title);
     }
 
     @Subscribe
     public void onWebsitesChangeEvent(WebsitesChangeEvent event){
+        setupServices();
         populateNavigationView();
-        getSupportFragmentManager().popBackStackImmediate();
     }
 
     /***************************

@@ -15,8 +15,8 @@ public class RequestFailedEvent extends AnecdoteEvent {
 
     public int pageNumber;
 
-    public RequestFailedEvent(String websiteName, String message, @Nullable  Exception exception, int pageNumber) {
-        super(websiteName);
+    public RequestFailedEvent(int websiteId, String message, @Nullable  Exception exception, int pageNumber) {
+        super(websiteId);
         this.message = message;
         this.exception = exception;
         this.pageNumber = pageNumber;

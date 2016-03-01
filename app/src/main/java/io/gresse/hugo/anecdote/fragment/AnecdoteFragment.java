@@ -28,6 +28,7 @@ import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.util.Utils;
@@ -41,8 +42,8 @@ public class AnecdoteFragment extends Fragment implements
         SwipeRefreshLayout.OnRefreshListener,
         ViewHolderListener {
 
-    private static final String TAG               = AnecdoteFragment.class.getSimpleName();
-    public static final  String ARGS_WEBSITE_NAME = "key_website_name";
+    private static final String TAG             = AnecdoteFragment.class.getSimpleName();
+    public static final  String ARGS_WEBSITE_ID = "key_website_name";
 
     @Bind(R.id.swipeRefreshLayout)
     public SwipeRefreshLayout mSwipeRefreshLayout;
@@ -50,7 +51,7 @@ public class AnecdoteFragment extends Fragment implements
     @Bind(R.id.recyclerView)
     public RecyclerView mRecyclerView;
 
-    protected String          mWebsiteName;
+    protected int             mWebsiteId;
     protected AnecdoteAdapter mAdapter;
     protected AnecdoteService mAnecdoteService;
     protected boolean         mIsLoadingNewItems;
@@ -65,9 +66,6 @@ public class AnecdoteFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        if (getArguments() != null) {
-            mWebsiteName = getArguments().getString(ARGS_WEBSITE_NAME);
-        }
 
         View view = inflater.inflate(R.layout.fragment_anecdote, container, false);
         ButterKnife.bind(this, view);
@@ -82,12 +80,37 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        mAnecdoteService = ((MainActivity) getActivity()).getAnecdoteService(mWebsiteName);
+        init();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        BusProvider.getInstance().register(this);
+        BusProvider.getInstance().post(new ChangeTitleEvent(mWebsiteId));
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        BusProvider.getInstance().unregister(this);
+    }
+
+    protected void init() {
+        if (getArguments() != null) {
+            mWebsiteId = getArguments().getInt(ARGS_WEBSITE_ID);
+        }
+
+        mAnecdoteService = ((MainActivity) getActivity()).getAnecdoteService(mWebsiteId);
 
         if (mAnecdoteService == null) {
             Log.e(TAG, "Unable to get an AnecdoteService");
             return;
         }
+
+        // Set default values
+        mIsLoadingNewItems = false;
 
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -120,20 +143,6 @@ public class AnecdoteFragment extends Fragment implements
         mSwipeRefreshLayout.setOnRefreshListener(this);
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        BusProvider.getInstance().register(this);
-        BusProvider.getInstance().post(new ChangeTitleEvent(mWebsiteName, this.getClass().getName()));
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        BusProvider.getInstance().unregister(this);
-    }
-
     /**
      * To be called by child fragment when a request if finished, could be an error or success.
      *
@@ -149,7 +158,7 @@ public class AnecdoteFragment extends Fragment implements
     }
 
     protected void loadNewAnecdotes(int start) {
-        BusProvider.getInstance().post(new LoadNewAnecdoteEvent(mWebsiteName, start));
+        BusProvider.getInstance().post(new LoadNewAnecdoteEvent(mWebsiteId, start));
     }
 
 
@@ -222,13 +231,19 @@ public class AnecdoteFragment extends Fragment implements
 
     @Subscribe
     public void onRequestFailedEvent(RequestFailedEvent event) {
-        if (!(event.websiteName.equals(mWebsiteName))) return;
+        if (event.websiteId != mWebsiteId) return;
         afterRequestFinished(false);
     }
 
     @Subscribe
     public void onAnecdoteReceived(OnAnecdoteLoadedEvent event) {
-        if (!(event.websiteName.equals(mWebsiteName))) return;
+        if (event.websiteId != mWebsiteId) return;
         afterRequestFinished(true);
+    }
+
+    @Subscribe
+    public void onUpdateAnecdoteFragment(UpdateAnecdoteFragmentEvent event) {
+
+
     }
 }

@@ -94,7 +94,8 @@ public class SharedPreferencesStorage {
     }
 
     /**
-     * Save or add a unique website
+     * Save or add a unique website. If we create a new website, we need to be sure his id is not already on another
+     * website.
      *
      * @param context app context
      * @param website website to save
@@ -102,14 +103,21 @@ public class SharedPreferencesStorage {
     public static void saveWebsite(Context context, Website website) {
         List<Website> websites = getWebsites(context);
 
+        int maxId = 1;
+        Website currentWebsite;
         for (int i = 0; i < websites.size(); i++) {
-            if (websites.get(i).equals(website)) {
+            currentWebsite = websites.get(i);
+            if (currentWebsite.equals(website)) {
                 websites.set(i, website);
                 saveWebsites(context, websites);
                 return;
             }
+            if (currentWebsite.id >= maxId) {
+                maxId = currentWebsite.id + 1;
+            }
         }
 
+        website.id = maxId;
         websites.add(website);
         saveWebsites(context, websites);
     }

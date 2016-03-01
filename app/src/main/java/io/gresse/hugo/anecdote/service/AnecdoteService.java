@@ -108,7 +108,7 @@ public class AnecdoteService {
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
                 mFailEvents.add(event);
-                postOnUiThread(new RequestFailedEvent(mWebsite.name, "Unable to load " + mWebsite.name, e, pageNumber));
+                postOnUiThread(new RequestFailedEvent(mWebsite.id, "Unable to load " + mWebsite.name, e, pageNumber));
             }
 
             @Override
@@ -125,7 +125,7 @@ public class AnecdoteService {
         try {
             document = Jsoup.parse(response.body().string());
         } catch (IOException e) {
-            postOnUiThread(new RequestFailedEvent(mWebsite.name, "Unable to parse " + mWebsite.name + " website", null, pageNumber));
+            postOnUiThread(new RequestFailedEvent(mWebsite.id, "Unable to parse " + mWebsite.name + " website", null, pageNumber));
             return;
         }
 
@@ -207,7 +207,7 @@ public class AnecdoteService {
                 url = "";
             }
 
-            postOnUiThread(new OnAnecdoteLoadedEvent(mWebsite.name, elements.size(), pageNumber));
+            postOnUiThread(new OnAnecdoteLoadedEvent(mWebsite.id, elements.size(), pageNumber));
         } else {
             Log.d(mServiceName, "No more elements from this");
             mEnd = true;
@@ -234,7 +234,7 @@ public class AnecdoteService {
 
     @Subscribe
     public void loadNexAnecdoteEvent(LoadNewAnecdoteEvent event) {
-        if (!(event.websiteName.equals(mWebsite.name))) return;
+        if (event.websiteId != mWebsite.id) return;
 
         int page = 1;
         int estimatedCurrentPage = event.start / mWebsite.itemPerPage;

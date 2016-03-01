@@ -7,9 +7,9 @@ package io.gresse.hugo.anecdote.event;
  */
 public abstract class AnecdoteEvent implements Event{
 
-    public String websiteName;
+    public int websiteId;
 
-    public AnecdoteEvent(String websiteName) {
-        this.websiteName = websiteName;
+    public AnecdoteEvent(int websiteId) {
+        this.websiteId = websiteId;
     }
 }

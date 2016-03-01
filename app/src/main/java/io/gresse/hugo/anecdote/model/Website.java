@@ -7,6 +7,7 @@ package io.gresse.hugo.anecdote.model;
  */
 public class Website {
 
+    // The website id should never be altered
     public int         id;
     public String      name;
     public String      pageUrl;

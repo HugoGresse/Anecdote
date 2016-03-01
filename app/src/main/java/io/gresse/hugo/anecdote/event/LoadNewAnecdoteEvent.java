@@ -10,12 +10,12 @@ public class LoadNewAnecdoteEvent extends AnecdoteEvent {
     public int start;
     public int count;
 
-    public LoadNewAnecdoteEvent(String websiteName, int start) {
-        this(websiteName, start, 0);
+    public LoadNewAnecdoteEvent(int websiteId, int start) {
+        this(websiteId, start, 0);
     }
 
-    public LoadNewAnecdoteEvent(String websiteName, int start, int count) {
-        super(websiteName);
+    public LoadNewAnecdoteEvent(int websiteId, int start, int count) {
+        super(websiteId);
         this.start = start;
         this.count = count;
     }
