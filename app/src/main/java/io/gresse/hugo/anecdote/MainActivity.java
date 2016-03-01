@@ -306,6 +306,11 @@ public class MainActivity extends AppCompatActivity
         navigationViewMenu.getItem(0).setChecked(true);
     }
 
+    /**
+     * Open a dialog to edit given website or create a new one. One save/add, will fire {@link WebsitesChangeEvent}
+     *
+     * @param website website to edit
+     */
     private void openWebsiteDialog(@Nullable Website website){
         FragmentManager fm = getSupportFragmentManager();
         DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(website);
