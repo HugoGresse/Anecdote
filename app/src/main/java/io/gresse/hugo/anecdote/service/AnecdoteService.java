@@ -13,6 +13,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.jsoup.select.Selector;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -114,7 +115,11 @@ public class AnecdoteService {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 // We are not on main thread
-                processResponse(pageNumber, response);
+                try {
+                    processResponse(pageNumber, response);
+                } catch (Selector.SelectorParseException exception){
+                    postOnUiThread(new RequestFailedEvent(mWebsite.id, "Something went wrong, try another website setting", exception, pageNumber));
+                }
             }
         });
     }

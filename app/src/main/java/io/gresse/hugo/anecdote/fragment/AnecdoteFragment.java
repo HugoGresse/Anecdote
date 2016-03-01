@@ -80,6 +80,31 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+
+        mLayoutManager = new LinearLayoutManager(getActivity());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+
+        mAdapter = new AnecdoteAdapter(this);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                mTotalItemCount = mLayoutManager.getItemCount();
+                mLastVisibleItem = mLayoutManager.findLastVisibleItemPosition();
+
+                // Scrolled to bottom. Do something here.
+                if (!mIsLoadingNewItems && mLastVisibleItem == mTotalItemCount - 1 && !mAllAnecdotesLoaded) {
+                    mIsLoadingNewItems = true;
+                    Log.d(TAG, "Scrolled to end, load new anecdotes");
+                    loadNewAnecdotes(mTotalItemCount);
+                }
+            }
+        });
+
+        mSwipeRefreshLayout.setOnRefreshListener(this);
+
         init();
     }
 
@@ -112,35 +137,11 @@ public class AnecdoteFragment extends Fragment implements
         // Set default values
         mIsLoadingNewItems = false;
 
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-
-        mAdapter = new AnecdoteAdapter(this);
-
         mAdapter.setData(mAnecdoteService.getAnecdotes());
-        mRecyclerView.setAdapter(mAdapter);
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                mTotalItemCount = mLayoutManager.getItemCount();
-                mLastVisibleItem = mLayoutManager.findLastVisibleItemPosition();
-
-                // Scrolled to bottom. Do something here.
-                if (!mIsLoadingNewItems && mLastVisibleItem == mTotalItemCount - 1 && !mAllAnecdotesLoaded) {
-                    mIsLoadingNewItems = true;
-                    Log.d(TAG, "Scrolled to end, load new anecdotes");
-                    loadNewAnecdotes(mTotalItemCount);
-                }
-            }
-        });
 
         if (mAnecdoteService.getAnecdotes().isEmpty()) {
             loadNewAnecdotes(0);
         }
-
-        mSwipeRefreshLayout.setOnRefreshListener(this);
     }
 
     /**
@@ -243,7 +244,7 @@ public class AnecdoteFragment extends Fragment implements
 
     @Subscribe
     public void onUpdateAnecdoteFragment(UpdateAnecdoteFragmentEvent event) {
-
-
+        init();
+        BusProvider.getInstance().post(new ChangeTitleEvent(mWebsiteId));
     }
 }
