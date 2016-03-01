@@ -8,6 +8,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import io.gresse.hugo.anecdote.model.Website;
@@ -119,6 +120,44 @@ public class SharedPreferencesStorage {
 
         website.id = maxId;
         websites.add(website);
+        saveWebsites(context, websites);
+    }
+
+    /**
+     * Delete/remove given website for preferences
+     *
+     * @param context app context
+     * @param website website to remove
+     */
+    public static void deleteWebsite(Context context, Website website) {
+        List<Website> websites = getWebsites(context);
+
+        for (Website websiteTemp : websites) {
+            if (websiteTemp.equals(website)) {
+                websites.remove(website);
+                break;
+            }
+        }
+        saveWebsites(context, websites);
+    }
+
+    /**
+     * Set given website as default/first website on the list
+     *
+     * @param context app context
+     * @param website website to set default on
+     */
+    public static void setDefaultWebsite(Context context, Website website){
+        List<Website> websites = getWebsites(context);
+
+        int websiteToSwap = -1;
+        for (int i = 0; i < websites.size(); i++) {
+            if (websites.get(i).equals(website)) {
+                websiteToSwap = i;
+                break;
+            }
+        }
+        Collections.swap(websites, 0, websiteToSwap);
         saveWebsites(context, websites);
     }
 

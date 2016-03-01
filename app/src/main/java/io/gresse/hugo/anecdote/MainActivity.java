@@ -13,6 +13,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -37,12 +38,12 @@ import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
 import io.gresse.hugo.anecdote.fragment.AnecdoteFragment;
-import io.gresse.hugo.anecdote.util.SharedPreferencesStorage;
+import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
-import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
+import io.gresse.hugo.anecdote.util.SharedPreferencesStorage;
 
 
 public class MainActivity extends AppCompatActivity
@@ -247,7 +248,9 @@ public class MainActivity extends AppCompatActivity
         mServiceProvider = new ServiceProvider(mWebsites);
         mServiceProvider.register(this, BusProvider.getInstance());
 
-        changeAnecdoteFragment(mWebsites.get(0));
+        if(!mWebsites.isEmpty()){
+            changeAnecdoteFragment(mWebsites.get(0));
+        }
     }
 
     private void populateNavigationView(){
@@ -256,7 +259,7 @@ public class MainActivity extends AppCompatActivity
         navigationViewMenu.clear();
 
         for (final Website website : mWebsites) {
-            ImageButton imageButton = (ImageButton) navigationViewMenu
+            final ImageButton imageButton = (ImageButton) navigationViewMenu
                     .add(R.id.drawer_group_content, Menu.NONE, Menu.NONE, website.name)
                     .setActionView(R.layout.navigationview_actionlayout)
                     .getActionView();
@@ -264,7 +267,34 @@ public class MainActivity extends AppCompatActivity
             imageButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    openWebsiteDialog(website);
+                    PopupMenu popup = new PopupMenu(MainActivity.this, imageButton);
+                    //Inflating the Popup using xml file
+                    popup.getMenuInflater()
+                            .inflate(R.menu.website_popup, popup.getMenu());
+
+                    //registering popup with OnMenuItemClickListener
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        public boolean onMenuItemClick(MenuItem item) {
+
+                            switch (item.getItemId()){
+                                case R.id.action_edit:
+                                    openWebsiteDialog(website);
+                                    break;
+                                case R.id.action_delete:
+                                    SharedPreferencesStorage.deleteWebsite(MainActivity.this, website);
+                                    BusProvider.getInstance().post(new WebsitesChangeEvent());
+                                    break;
+                                case R.id.action_default:
+                                    SharedPreferencesStorage.setDefaultWebsite(MainActivity.this, website);
+                                    BusProvider.getInstance().post(new WebsitesChangeEvent());
+                                    break;
+
+                            }
+                            return true;
+                        }
+                    });
+
+                    popup.show();
                 }
             });
         }
