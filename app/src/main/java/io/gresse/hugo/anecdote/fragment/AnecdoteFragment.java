@@ -1,5 +1,6 @@
 package io.gresse.hugo.anecdote.fragment;
 
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
@@ -205,8 +206,12 @@ public class AnecdoteFragment extends Fragment implements
                         break;
                     // Open details
                     case 1:
-                        Toast.makeText(getActivity(), R.string.open_intent_browser, Toast.LENGTH_SHORT).show();
-                        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(anecdote.permalink)));
+                        try {
+                            Toast.makeText(getActivity(), R.string.open_intent_browser, Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(anecdote.permalink)));
+                        } catch (ActivityNotFoundException exception) {
+                            Toast.makeText(getActivity(), R.string.open_intent_browser_error, Toast.LENGTH_SHORT).show();
+                        }
                         break;
                     // Copy
                     case 2:
