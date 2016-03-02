@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Anecdote</string>
+    <string name="app_name" translatable="false">Anecdote</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -10,7 +10,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_default">Default</string>
     <string name="copied">Copied to clipboard</string>
-    <string name="not_implemented">Not implemented</string>
+    <string name="not_implemented" translatable="false">Not implemented</string>
 
     <string name="app_share_credits"> - via Anecdote http://bit.ly/anecdoteapp </string>
 
@@ -43,7 +43,7 @@
 
     <string name="about_title">About</string>
     <string name="about_made">Made with love by</string>
-    <string name="about_made_person">Hugo Gresse http://hugo.gresse.io/</string>
+    <string name="about_made_person" translatable="false">Hugo Gresse http://hugo.gresse.io/</string>
     <string name="using" translatable="false">Third-party libraries</string>
     <string-array name="about_libraries"  translatable="false">
         <item>OkHttp by Square http://square.github.io/okhttp/</item>

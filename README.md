@@ -19,10 +19,10 @@ Features
 
 TODO
 --------
-- WIP: allow changing parsing options on each website, which will allow more website to be parsed
 - additional setting for tinting app based on selected website
-- set default choosed website
-
+- select website on first app open, the website list could be download from Anecdote BaaS
+- implement urlItem and contentItem on website dialog
+- guide to add website (a follow through user step)
 
 Contribution
 ------
