@@ -40,6 +40,8 @@
     <string name="dialog_website_itemperpage_hint">Nombre d\'élement par page</string>
     <string name="dialog_website_firstpagezero_hint">Numéro de la première page = 0</string>
 
+    <string name="dialog_websitechooser_title">Sélectionner vos sites préférés</string>
+
     <string name="about_title">À propos</string>
     <string name="about_made">Fait avec amour par</string>
 

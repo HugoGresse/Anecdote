@@ -21,7 +21,7 @@ import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.model.Website;
-import io.gresse.hugo.anecdote.util.SharedPreferencesStorage;
+import io.gresse.hugo.anecdote.util.SpStorage;
 
 /**
  * FialogFragment to edit or add wesites
@@ -103,15 +103,15 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
                     return;
                 }
                 mWebsite.name = mNameEditText.getText().toString();
-                mWebsite.pageUrl = mUrlEditText.getText().toString();
-                mWebsite.pageSuffix = mUrlSuffixEditText.getText().toString();
-                mWebsite.itemSelector = mSelectorEditText.getText().toString();
+                mWebsite.url = mUrlEditText.getText().toString();
+                mWebsite.urlSuffix = mUrlSuffixEditText.getText().toString();
+                mWebsite.selector = mSelectorEditText.getText().toString();
                 mWebsite.itemPerPage = Integer.parseInt(mItemPerPageEditText.getText().toString());
                 mWebsite.isFirstPageZero = mFirstPageZeroSwitchCompat.isChecked();
 
-                SharedPreferencesStorage.saveWebsite(getContext(), mWebsite);
+                SpStorage.saveWebsite(getContext(), mWebsite);
                 BusProvider.getInstance().post(new WebsitesChangeEvent());
-                WebsiteDialogFragment.this.getDialog().hide();
+                WebsiteDialogFragment.this.getDialog().dismiss();
             }
         });
     }
@@ -131,9 +131,9 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
         mEditMode = true;
         getDialog().setTitle(R.string.dialog_website_edit_title);
         mNameEditText.setText(mWebsite.name);
-        mUrlEditText.setText(mWebsite.pageUrl);
-        mUrlSuffixEditText.setText(mWebsite.pageSuffix);
-        mSelectorEditText.setText(mWebsite.itemSelector);
+        mUrlEditText.setText(mWebsite.url);
+        mUrlSuffixEditText.setText(mWebsite.urlSuffix);
+        mSelectorEditText.setText(mWebsite.selector);
         mItemPerPageEditText.setText(String.valueOf(mWebsite.itemPerPage));
         mFirstPageZeroSwitchCompat.setChecked(mWebsite.isFirstPageZero);
     }

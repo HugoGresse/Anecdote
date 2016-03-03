@@ -41,6 +41,8 @@
     <string name="dialog_website_itemperpage_hint">Number of element in a page</string>
     <string name="dialog_website_firstpagezero_hint">If the first page number is 0</string>
 
+    <string name="dialog_websitechooser_title">Select your favorites sites</string>
+
     <string name="about_title">About</string>
     <string name="about_made">Made with love by</string>
     <string name="about_made_person" translatable="false">Hugo Gresse http://hugo.gresse.io/</string>

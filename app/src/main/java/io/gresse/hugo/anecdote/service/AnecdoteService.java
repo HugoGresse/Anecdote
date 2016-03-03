@@ -98,9 +98,9 @@ public class AnecdoteService {
     private void downloadLatest(@NonNull final Event event, final int pageNumber) {
         Log.d(mServiceName, "Downloading page " + pageNumber);
         Request request = new Request.Builder()
-                .url(mWebsite.pageUrl +
+                .url(mWebsite.url +
                         ((mWebsite.isFirstPageZero) ? pageNumber - 1 : pageNumber) +
-                        mWebsite.pageSuffix)
+                        mWebsite.urlSuffix)
                 .header("User-Agent", Utils.getUserAgent())
                 .build();
 
@@ -134,7 +134,7 @@ public class AnecdoteService {
             return;
         }
 
-        final Elements elements = document.select(mWebsite.itemSelector);
+        final Elements elements = document.select(mWebsite.selector);
 
         if (elements != null && !elements.isEmpty()) {
             Element tempElement;

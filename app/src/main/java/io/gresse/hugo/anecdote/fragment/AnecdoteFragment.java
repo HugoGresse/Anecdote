@@ -180,7 +180,16 @@ public class AnecdoteFragment extends Fragment implements
      **************************/
 
     @Override
-    public void onLongClick(final Anecdote anecdote) {
+    public void onClick(Object object) {
+
+    }
+
+    @Override
+    public void onLongClick(final Object object) {
+        if(!(object instanceof Anecdote)){
+            return;
+        }
+        final Anecdote anecdote = (Anecdote) object;
         // Open a dialog picker on item long click to choose between Open details, Share or copy the content
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());

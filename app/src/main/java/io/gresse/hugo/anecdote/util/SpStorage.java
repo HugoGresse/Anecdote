@@ -2,6 +2,7 @@ package io.gresse.hugo.anecdote.util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -18,24 +19,51 @@ import io.gresse.hugo.anecdote.model.Website;
  * <p/>
  * Created by Hugo Gresse on 28/02/16.
  */
-public class SharedPreferencesStorage {
+public class SpStorage {
 
 
-    public static final String SP_KEY          = "io.gresse.hugo.anecdote";
-    public static final String SP_KEY_WEBSITES = "contentProvider";
+    public static final String SP_KEY             = "io.gresse.hugo.anecdote";
+    public static final String SP_KEY_FIRSTLAUNCH = "firstLaunch";
+    public static final String SP_KEY_WEBSITES    = "websites";
+
+
+    /**
+     * Check if it's the first application launch or not
+     *
+     * @param context app context
+     * @return true if first launch, false otherwise
+     */
+    public static boolean isFirstLaunch(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
+        return sharedPreferences.getBoolean(SP_KEY_FIRSTLAUNCH, true);
+    }
+
+    /**
+     * Set first launch pref or the app
+     *
+     * @param context       app context
+     * @param isFirstLaunch true if the app is in first launch, false otherweise
+     */
+    public static void setFirstLaunch(Context context, boolean isFirstLaunch) {
+        SharedPreferences.Editor sharedPreferencesEditor = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE).edit();
+        sharedPreferencesEditor.putBoolean(SP_KEY_FIRSTLAUNCH, isFirstLaunch);
+        sharedPreferencesEditor.apply();
+    }
 
     /**
      * Get the list of user Website to be displayed in the app
      *
      * @param context app context
-     * @return the lsit of website to be displayed
+     * @return the list of website to be displayed
      */
     public static List<Website> getWebsites(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
 
-        String settingString = sharedPreferences.getString(
-                SP_KEY_WEBSITES,
-                generateDefaultWebsites());
+        String settingString = sharedPreferences.getString(SP_KEY_WEBSITES, "");
+
+        if (TextUtils.isEmpty(settingString)) {
+            return new ArrayList<>();
+        }
 
         Type listType = new TypeToken<ArrayList<Website>>() {
         }.getType();
@@ -147,7 +175,7 @@ public class SharedPreferencesStorage {
      * @param context app context
      * @param website website to set default on
      */
-    public static void setDefaultWebsite(Context context, Website website){
+    public static void setDefaultWebsite(Context context, Website website) {
         List<Website> websites = getWebsites(context);
 
         int websiteToSwap = -1;

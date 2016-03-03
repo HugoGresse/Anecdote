@@ -38,12 +38,13 @@ import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
 import io.gresse.hugo.anecdote.fragment.AnecdoteFragment;
+import io.gresse.hugo.anecdote.fragment.WebsiteChooserDialogFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
-import io.gresse.hugo.anecdote.util.SharedPreferencesStorage;
+import io.gresse.hugo.anecdote.util.SpStorage;
 
 
 public class MainActivity extends AppCompatActivity
@@ -91,6 +92,10 @@ public class MainActivity extends AppCompatActivity
 
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.startListening(this, this);
+
+        if(SpStorage.isFirstLaunch(this)){
+            openWebsiteChooserDialog();
+        }
     }
 
     @Override
@@ -241,7 +246,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setupServices() {
-        mWebsites = SharedPreferencesStorage.getWebsites(this);
+        mWebsites = SpStorage.getWebsites(this);
         if(mServiceProvider != null){
             mServiceProvider.unregister(BusProvider.getInstance());
         }
@@ -281,11 +286,11 @@ public class MainActivity extends AppCompatActivity
                                     openWebsiteDialog(website);
                                     break;
                                 case R.id.action_delete:
-                                    SharedPreferencesStorage.deleteWebsite(MainActivity.this, website);
+                                    SpStorage.deleteWebsite(MainActivity.this, website);
                                     BusProvider.getInstance().post(new WebsitesChangeEvent());
                                     break;
                                 case R.id.action_default:
-                                    SharedPreferencesStorage.setDefaultWebsite(MainActivity.this, website);
+                                    SpStorage.setDefaultWebsite(MainActivity.this, website);
                                     BusProvider.getInstance().post(new WebsitesChangeEvent());
                                     break;
 
@@ -304,6 +309,15 @@ public class MainActivity extends AppCompatActivity
 
         navigationViewMenu.setGroupCheckable(R.id.drawer_group_content, true, true);
         navigationViewMenu.getItem(0).setChecked(true);
+    }
+
+    /**
+     * Show the website dialog chooser to select which website we want to import
+     */
+    private void openWebsiteChooserDialog(){
+        FragmentManager fm = getSupportFragmentManager();
+        DialogFragment dialogFragment = WebsiteChooserDialogFragment.newInstance();
+        dialogFragment.show(fm, dialogFragment.getClass().getSimpleName());
     }
 
     /**

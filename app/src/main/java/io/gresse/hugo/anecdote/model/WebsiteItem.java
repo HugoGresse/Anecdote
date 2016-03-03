@@ -43,6 +43,21 @@ public class WebsiteItem {
     public Map<String, String> replaceMap;
 
     public WebsiteItem() {
+        suffix = null;
+        prefix = null;
+        attribute = null;
+        selector = null;
         replaceMap = new HashMap<>();
+    }
+
+    @Override
+    public String toString() {
+        return "WebsiteItem{" +
+                "selector='" + selector + '\'' +
+                ", attribute='" + attribute + '\'' +
+                ", prefix='" + prefix + '\'' +
+                ", suffix='" + suffix + '\'' +
+                ", replaceMap=" + replaceMap +
+                '}';
     }
 }
