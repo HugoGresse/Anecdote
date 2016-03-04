@@ -97,29 +97,57 @@ public class AnecdoteService {
      */
     private void downloadLatest(@NonNull final Event event, final int pageNumber) {
         Log.d(mServiceName, "Downloading page " + pageNumber);
-        Request request = new Request.Builder()
-                .url(mWebsite.url +
-                        ((mWebsite.isFirstPageZero) ? pageNumber - 1 : pageNumber) +
-                        mWebsite.urlSuffix)
-                .header("User-Agent", Utils.getUserAgent())
-                .build();
+        Request request;
+        try {
+            request = new Request.Builder()
+                    .url(mWebsite.url +
+                            ((mWebsite.isFirstPageZero) ? pageNumber - 1 : pageNumber) +
+                            mWebsite.urlSuffix)
+                    .header("User-Agent", Utils.getUserAgent())
+                    .build();
+        } catch (IllegalArgumentException exception){
+            mFailEvents.add(event);
+            postOnUiThread(new RequestFailedEvent(
+                    mWebsite.id,
+                    "Website configuration is wrong: " + mWebsite.name,
+                    exception,
+                    pageNumber));
+            return;
+        }
 
         mOkHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
                 mFailEvents.add(event);
-                postOnUiThread(new RequestFailedEvent(mWebsite.id, "Unable to load " + mWebsite.name, e, pageNumber));
+                postOnUiThread(new RequestFailedEvent(
+                        mWebsite.id, "Unable to load " + mWebsite.name,
+                        e,
+                        pageNumber));
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 // We are not on main thread
-                try {
-                    processResponse(pageNumber, response);
-                } catch (Selector.SelectorParseException exception){
-                    postOnUiThread(new RequestFailedEvent(mWebsite.id, "Something went wrong, try another website setting", exception, pageNumber));
+                if(response.isSuccessful()){
+                    try {
+                        processResponse(pageNumber, response);
+                    } catch (Selector.SelectorParseException exception){
+                        postOnUiThread(new RequestFailedEvent(
+                                mWebsite.id,
+                                "Something went wrong, try another website setting",
+                                exception,
+                                pageNumber));
+                    }
+                } else {
+                    mFailEvents.add(event);
+                    postOnUiThread(new RequestFailedEvent(
+                            mWebsite.id,
+                            "Unable to load website",
+                            null,
+                            pageNumber));
                 }
+
             }
         });
     }
@@ -238,7 +266,7 @@ public class AnecdoteService {
      ***************************/
 
     @Subscribe
-    public void loadNexAnecdoteEvent(LoadNewAnecdoteEvent event) {
+    public void loadNextAnecdoteEvent(LoadNewAnecdoteEvent event) {
         if (event.websiteId != mWebsite.id) return;
 
         int page = 1;

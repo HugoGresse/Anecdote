@@ -118,6 +118,9 @@ public class SpStorage {
      */
     public static void saveWebsites(Context context, List<Website> websites) {
         SharedPreferences.Editor sharedPreferencesEditor = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE).edit();
+        for(Website website : websites){
+            website.validateData();
+        }
         sharedPreferencesEditor.putString(SP_KEY_WEBSITES, new Gson().toJson(websites));
         sharedPreferencesEditor.apply();
     }
@@ -131,6 +134,8 @@ public class SpStorage {
      */
     public static void saveWebsite(Context context, Website website) {
         List<Website> websites = getWebsites(context);
+
+        website.validateData();
 
         int maxId = 1;
         Website currentWebsite;

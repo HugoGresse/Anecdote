@@ -1,5 +1,7 @@
 package io.gresse.hugo.anecdote.model;
 
+import android.text.TextUtils;
+
 /**
  * Represent a unique content provider such as VDM or DTC to be used to get and parse data from the website.
  * <p/>
@@ -42,6 +44,33 @@ public class Website {
         this.isFirstPageZero = isFirstPageZero;
     }
 
+    /**
+     * Validate this object by preventing any crash when using it
+     */
+    public void validateData(){
+        if(TextUtils.isEmpty(name)){
+            name = "";
+        }
+        if(TextUtils.isEmpty(url)){
+            url = "";
+        }
+        if(TextUtils.isEmpty(selector)){
+            selector = "";
+        }
+        if(TextUtils.isEmpty(urlSuffix)){
+            urlSuffix = "";
+        }
+        if(itemPerPage <= 0){
+            itemPerPage = 1;
+        }
+        if(contentItem == null){
+            contentItem = new WebsiteItem();
+        }
+        if(urlItem == null){
+            urlItem = new WebsiteItem();
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -50,7 +79,6 @@ public class Website {
         Website website = (Website) o;
 
         return id == website.id;
-
     }
 
     @Override

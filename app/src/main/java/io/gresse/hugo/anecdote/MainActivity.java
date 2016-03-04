@@ -352,8 +352,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection WrongConstant
         Snackbar
-                .make(mCoordinatorLayout, event.message, Snackbar.LENGTH_LONG)
-                .setDuration(8000)
+                .make(mCoordinatorLayout, event.message, Snackbar.LENGTH_INDEFINITE)
                 .setAction("Retry", new View.OnClickListener() {
 
                     @Override
