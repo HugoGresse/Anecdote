@@ -6,6 +6,7 @@
 
     <string name="action_settings">Paramètres</string>
     <string name="action_about">À propos</string>
+    <string name="action_restore">Restaurer les sites</string>
     <string name="action_edit">Modifier</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_default">Défaut</string>

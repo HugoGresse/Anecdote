@@ -154,6 +154,10 @@ public class MainActivity extends AppCompatActivity
             case R.id.action_about:
                 changeFragment(Fragment.instantiate(this, AboutFragment.class.getName()), true, false);
                 return true;
+            case R.id.action_restore:
+                SpStorage.setFirstLaunch(this, true);
+                openWebsiteChooserDialog();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
