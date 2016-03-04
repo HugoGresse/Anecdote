@@ -1,0 +1,4 @@
+release.storeFile=/path/to/your/keystore/file.jks
+release.storePassword=p455w0rd
+release.keyAlias=awesome
+release.keyPassword=53cr3t
