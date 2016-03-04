@@ -4,6 +4,12 @@ import android.content.Context;
 
 import com.squareup.otto.Bus;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import io.gresse.hugo.anecdote.model.Website;
+
 /**
  * Provide different services
  * <p/>
@@ -11,28 +17,33 @@ import com.squareup.otto.Bus;
  */
 public class ServiceProvider {
 
-    protected DtcService mDtcService;
-    protected VdmService mVdmService;
+    protected List<Website>                mWebsites;
+    protected Map<Integer, AnecdoteService> mServices;
+
+    public ServiceProvider(List<Website> websites) {
+        mWebsites = websites;
+        mServices = new HashMap<>();
+    }
 
     public void register(Context context, Bus bus) {
-        mDtcService = new DtcService(context);
-        mVdmService = new VdmService(context);
+        AnecdoteService service;
 
-        bus.register(mDtcService);
-        bus.register(mVdmService);
+        for (Website website : mWebsites) {
+            service = new AnecdoteService(context, website);
+            bus.register(service);
+            mServices.put(website.id, service);
+        }
     }
 
-    public void unregister(Bus bus){
-        bus.unregister(mDtcService);
-        bus.unregister(mVdmService);
+    public void unregister(Bus bus) {
+        for(Map.Entry<Integer, AnecdoteService> entry : mServices.entrySet()) {
+            bus.unregister(entry.getValue());
+        }
+        mServices.clear();
     }
 
-    public AnecdoteService getDtcService() {
-        return mDtcService;
-    }
-
-    public AnecdoteService getVdmService() {
-        return mVdmService;
+    public AnecdoteService getAnecdoteService(int websiteId){
+        return mServices.get(websiteId);
     }
 
 }

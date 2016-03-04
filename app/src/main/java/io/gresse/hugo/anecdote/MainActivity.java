@@ -1,9 +1,11 @@
 package io.gresse.hugo.anecdote;
 
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -11,32 +13,38 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
 import com.squareup.otto.Subscribe;
+
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.fabric.sdk.android.Fabric;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
-import io.gresse.hugo.anecdote.event.Event;
-import io.gresse.hugo.anecdote.event.LoadNewAnecdoteDtcEvent;
-import io.gresse.hugo.anecdote.event.RequestFailedDtcEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
+import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
-import io.gresse.hugo.anecdote.fragment.DtcFragment;
-import io.gresse.hugo.anecdote.fragment.VdmFragment;
+import io.gresse.hugo.anecdote.fragment.AnecdoteFragment;
+import io.gresse.hugo.anecdote.fragment.WebsiteChooserDialogFragment;
+import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
+import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
-import io.gresse.hugo.anecdote.service.DtcService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
+import io.gresse.hugo.anecdote.util.SpStorage;
 
 
 public class MainActivity extends AppCompatActivity
@@ -56,14 +64,15 @@ public class MainActivity extends AppCompatActivity
     @Bind(R.id.nav_view)
     public NavigationView mNavigationView;
 
-    protected ServiceProvider mServiceProvider;
-    protected boolean         mDrawerBackOpen;
+    protected ServiceProvider             mServiceProvider;
+    protected boolean                     mDrawerBackOpen;
     protected NetworkConnectivityListener mNetworkConnectivityListener;
+    protected List<Website>               mWebsites;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if(!BuildConfig.DEBUG){
+        if (!BuildConfig.DEBUG) {
             Fabric.with(this, new Crashlytics());
         }
         setContentView(R.layout.activity_main);
@@ -78,15 +87,15 @@ public class MainActivity extends AppCompatActivity
 
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        mServiceProvider = new ServiceProvider();
-        mServiceProvider.register(this, BusProvider.getInstance());
-
-        // Default fragment to DTC
-        mNavigationView.setCheckedItem(R.id.nav_dtc);
-        changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
+        setupServices();
+        populateNavigationView();
 
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.startListening(this, this);
+
+        if(SpStorage.isFirstLaunch(this)){
+            openWebsiteChooserDialog();
+        }
     }
 
     @Override
@@ -107,11 +116,11 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         mServiceProvider.unregister(BusProvider.getInstance());
+        mNetworkConnectivityListener.stopListening();
     }
 
     @Override
     public void onBackPressed() {
-        Log.d(TAG, "entryCount: " + getFragmentManager().getBackStackEntryCount());
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START) && !mDrawerBackOpen) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
@@ -124,6 +133,7 @@ public class MainActivity extends AppCompatActivity
                 } else {
                     mDrawerBackOpen = false;
                     finish();
+                    return;
                 }
             }
 
@@ -142,8 +152,11 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_about:
-
                 changeFragment(Fragment.instantiate(this, AboutFragment.class.getName()), true, false);
+                return true;
+            case R.id.action_restore:
+                SpStorage.setFirstLaunch(this, true);
+                openWebsiteChooserDialog();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -152,12 +165,20 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.nav_dtc:
-                changeFragment(Fragment.instantiate(this, DtcFragment.class.getName()), true, false);
+        switch (item.getGroupId()) {
+            case R.id.drawer_group_content:
+                for(Website website : mWebsites){
+                    if(website.name.equals(item.getTitle())){
+                        changeAnecdoteFragment(website);
+                        break;
+                    }
+                }
                 break;
-            case R.id.nav_vdm:
-                changeFragment(Fragment.instantiate(this, VdmFragment.class.getName()), true, false);
+            case R.id.drawer_group_action:
+                openWebsiteDialog(null);
+                break;
+            default:
+                Toast.makeText(this, "NavigationGroup not managed", Toast.LENGTH_SHORT).show();
                 break;
         }
 
@@ -175,6 +196,10 @@ public class MainActivity extends AppCompatActivity
     private void changeFragment(Fragment frag, boolean saveInBackstack, boolean animate) {
         String backStateName = ((Object) frag).getClass().getName();
 
+        if(frag instanceof AnecdoteFragment){
+            backStateName += frag.getArguments().getInt(AnecdoteFragment.ARGS_WEBSITE_ID);
+        }
+
         try {
             FragmentManager manager = getSupportFragmentManager();
             boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
@@ -187,10 +212,10 @@ public class MainActivity extends AppCompatActivity
                     transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
                 }
 
-                transaction.replace(R.id.fragment_container, frag, ((Object) frag).getClass().getName());
+                transaction.replace(R.id.fragment_container, frag, backStateName);
 
                 if (saveInBackstack) {
-                    Log.d(TAG, "Change Fragment: addToBackTack " + frag.getClass().getName());
+                    Log.d(TAG, "Change Fragment: addToBackTack " + backStateName);
                     transaction.addToBackStack(backStateName);
                 } else {
                     Log.d(TAG, "Change Fragment: NO addToBackTack");
@@ -211,21 +236,114 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Get the DTC Service to be used by fragments
+     * Change the current fragment to a new one displaying given website spec
      *
-     * @return the DTC Service
+     * @param website the website specification to be displayed in the fragment
      */
-    public AnecdoteService getDtcService() {
-        return mServiceProvider.getDtcService();
+    private void changeAnecdoteFragment(Website website){
+
+        Fragment fragment = Fragment.instantiate(this, AnecdoteFragment.class.getName());
+        Bundle bundle = new Bundle();
+        bundle.putInt(AnecdoteFragment.ARGS_WEBSITE_ID, website.id);
+        fragment.setArguments(bundle);
+        changeFragment(fragment, true, false);
+    }
+
+    private void setupServices() {
+        mWebsites = SpStorage.getWebsites(this);
+        if(mServiceProvider != null){
+            mServiceProvider.unregister(BusProvider.getInstance());
+        }
+        mServiceProvider = new ServiceProvider(mWebsites);
+        mServiceProvider.register(this, BusProvider.getInstance());
+
+        if(!mWebsites.isEmpty()){
+            changeAnecdoteFragment(mWebsites.get(0));
+        }
+    }
+
+    private void populateNavigationView(){
+        // Setup NavigationView
+        Menu navigationViewMenu = mNavigationView.getMenu();
+        navigationViewMenu.clear();
+
+        for (final Website website : mWebsites) {
+            final ImageButton imageButton = (ImageButton) navigationViewMenu
+                    .add(R.id.drawer_group_content, Menu.NONE, Menu.NONE, website.name)
+                    .setActionView(R.layout.navigationview_actionlayout)
+                    .getActionView();
+
+            imageButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PopupMenu popup = new PopupMenu(MainActivity.this, imageButton);
+                    //Inflating the Popup using xml file
+                    popup.getMenuInflater()
+                            .inflate(R.menu.website_popup, popup.getMenu());
+
+                    //registering popup with OnMenuItemClickListener
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        public boolean onMenuItemClick(MenuItem item) {
+
+                            switch (item.getItemId()){
+                                case R.id.action_edit:
+                                    openWebsiteDialog(website);
+                                    break;
+                                case R.id.action_delete:
+                                    SpStorage.deleteWebsite(MainActivity.this, website);
+                                    BusProvider.getInstance().post(new WebsitesChangeEvent());
+                                    break;
+                                case R.id.action_default:
+                                    SpStorage.setDefaultWebsite(MainActivity.this, website);
+                                    BusProvider.getInstance().post(new WebsitesChangeEvent());
+                                    break;
+
+                            }
+                            return true;
+                        }
+                    });
+
+                    popup.show();
+                }
+            });
+        }
+
+        navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, "Add website")
+                .setIcon(R.drawable.ic_action_content_add);
+
+        navigationViewMenu.setGroupCheckable(R.id.drawer_group_content, true, true);
+        navigationViewMenu.getItem(0).setChecked(true);
     }
 
     /**
-     * Get the VDM Service to be used by fragments
-     *
-     * @return the VDM Service
+     * Show the website dialog chooser to select which website we want to import
      */
-    public AnecdoteService getVdmService() {
-        return mServiceProvider.getVdmService();
+    private void openWebsiteChooserDialog(){
+        FragmentManager fm = getSupportFragmentManager();
+        DialogFragment dialogFragment = WebsiteChooserDialogFragment.newInstance();
+        dialogFragment.show(fm, dialogFragment.getClass().getSimpleName());
+    }
+
+    /**
+     * Open a dialog to edit given website or create a new one. One save/add, will fire {@link WebsitesChangeEvent}
+     *
+     * @param website website to edit
+     */
+    private void openWebsiteDialog(@Nullable Website website){
+        FragmentManager fm = getSupportFragmentManager();
+        DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(website);
+        dialogFragment.show(fm, dialogFragment.getClass().getSimpleName());
+    }
+
+    /**
+     * Get the anecdote Service corresponding to the given name
+     *
+     * @param websiteId the website id to get the service from
+     * @return an anecdote Service, if one is find
+     */
+    @Nullable
+    public AnecdoteService getAnecdoteService(int websiteId) {
+        return mServiceProvider.getAnecdoteService(websiteId);
     }
 
     /***************************
@@ -238,23 +356,15 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection WrongConstant
         Snackbar
-                .make(mCoordinatorLayout, event.message, Snackbar.LENGTH_LONG)
-                .setDuration(8000)
+                .make(mCoordinatorLayout, event.message, Snackbar.LENGTH_INDEFINITE)
                 .setAction("Retry", new View.OnClickListener() {
 
                     @Override
                     public void onClick(View v) {
-                        if (event instanceof RequestFailedDtcEvent) {
-                            Event eventToSend;
-                            if (event.pageNumber <= 1) {
-                                eventToSend = new LoadNewAnecdoteDtcEvent(0);
-                            } else {
-                                eventToSend = new LoadNewAnecdoteDtcEvent(event.pageNumber * DtcService.ITEM_PER_PAGE);
-                            }
-
-                            BusProvider.getInstance().post(eventToSend);
+                        AnecdoteService service = MainActivity.this.getAnecdoteService(event.websiteId);
+                        if (service != null) {
+                            service.retryFailedEvent();
                         }
-
                     }
 
                 })
@@ -263,16 +373,28 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeTitle(ChangeTitleEvent event) {
-        if (event.className.equals(VdmFragment.class.getName())) {
-            mNavigationView.setCheckedItem(R.id.nav_vdm);
-        } else if (event.className.equals(DtcFragment.class.getName())) {
-            mNavigationView.setCheckedItem(R.id.nav_dtc);
+        if(event.websiteId != null){
+            for(int i = 0; i < mWebsites.size(); i++){
+                if(mWebsites.get(i).id == event.websiteId){
+                    mToolbar.setTitle(mWebsites.get(i).name);
+                    mNavigationView.getMenu().getItem(i).setChecked(true);
+                    break;
+                }
+            }
+        } else {
+            mToolbar.setTitle(event.title);
         }
-        mToolbar.setTitle(event.title);
+    }
+
+    @Subscribe
+    public void onWebsitesChangeEvent(WebsitesChangeEvent event){
+        setupServices();
+        populateNavigationView();
+        BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());
     }
 
     /***************************
-     * Impelemnts NetworkConnectivityListener.ConnectivityListener
+     * Implements NetworkConnectivityListener.ConnectivityListener
      ***************************/
 
     @Override

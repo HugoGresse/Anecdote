@@ -20,7 +20,7 @@ public class Utils {
      * @return the user agent
      */
     public static String getUserAgent() {
-        return "Mozilla/5.0 (Linux; Android 5.1; " + Build.MODEL +
+        return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1 " + Build.MODEL +
                 ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.95 Mobile Safari/537.36";
     }
 

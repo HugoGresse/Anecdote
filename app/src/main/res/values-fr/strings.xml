@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="navigation_drawer_open">Ouvrir le tiroir de navigation</string>
+    <string name="navigation_drawer_close">Fermer le tiroir de navigation</string>
+
+    <string name="action_settings">Paramètres</string>
+    <string name="action_about">À propos</string>
+    <string name="action_restore">Restaurer les sites</string>
+    <string name="action_edit">Modifier</string>
+    <string name="action_delete">Supprimer</string>
+    <string name="action_default">Défaut</string>
+    <string name="copied">Copier</string>
+
+    <string name="app_share_credits"> - via Anecdote http://bit.ly/anecdoteapp </string>
+
+    <string name="anecdote_share_title">Partagez avec</string>
+    <string-array name="anecdote_dialog" >
+        <item>Partager</item>
+        <item>Ouvrir les détails</item>
+        <item>Copier</item>
+    </string-array>
+
+    <string name="open_intent_browser">Ouverture du navigateur…</string>
+    <string name="open_intent_browser_error">Impossible d\'ouvrir le navigateur, vérifier la configuration du site</string>
+
+    <string name="action_website">Actions du site</string>
+
+    <string name="dialog_website_new_title">Nouveau site</string>
+    <string name="dialog_website_edit_title">Modification</string>
+    <string name="dialog_website_add">Ajouter</string>
+    <string name="dialog_website_error_itemperpage">Le nombre de d\'item par page doit être plus grand que 0</string>
+    <string name="dialog_website_error_name">Ne voulez-vous pas ajouter un nom ?</string>
+    <string name="dialog_website_error_url">Url du site manquante :(</string>
+    <string name="dialog_website_error_selector">Sélecteur manquant</string>
+    <string name="dialog_website_save">Sauvegarder</string>
+    <string name="dialog_website_name_hint">Nom du site</string>
+    <string name="dialog_website_url_hint">Url du site</string>
+    <string name="dialog_website_urlsuffix_hint">(optionnel) Suffix du numéro de page</string>
+    <string name="dialog_website_selector_hint">Sélecteur DOM</string>
+    <string name="dialog_website_itemperpage_hint">Nombre d\'élement par page</string>
+    <string name="dialog_website_firstpagezero_hint">Numéro de la première page = 0</string>
+
+    <string name="dialog_websitechooser_title">Sélectionner vos sites préférés</string>
+
+    <string name="about_title">À propos</string>
+    <string name="about_made">Fait avec amour par</string>
+
+</resources>

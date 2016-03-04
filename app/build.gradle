@@ -22,15 +22,45 @@ android {
         applicationId "io.gresse.hugo.anecdote"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 2
-        versionName "0.1.1"
+        versionCode 3
+        versionName "0.2.0"
         archivesBaseName = "anecdote-" + versionName
     }
+
+    signingConfigs {
+        release {
+            File signingPropFile = rootProject.file('signing.properties')
+            if (signingPropFile.exists()) {
+                Properties signingProp = new Properties()
+                signingProp.load(signingPropFile.newDataInputStream())
+                storeFile file(signingProp.get("release.storeFile"))
+                storePassword signingProp.get("release.storePassword")
+                keyAlias signingProp.get("release.keyAlias")
+                keyPassword signingProp.get("release.keyPassword")
+            } else if (System.getenv('RELEASE_KEYSTORE_BASE64') != null) {
+                storeFile decodeKeyStoreFileFromBase64Env('RELEASE_KEYSTORE_BASE64')
+                storePassword System.getenv('RELEASE_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('RELEASE_KEYSTORE_KEY_ALIAS')
+                keyPassword System.getenv('RELEASE_KEYSTORE_KEY_PASSWORD')
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            if (rootProject.file('signing.properties').exists()
+                    || System.getenv('RELEASE_KEYSTORE_BASE64') != null) {
+                signingConfig signingConfigs.release
+            }
         }
+    }
+
+    lintOptions {
+        warning 'InvalidPackage'
+        abortOnError false
     }
 }
 
@@ -44,9 +74,28 @@ dependencies {
     compile 'com.android.support:multidex:1.0.+'
     compile 'com.squareup.okhttp3:okhttp:3.1.2'
     compile 'com.squareup:otto:1.3.8'
+    compile 'com.google.code.gson:gson:2.6.2'
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.jakewharton:butterknife:7.0.1'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
+}
+
+
+def decodeKeyStoreFileFromBase64Env(String name) {
+    String keyStoreBase64 = System.getenv(name)
+    if (keyStoreBase64 == null) return null
+    File tempKeyStoreFile = File.createTempFile("tmp_ks_", ".jks", File.createTempDir())
+    FileOutputStream fos = null
+    try {
+        fos = new FileOutputStream(tempKeyStoreFile)
+        fos.write(keyStoreBase64.decodeBase64())
+        fos.flush()
+    } finally {
+        if (fos != null) {
+            fos.close()
+        }
+    }
+    return tempKeyStoreFile
 }

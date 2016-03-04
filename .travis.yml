@@ -1,0 +1,19 @@
+sudo: false
+language: android
+android:
+  components:
+    - build-tools-23.0.1
+    - android-23
+    - extra-google-google_play_services
+    - extra-google-m2repository
+    - extra-android-m2repository
+    - addon-google_apis-google-19
+    # - sys-img-armeabi-v7a-android-23
+
+script: ./gradlew build
+
+addons:
+  apt:
+    packages:
+    - python2.7
+after_success: ./travis_upload_release_to_github.py
