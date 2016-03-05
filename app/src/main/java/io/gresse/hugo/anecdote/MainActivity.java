@@ -38,7 +38,7 @@ import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
 import io.gresse.hugo.anecdote.fragment.AnecdoteFragment;
-import io.gresse.hugo.anecdote.fragment.WebsiteChooserDialogFragment;
+import io.gresse.hugo.anecdote.fragment.WebsiteChooserFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
@@ -94,7 +94,7 @@ public class MainActivity extends AppCompatActivity
         mNetworkConnectivityListener.startListening(this, this);
 
         if(SpStorage.isFirstLaunch(this)){
-            openWebsiteChooserDialog();
+            changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
         }
     }
 
@@ -124,8 +124,8 @@ public class MainActivity extends AppCompatActivity
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START) && !mDrawerBackOpen) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            int fragments = getSupportFragmentManager().getBackStackEntryCount();
-            if (fragments == 1) {
+            int fragmentCount = getSupportFragmentManager().getBackStackEntryCount();
+            if (fragmentCount == 1) {
                 if (!mDrawerBackOpen) {
                     mDrawerBackOpen = true;
                     mDrawerLayout.openDrawer(GravityCompat.START);
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity
                     return;
                 }
             }
-
+            Log.d(TAG, "onBackPressed");
             super.onBackPressed();
         }
     }
@@ -152,11 +152,16 @@ public class MainActivity extends AppCompatActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_about:
-                changeFragment(Fragment.instantiate(this, AboutFragment.class.getName()), true, false);
+                changeFragment(
+                        Fragment.instantiate(this, AboutFragment.class.getName()),
+                        true,
+                        true);
                 return true;
             case R.id.action_restore:
-                SpStorage.setFirstLaunch(this, true);
-                openWebsiteChooserDialog();
+                changeFragment(
+                        WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_RESTORE),
+                        true,
+                        true);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -218,12 +223,15 @@ public class MainActivity extends AppCompatActivity
                     Log.d(TAG, "Change Fragment: addToBackTack " + backStateName);
                     transaction.addToBackStack(backStateName);
                 } else {
-                    Log.d(TAG, "Change Fragment: NO addToBackTack");
+                    Log.d(TAG, "Change Fragment: NO addToBackTack " + backStateName);
                 }
 
                 transaction.commit();
+            } else if(!fragmentPopped && manager.findFragmentByTag(backStateName) != null) {
+                Log.d(TAG, "Fragment not popped but finded: " + backStateName);
+                // manager.popBackStackImmediate(backStateName, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             } else {
-                Log.d(TAG, "Change Fragment: nothing to do : " + backStateName);
+                Log.d(TAG, "Change Fragment: nothing to do : " + backStateName + " fragmentPopped: " + fragmentPopped);
 //                if(manager.findFragmentByTag(backStateName) != null){
 //                    Log.d(TAG, "Try to remove the backStack");
 //                    manager.popBackStackImmediate();
@@ -316,15 +324,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     * Show the website dialog chooser to select which website we want to import
-     */
-    private void openWebsiteChooserDialog(){
-        FragmentManager fm = getSupportFragmentManager();
-        DialogFragment dialogFragment = WebsiteChooserDialogFragment.newInstance();
-        dialogFragment.show(fm, dialogFragment.getClass().getSimpleName());
-    }
-
-    /**
      * Open a dialog to edit given website or create a new one. One save/add, will fire {@link WebsitesChangeEvent}
      *
      * @param website website to edit
@@ -388,6 +387,22 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void onWebsitesChangeEvent(WebsitesChangeEvent event){
+        if(event.fromWebsiteChooserOverride){
+            // if we come after a restoration or at the first start
+
+            // 1. remove all already added fragment
+            FragmentManager fm = getSupportFragmentManager();
+            for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+                fm.popBackStack();
+            }
+            // 2. remove the WebsiteChooserFragment
+            Fragment fragment = fm.findFragmentByTag(WebsiteChooserFragment.class.getName());
+            if(fragment != null){
+                FragmentTransaction transaction = fm.beginTransaction();
+                transaction.remove(fragment).commit();
+
+            }
+        }
         setupServices();
         populateNavigationView();
         BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());

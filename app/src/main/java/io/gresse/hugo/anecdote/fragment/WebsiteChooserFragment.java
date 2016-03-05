@@ -4,9 +4,10 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatDialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
 import io.gresse.hugo.anecdote.adapter.WebsiteChooserAdapter;
 import io.gresse.hugo.anecdote.event.BusProvider;
+import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Website;
@@ -48,29 +50,39 @@ import okhttp3.Response;
  * <p/>
  * Created by Hugo Gresse on 03/03/16.
  */
-public class WebsiteChooserDialogFragment extends AppCompatDialogFragment implements ViewHolderListener {
+public class WebsiteChooserFragment extends Fragment implements ViewHolderListener {
 
-    public static final String TAG = WebsiteChooserDialogFragment.class.getSimpleName();
+    @SuppressWarnings("unused")
+    public static final String TAG = WebsiteChooserFragment.class.getSimpleName();
+
+    public static final String BUNDLE_MODE_KEY     = "modeKey";
+    public static final String BUNDLE_MODE_RESTORE = "restore";
+    public static final String BUNDLE_MODE_ADD     = "add";
 
     @Bind(R.id.recyclerView)
     public RecyclerView mRecyclerView;
 
-    protected OkHttpClient mOkHttpClient;
-
+    @Nullable
+    protected String                mMode;
+    protected OkHttpClient          mOkHttpClient;
     @Nullable
     protected Request               mFailRequest;
     private   List<Website>         mWebsites;
     private   WebsiteChooserAdapter mAdapter;
     private   List<Website>         mSelectedWebsites;
 
-    public static WebsiteChooserDialogFragment newInstance() {
-        return new WebsiteChooserDialogFragment();
+    public static WebsiteChooserFragment newInstance(String mode) {
+        WebsiteChooserFragment fragment = new WebsiteChooserFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(BUNDLE_MODE_KEY, mode);
+        fragment.setArguments(bundle);
+        return fragment;
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_dialog_websitechooser, container);
+        View view = inflater.inflate(R.layout.fragment_websitechooser, container, false);
         ButterKnife.bind(this, view);
         return view;
     }
@@ -79,10 +91,9 @@ public class WebsiteChooserDialogFragment extends AppCompatDialogFragment implem
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Init dialog stuff
-        getDialog().setTitle(R.string.dialog_websitechooser_title);
-//        int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90);
-//        getDialog().getWindow().setLayout(width, getDialog().getWindow().getAttributes().height);
+        if(getArguments() != null){
+            mMode = getArguments().getString(WebsiteChooserFragment.BUNDLE_MODE_KEY, null);
+        }
 
         mSelectedWebsites = new ArrayList<>();
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -109,6 +120,9 @@ public class WebsiteChooserDialogFragment extends AppCompatDialogFragment implem
     public void onResume() {
         super.onResume();
         BusProvider.getInstance().register(this);
+        BusProvider.getInstance().post(new ChangeTitleEvent(
+                getString(R.string.dialog_websitechooser_title),
+                this.getClass().getName()));
     }
 
     @Override
@@ -118,11 +132,22 @@ public class WebsiteChooserDialogFragment extends AppCompatDialogFragment implem
     }
 
     @OnClick(R.id.saveButton)
-    public void onSaveButtonClicked(){
-        SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
-        SpStorage.setFirstLaunch(getActivity(), false);
-        BusProvider.getInstance().post(new WebsitesChangeEvent());
-        getDialog().dismiss();
+    public void onSaveButtonClicked() {
+        // If we are on the first launch, we assume the user didn't have any Websites, so we override it.
+        // Else, we add the selected one
+        if (TextUtils.isEmpty(mMode)) {
+            SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
+            SpStorage.setFirstLaunch(getActivity(), false);
+            BusProvider.getInstance().post(new WebsitesChangeEvent(true));
+        } else if(mMode.equals(BUNDLE_MODE_RESTORE)) {
+            SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
+            BusProvider.getInstance().post(new WebsitesChangeEvent(true));
+        } else if(mMode.equals(BUNDLE_MODE_ADD)) {
+            for (Website website : mSelectedWebsites) {
+                SpStorage.saveWebsite(getActivity(), website);
+            }
+            BusProvider.getInstance().post(new WebsitesChangeEvent(false));
+        }
     }
 
     /***************************
@@ -207,7 +232,7 @@ public class WebsiteChooserDialogFragment extends AppCompatDialogFragment implem
             return;
         }
         Website website = (Website) object;
-        if(mSelectedWebsites.contains(website)){
+        if (mSelectedWebsites.contains(website)) {
             mSelectedWebsites.remove(website);
         } else {
             mSelectedWebsites.add(website);
