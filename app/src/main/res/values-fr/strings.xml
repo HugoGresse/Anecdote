@@ -10,6 +10,8 @@
     <string name="action_edit">Modifier</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_default">Défaut</string>
+    <string name="action_website_add">Ajouter un site</string>
+    <string name="action_website_add_custom">Ajouter un site personnalisé</string>
     <string name="copied">Copier</string>
 
     <string name="app_share_credits"> - via Anecdote http://bit.ly/anecdoteapp </string>

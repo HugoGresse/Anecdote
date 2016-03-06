@@ -136,17 +136,10 @@ public class MainActivity extends AppCompatActivity
                     return;
                 }
             }
-            Log.d(TAG, "onBackPressed");
             super.onBackPressed();
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -180,7 +173,10 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
             case R.id.drawer_group_action:
-                openWebsiteDialog(null);
+                changeFragment(
+                        WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_ADD),
+                        true,
+                        true);
                 break;
             default:
                 Toast.makeText(this, "NavigationGroup not managed", Toast.LENGTH_SHORT).show();
@@ -229,13 +225,8 @@ public class MainActivity extends AppCompatActivity
                 transaction.commit();
             } else if(!fragmentPopped && manager.findFragmentByTag(backStateName) != null) {
                 Log.d(TAG, "Fragment not popped but finded: " + backStateName);
-                // manager.popBackStackImmediate(backStateName, FragmentManager.POP_BACK_STACK_INCLUSIVE);
             } else {
                 Log.d(TAG, "Change Fragment: nothing to do : " + backStateName + " fragmentPopped: " + fragmentPopped);
-//                if(manager.findFragmentByTag(backStateName) != null){
-//                    Log.d(TAG, "Try to remove the backStack");
-//                    manager.popBackStackImmediate();
-//                }
                 // custom effect if fragment is already instanciated
             }
         } catch (IllegalStateException exception) {
@@ -316,7 +307,7 @@ public class MainActivity extends AppCompatActivity
             });
         }
 
-        navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, "Add website")
+        navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_add)
                 .setIcon(R.drawable.ic_action_content_add);
 
         navigationViewMenu.setGroupCheckable(R.id.drawer_group_content, true, true);

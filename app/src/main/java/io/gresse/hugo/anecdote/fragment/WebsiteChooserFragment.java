@@ -4,13 +4,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -62,6 +66,9 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
     @Bind(R.id.recyclerView)
     public RecyclerView mRecyclerView;
 
+    @Bind(R.id.saveButton)
+    public Button mSaveButton;
+
     @Nullable
     protected String                mMode;
     protected OkHttpClient          mOkHttpClient;
@@ -80,6 +87,11 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_websitechooser, container, false);
@@ -91,7 +103,7 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if(getArguments() != null){
+        if (getArguments() != null) {
             mMode = getArguments().getString(WebsiteChooserFragment.BUNDLE_MODE_KEY, null);
         }
 
@@ -108,6 +120,10 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
                 .build();
 
         getWebsites(request);
+
+        if (!TextUtils.isEmpty(mMode) && mMode.equals(BUNDLE_MODE_ADD)) {
+            mSaveButton.setText(R.string.dialog_website_add);
+        }
     }
 
     @Override
@@ -123,6 +139,11 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
         BusProvider.getInstance().post(new ChangeTitleEvent(
                 getString(R.string.dialog_websitechooser_title),
                 this.getClass().getName()));
+
+
+        if (mWebsites != null && !mWebsites.isEmpty()) {
+            mAdapter.setData(mWebsites);
+        }
     }
 
     @Override
@@ -139,10 +160,10 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
             SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
             SpStorage.setFirstLaunch(getActivity(), false);
             BusProvider.getInstance().post(new WebsitesChangeEvent(true));
-        } else if(mMode.equals(BUNDLE_MODE_RESTORE)) {
+        } else if (mMode.equals(BUNDLE_MODE_RESTORE)) {
             SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
             BusProvider.getInstance().post(new WebsitesChangeEvent(true));
-        } else if(mMode.equals(BUNDLE_MODE_ADD)) {
+        } else if (mMode.equals(BUNDLE_MODE_ADD)) {
             for (Website website : mSelectedWebsites) {
                 SpStorage.saveWebsite(getActivity(), website);
             }
@@ -165,6 +186,18 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    mFailRequest = request;
+                    if (getActivity() != null) {
+                        Toast
+                                .makeText(
+                                        getActivity(),
+                                        getActivity().getString(R.string.error_server_unknown),
+                                        Toast.LENGTH_SHORT)
+                                .show();
+                    }
+                    return;
+                }
                 // We are not on main thread
                 String websitesString = response.body().string();
 
@@ -181,10 +214,23 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
 
                 mWebsites = new ArrayList<>();
 
-                for (Map.Entry<String, Website> entry : websites.entrySet()) {
-                    mWebsites.add(entry.getValue());
-                }
+                if (TextUtils.isEmpty(mMode) || mMode.equals(BUNDLE_MODE_RESTORE)) {
 
+                    for (Map.Entry<String, Website> entry : websites.entrySet()) {
+                        mWebsites.add(entry.getValue());
+                    }
+
+                } else if (getContext() != null) {
+                    // We want to add some websites : remove duplicates or already added ones
+                    List<Website> savedWebsite = SpStorage.getWebsites(getActivity());
+
+                    for (Map.Entry<String, Website> entry : websites.entrySet()) {
+                        if (savedWebsite.contains(entry.getValue())) {
+                            continue;
+                        }
+                        mWebsites.add(entry.getValue());
+                    }
+                }
 
                 Collections.sort(mWebsites, new Comparator<Website>() {
                     @Override
@@ -228,14 +274,18 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
 
     @Override
     public void onClick(Object object) {
-        if (!(object instanceof Website)) {
-            return;
-        }
-        Website website = (Website) object;
-        if (mSelectedWebsites.contains(website)) {
-            mSelectedWebsites.remove(website);
-        } else {
-            mSelectedWebsites.add(website);
+        if(object instanceof Integer){
+            FragmentManager fm = getActivity().getSupportFragmentManager();
+            DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(null);
+            dialogFragment.show(fm, dialogFragment.getClass().getSimpleName());
+        } else if (object instanceof Website){
+
+            Website website = (Website) object;
+            if (mSelectedWebsites.contains(website)) {
+                mSelectedWebsites.remove(website);
+            } else {
+                mSelectedWebsites.add(website);
+            }
         }
     }
 

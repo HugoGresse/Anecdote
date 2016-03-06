@@ -10,6 +10,8 @@
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_default">Default</string>
+    <string name="action_website_add">Add website</string>
+    <string name="action_website_add_custom">Add custom website</string>
     <string name="copied">Copied to clipboard</string>
     <string name="not_implemented" translatable="false">Not implemented</string>
 
@@ -48,6 +50,7 @@
     <string name="about_made">Made with love by</string>
     <string name="about_made_person" translatable="false">Hugo Gresse http://hugo.gresse.io/</string>
     <string name="using" translatable="false">Third-party libraries</string>
+    <string name="error_server_unknown">Something went wrong with the server :(</string>
     <string-array name="about_libraries"  translatable="false">
         <item>OkHttp by Square http://square.github.io/okhttp/</item>
         <item>Otto by Square http://square.github.io/otto/</item>
