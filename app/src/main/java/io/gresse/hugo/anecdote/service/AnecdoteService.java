@@ -158,8 +158,11 @@ public class AnecdoteService {
         try {
             document = Jsoup.parse(response.body().string());
         } catch (IOException e) {
+            response.body().close();
             postOnUiThread(new RequestFailedEvent(mWebsite.id, "Unable to parse " + mWebsite.name + " website", null, pageNumber));
             return;
+        } finally {
+            response.body().close();
         }
 
         final Elements elements = document.select(mWebsite.selector);
