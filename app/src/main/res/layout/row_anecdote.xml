@@ -9,5 +9,5 @@
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/contentTextView"
-        android:padding="32dp"/>
+        android:padding="@dimen/padding_anecdoterow"/>
 </LinearLayout>

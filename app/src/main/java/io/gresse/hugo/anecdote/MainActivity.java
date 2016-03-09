@@ -38,7 +38,8 @@ import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
 import io.gresse.hugo.anecdote.fragment.AnecdoteFragment;
-import io.gresse.hugo.anecdote.fragment.WebsiteChooserDialogFragment;
+import io.gresse.hugo.anecdote.fragment.SettingsFragment;
+import io.gresse.hugo.anecdote.fragment.WebsiteChooserFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!BuildConfig.DEBUG) {
+        if (isFabricEnable()) {
             Fabric.with(this, new Crashlytics());
         }
         setContentView(R.layout.activity_main);
@@ -94,7 +95,7 @@ public class MainActivity extends AppCompatActivity
         mNetworkConnectivityListener.startListening(this, this);
 
         if(SpStorage.isFirstLaunch(this)){
-            openWebsiteChooserDialog();
+            changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
         }
     }
 
@@ -124,8 +125,8 @@ public class MainActivity extends AppCompatActivity
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START) && !mDrawerBackOpen) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
-            int fragments = getSupportFragmentManager().getBackStackEntryCount();
-            if (fragments == 1) {
+            int fragmentCount = getSupportFragmentManager().getBackStackEntryCount();
+            if (fragmentCount == 1) {
                 if (!mDrawerBackOpen) {
                     mDrawerBackOpen = true;
                     mDrawerLayout.openDrawer(GravityCompat.START);
@@ -136,27 +137,31 @@ public class MainActivity extends AppCompatActivity
                     return;
                 }
             }
-
             super.onBackPressed();
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_about:
-                changeFragment(Fragment.instantiate(this, AboutFragment.class.getName()), true, false);
-                return true;
             case R.id.action_restore:
-                SpStorage.setFirstLaunch(this, true);
-                openWebsiteChooserDialog();
+                changeFragment(
+                        WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_RESTORE),
+                        true,
+                        true);
+                return true;
+            case R.id.action_about:
+                changeFragment(
+                        Fragment.instantiate(this, AboutFragment.class.getName()),
+                        true,
+                        true);
+                return true;
+            case R.id.action_settings:
+                changeFragment(
+                        Fragment.instantiate(this, SettingsFragment.class.getName()),
+                        true,
+                        true);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -175,7 +180,10 @@ public class MainActivity extends AppCompatActivity
                 }
                 break;
             case R.id.drawer_group_action:
-                openWebsiteDialog(null);
+                changeFragment(
+                        WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_ADD),
+                        true,
+                        true);
                 break;
             default:
                 Toast.makeText(this, "NavigationGroup not managed", Toast.LENGTH_SHORT).show();
@@ -185,6 +193,10 @@ public class MainActivity extends AppCompatActivity
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    /***************************
+     * inner methods
+     ***************************/
 
     /**
      * Change tu current displayed fragment by a new one.
@@ -218,16 +230,14 @@ public class MainActivity extends AppCompatActivity
                     Log.d(TAG, "Change Fragment: addToBackTack " + backStateName);
                     transaction.addToBackStack(backStateName);
                 } else {
-                    Log.d(TAG, "Change Fragment: NO addToBackTack");
+                    Log.d(TAG, "Change Fragment: NO addToBackTack " + backStateName);
                 }
 
                 transaction.commit();
+            } else if(!fragmentPopped && manager.findFragmentByTag(backStateName) != null) {
+                Log.d(TAG, "Fragment not popped but finded: " + backStateName);
             } else {
-                Log.d(TAG, "Change Fragment: nothing to do : " + backStateName);
-//                if(manager.findFragmentByTag(backStateName) != null){
-//                    Log.d(TAG, "Try to remove the backStack");
-//                    manager.popBackStackImmediate();
-//                }
+                Log.d(TAG, "Change Fragment: nothing to do : " + backStateName + " fragmentPopped: " + fragmentPopped);
                 // custom effect if fragment is already instanciated
             }
         } catch (IllegalStateException exception) {
@@ -308,20 +318,11 @@ public class MainActivity extends AppCompatActivity
             });
         }
 
-        navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, "Add website")
+        navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_add)
                 .setIcon(R.drawable.ic_action_content_add);
 
         navigationViewMenu.setGroupCheckable(R.id.drawer_group_content, true, true);
         navigationViewMenu.getItem(0).setChecked(true);
-    }
-
-    /**
-     * Show the website dialog chooser to select which website we want to import
-     */
-    private void openWebsiteChooserDialog(){
-        FragmentManager fm = getSupportFragmentManager();
-        DialogFragment dialogFragment = WebsiteChooserDialogFragment.newInstance();
-        dialogFragment.show(fm, dialogFragment.getClass().getSimpleName());
     }
 
     /**
@@ -344,6 +345,15 @@ public class MainActivity extends AppCompatActivity
     @Nullable
     public AnecdoteService getAnecdoteService(int websiteId) {
         return mServiceProvider.getAnecdoteService(websiteId);
+    }
+
+    /**
+     * Return true if fabric is enable, checking the BuildConfig
+     *
+     * @return true if enable, false otherweise
+     */
+    private static boolean isFabricEnable() {
+        return !Configuration.DEBUG;
     }
 
     /***************************
@@ -388,6 +398,23 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void onWebsitesChangeEvent(WebsitesChangeEvent event){
+        if(event.fromWebsiteChooserOverride){
+            Log.d(TAG, "onWebsitesChangeEvent: removing all fragments");
+            // if we come after a restoration or at the first start
+
+            // 1. remove all already added fragment
+            FragmentManager fm = getSupportFragmentManager();
+            for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+                fm.popBackStack();
+            }
+            // 2. remove the WebsiteChooserFragment
+            Fragment fragment = fm.findFragmentByTag(WebsiteChooserFragment.class.getName());
+            if(fragment != null){
+                FragmentTransaction transaction = fm.beginTransaction();
+                transaction.remove(fragment).commit();
+
+            }
+        }
         setupServices();
         populateNavigationView();
         BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());

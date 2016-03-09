@@ -1,0 +1,28 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <PreferenceCategory android:title="@string/pref_cat_display">
+
+        <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
+             dismiss it. -->
+        <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
+        <ListPreference
+            android:defaultValue="@integer/anecdote_textsize_default"
+            android:entries="@array/pref_textsize_title"
+            android:entryValues="@array/pref_textsize_values"
+            android:key="@string/pref_textsize_key"
+            android:summary="%s"
+            android:negativeButtonText="@null"
+            android:positiveButtonText="@null"
+            android:title="@string/pref_textsize_title"/>
+
+        <SwitchPreference
+            android:defaultValue="@bool/pref_rowstripping_default"
+            android:key="@string/pref_rowstriping_key"
+            android:summary="@string/pref_rowstriping_summary"
+            android:title="@string/pref_rowstriping_title"/>
+
+    </PreferenceCategory>
+
+
+</PreferenceScreen>

@@ -1,12 +1,11 @@
-# Anecdote
+<a id="status-image-popup" class="open-popup" href="#" title="build status image" name="status-images" data-ember-action="944">
+<img src="https://travis-ci.org/HugoGresse/Anecdote.svg" alt="build:started">
+</a>
+# Anecdote 
 
 Simply display VDM and DTC content in a basic interface
 
 <a href="https://play.google.com/store/apps/details?id=io.gresse.hugo.anecdote&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img width="200px" alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a>
-
-<a id="status-image-popup" class="open-popup" href="#" title="build status image" name="status-images" data-ember-action="944">
-<img src="https://travis-ci.org/HugoGresse/Anecdote.svg" alt="build:started">
-</a>
 
 ![home](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/screen_home.png)
 ![edit](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/screen_edit.png)
@@ -15,7 +14,6 @@ _This application is not related in anyway with [viedemerde.fr](http://viedemerd
 
 Features
 --------
-
 - display DansTonChat.com, VieDeMerde.fr, fmlife.com and much more (choose on first start which websites you want to read, based on Anecdote database)
 - infinit scroll
 - pull to refresh

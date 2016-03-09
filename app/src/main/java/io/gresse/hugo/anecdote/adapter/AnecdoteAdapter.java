@@ -1,5 +1,6 @@
 package io.gresse.hugo.anecdote.adapter;
 
+import android.graphics.Color;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -31,6 +32,9 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
     private List<Anecdote>     mAnecdotes;
     @Nullable
     private ViewHolderListener mViewHolderListener;
+    private int                mTextSize;
+    private boolean            mRowStriping;
+    private int                mRowStripingBackground;
 
     public AnecdoteAdapter(@Nullable ViewHolderListener viewHolderListener) {
         mAnecdotes = new ArrayList<>();
@@ -39,6 +43,13 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
 
     public void setData(List<Anecdote> quotes) {
         mAnecdotes = quotes;
+        notifyDataSetChanged();
+    }
+
+    public void setTextStyle(int textSize, boolean rowStriping, int colorBackgroundStripping) {
+        mTextSize = textSize;
+        mRowStriping = rowStriping;
+        mRowStripingBackground = colorBackgroundStripping;
         notifyDataSetChanged();
     }
 
@@ -59,7 +70,7 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
     @Override
     public void onBindViewHolder(BaseAnecdoteViewHolder holder, int position) {
         if (position < mAnecdotes.size()) {
-            holder.setData(mAnecdotes.get(position));
+            holder.setData(position, mAnecdotes.get(position));
         }
     }
 
@@ -87,7 +98,7 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
             super(itemView);
         }
 
-        public abstract void setData(Anecdote anecdote);
+        public abstract void setData(int position, Anecdote anecdote);
     }
 
     public class AnecdoteViewHolder extends BaseAnecdoteViewHolder implements View.OnLongClickListener {
@@ -103,8 +114,16 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
         }
 
         @Override
-        public void setData(Anecdote anecdote) {
+        public void setData(int position, Anecdote anecdote) {
             textView.setText(Html.fromHtml(anecdote.content));
+            textView.setTextSize(mTextSize);
+            if(mRowStriping){
+                if(position % 2 == 0){
+                    textView.setBackgroundColor(mRowStripingBackground);
+                } else {
+                    textView.setBackgroundColor(Color.TRANSPARENT);
+                }
+            }
         }
 
         @Override
@@ -126,7 +145,7 @@ public class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAn
         }
 
         @Override
-        public void setData(Anecdote anecdote) {
+        public void setData(int position, Anecdote anecdote) {
 
         }
     }

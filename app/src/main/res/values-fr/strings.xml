@@ -10,6 +10,8 @@
     <string name="action_edit">Modifier</string>
     <string name="action_delete">Supprimer</string>
     <string name="action_default">Défaut</string>
+    <string name="action_website_add">Ajouter un site</string>
+    <string name="action_website_add_custom">Ajouter un site personnalisé</string>
     <string name="copied">Copier</string>
 
     <string name="app_share_credits"> - via Anecdote http://bit.ly/anecdoteapp </string>
@@ -46,4 +48,10 @@
     <string name="about_title">À propos</string>
     <string name="about_made">Fait avec amour par</string>
 
+
+    <!-- Strings related to Settings -->
+    <string name="pref_cat_display">Affichage</string>
+    <string name="pref_rowstriping_title">Séparation des citations</string>
+    <string name="pref_rowstriping_summary">Ajouter un fond pour séparer les citations</string>
+    <string name="pref_textsize_title">Taille du texte</string>
 </resources>

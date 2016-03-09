@@ -2,7 +2,6 @@
 
     <!-- Base application theme. -->
     <style name="AnecdoteTheme" parent="Theme.AppCompat">
-        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
@@ -10,6 +9,8 @@
         <item name="android:textColor">@color/colorTextPrimary</item>
         <item name="android:textColorPrimary">@color/colorTextPrimary</item>
         <item name="android:textColorPrimaryInverse">@color/colorTextSecondary</item>
+
+        <item name="preferenceTheme">@style/PreferenceThemeOverlay.v14.Material</item>
     </style>
 
     <style name="AnecdoteTheme.NoActionBar">

@@ -111,7 +111,7 @@ public class SpStorage {
     }
 
     /**
-     * Update all saved websites config
+     * Update all saved websites config, override alreayd saved ones
      *
      * @param context  app context
      * @param websites list of websites to save

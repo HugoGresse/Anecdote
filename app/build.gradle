@@ -23,7 +23,7 @@ android {
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 3
-        versionName "0.2.0"
+        versionName "0.3.0"
         archivesBaseName = "anecdote-" + versionName
     }
 
@@ -68,6 +68,8 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:preference-v7:23.1.1'
+    compile 'com.android.support:preference-v14:23.1.1'
     compile 'com.android.support:design:23.1.1'
     compile 'com.android.support:recyclerview-v7:23.1.1'
     //noinspection GradleDynamicVersion

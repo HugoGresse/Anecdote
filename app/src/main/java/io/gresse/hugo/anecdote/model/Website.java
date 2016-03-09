@@ -9,6 +9,9 @@ import android.text.TextUtils;
  */
 public class Website {
 
+    public static final String SOURCE_LOCAL  = "local";
+    public static final String SOURCE_REMOTE = "remote";
+
     // The website id should never be altered
     public int         id;
     public String      name;
@@ -19,12 +22,14 @@ public class Website {
     public boolean     isFirstPageZero;
     public int         color;
     public int         like;
+    public String      source;
     public WebsiteItem contentItem;
     public WebsiteItem urlItem;
 
     public Website() {
         this.contentItem = new WebsiteItem();
         this.urlItem = new WebsiteItem();
+        this.source = SOURCE_LOCAL;
     }
 
     public Website(int id,
@@ -47,26 +52,26 @@ public class Website {
     /**
      * Validate this object by preventing any crash when using it
      */
-    public void validateData(){
-        if(TextUtils.isEmpty(name)){
+    public void validateData() {
+        if (TextUtils.isEmpty(name)) {
             name = "";
         }
-        if(TextUtils.isEmpty(url)){
+        if (TextUtils.isEmpty(url)) {
             url = "";
         }
-        if(TextUtils.isEmpty(selector)){
+        if (TextUtils.isEmpty(selector)) {
             selector = "";
         }
-        if(TextUtils.isEmpty(urlSuffix)){
+        if (TextUtils.isEmpty(urlSuffix)) {
             urlSuffix = "";
         }
-        if(itemPerPage <= 0){
+        if (itemPerPage <= 0) {
             itemPerPage = 1;
         }
-        if(contentItem == null){
+        if (contentItem == null) {
             contentItem = new WebsiteItem();
         }
-        if(urlItem == null){
+        if (urlItem == null) {
             urlItem = new WebsiteItem();
         }
     }
@@ -78,12 +83,14 @@ public class Website {
 
         Website website = (Website) o;
 
-        return id == website.id;
+        return id == website.id && source.equals(website.source);
     }
 
     @Override
     public int hashCode() {
-        return id;
+        int result = id;
+        result = 31 * result + source.hashCode();
+        return result;
     }
 
     @Override
@@ -91,9 +98,9 @@ public class Website {
         return "Website{" +
                 "id=" + id +
                 "\n, name='" + name + "'" +
-                "\n, url='" + url +  "'" +
-                "\n, selector='" + selector +  "'" +
-                "\n, urlSuffix='" + urlSuffix +  "'" +
+                "\n, url='" + url + "'" +
+                "\n, selector='" + selector + "'" +
+                "\n, urlSuffix='" + urlSuffix + "'" +
                 "\n, itemPerPage=" + itemPerPage +
                 "\n, isFirstPageZero=" + isFirstPageZero +
                 "\n, color=" + color +
