@@ -46,16 +46,41 @@
 
     <string name="dialog_websitechooser_title">Select your favorites sites</string>
 
+
+    <!-- About fragment -->
     <string name="about_title">About</string>
     <string name="about_made">Made with love by</string>
     <string name="about_made_person" translatable="false">Hugo Gresse http://hugo.gresse.io/</string>
     <string name="using" translatable="false">Third-party libraries</string>
-    <string name="error_server_unknown">Something went wrong with the server :(</string>
-    <string-array name="about_libraries"  translatable="false">
+    <string name="error_server_unknown" translatable="false">Something went wrong with the server :(</string>
+    <string-array name="about_libraries" translatable="false">
         <item>OkHttp by Square http://square.github.io/okhttp/</item>
         <item>Otto by Square http://square.github.io/otto/</item>
         <item>Gson by Google http://github.com/google/gson</item>
         <item>Jsoup by Jonathan Hedley http://jsoup.org/</item>
         <item>ButterKnife by Jake Wharton http://jakewharton.github.io/butterknife/</item>
     </string-array>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_cat_display">Display</string>
+    <string name="pref_rowstriping_title">Quote row striping</string>
+    <string name="pref_rowstriping_summary">Add a background to separate each quotes</string>
+    <string name="pref_textsize_title">Text size</string>
+    <string-array name="pref_textsize_title">
+        <item>Extra small</item>
+        <item>Small</item>
+        <item>Normal</item>
+        <item>Large</item>
+        <item>Extra large</item>
+    </string-array>
+    <string name="pref_rowstriping_key" translatable="false">rowStriping</string>
+    <string name="pref_textsize_key" translatable="false">textSize</string>
+    <string-array name="pref_textsize_values" translatable="false">
+        <item>10</item>
+        <item>12</item>
+        <item>14</item>
+        <item>18</item>
+        <item>24</item>
+    </string-array>
+
 </resources>

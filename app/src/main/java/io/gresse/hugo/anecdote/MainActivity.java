@@ -38,6 +38,7 @@ import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
 import io.gresse.hugo.anecdote.fragment.AnecdoteFragment;
+import io.gresse.hugo.anecdote.fragment.SettingsFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteChooserFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.model.Website;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!BuildConfig.DEBUG) {
+        if (isFabricEnable()) {
             Fabric.with(this, new Crashlytics());
         }
         setContentView(R.layout.activity_main);
@@ -144,15 +145,21 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_restore:
+                changeFragment(
+                        WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_RESTORE),
+                        true,
+                        true);
+                return true;
             case R.id.action_about:
                 changeFragment(
                         Fragment.instantiate(this, AboutFragment.class.getName()),
                         true,
                         true);
                 return true;
-            case R.id.action_restore:
+            case R.id.action_settings:
                 changeFragment(
-                        WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_RESTORE),
+                        Fragment.instantiate(this, SettingsFragment.class.getName()),
                         true,
                         true);
                 return true;
@@ -186,6 +193,10 @@ public class MainActivity extends AppCompatActivity
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    /***************************
+     * inner methods
+     ***************************/
 
     /**
      * Change tu current displayed fragment by a new one.
@@ -336,6 +347,15 @@ public class MainActivity extends AppCompatActivity
         return mServiceProvider.getAnecdoteService(websiteId);
     }
 
+    /**
+     * Return true if fabric is enable, checking the BuildConfig
+     *
+     * @return true if enable, false otherweise
+     */
+    private static boolean isFabricEnable() {
+        return !Configuration.DEBUG;
+    }
+
     /***************************
      * Event
      ***************************/
@@ -379,6 +399,7 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onWebsitesChangeEvent(WebsitesChangeEvent event){
         if(event.fromWebsiteChooserOverride){
+            Log.d(TAG, "onWebsitesChangeEvent: removing all fragments");
             // if we come after a restoration or at the first start
 
             // 1. remove all already added fragment

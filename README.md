@@ -14,7 +14,6 @@ _This application is not related in anyway with [viedemerde.fr](http://viedemerd
 
 Features
 --------
-- scroll bar
 - display DansTonChat.com, VieDeMerde.fr, fmlife.com and much more (choose on first start which websites you want to read, based on Anecdote database)
 - infinit scroll
 - pull to refresh

@@ -3,12 +3,15 @@ package io.gresse.hugo.anecdote.fragment;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -142,6 +145,11 @@ public class AnecdoteFragment extends Fragment implements
             mWebsiteId = getArguments().getInt(ARGS_WEBSITE_ID);
         }
 
+        // Get text pref
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(getContext());
+        int textSize = Integer.parseInt(preferences.getString(getString(R.string.pref_textsize_key), String.valueOf(getResources().getInteger(R.integer.anecdote_textsize_default))));
+        boolean rowStripping = preferences.getBoolean(getString(R.string.pref_rowstriping_key), getResources().getBoolean(R.bool.pref_rowstripping_default));
+
         mAnecdoteService = ((MainActivity) getActivity()).getAnecdoteService(mWebsiteId);
 
         if (mAnecdoteService == null) {
@@ -152,6 +160,12 @@ public class AnecdoteFragment extends Fragment implements
         // Set default values
         mIsLoadingNewItems = false;
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            mAdapter.setTextStyle(textSize, rowStripping, getResources().getColor(R.color.colorBackgroundStripping, null));
+        } else {
+            // noinspection deprecation
+            mAdapter.setTextStyle(textSize, rowStripping, getResources().getColor(R.color.colorBackgroundStripping));
+        }
         mAdapter.setData(mAnecdoteService.getAnecdotes());
 
         if (mAnecdoteService.getAnecdotes().isEmpty()) {
@@ -200,7 +214,7 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onLongClick(final Object object) {
-        if(!(object instanceof Anecdote)){
+        if (!(object instanceof Anecdote)) {
             return;
         }
         final Anecdote anecdote = (Anecdote) object;

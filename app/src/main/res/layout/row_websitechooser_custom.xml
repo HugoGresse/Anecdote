@@ -8,7 +8,9 @@
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/colorDivider"/>
+        android:background="@color/colorDivider"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin"/>
 
     <TextView
         android:layout_width="wrap_content"
