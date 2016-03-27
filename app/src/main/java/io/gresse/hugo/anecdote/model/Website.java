@@ -1,6 +1,9 @@
 package io.gresse.hugo.anecdote.model;
 
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
+import java.util.Map;
 
 /**
  * Represent a unique content provider such as VDM or DTC to be used to get and parse data from the website.
@@ -14,6 +17,7 @@ public class Website {
 
     // The website id should never be altered
     public int         id;
+    public int         version;
     public String      name;
     public String      url;
     public String      selector;
@@ -25,6 +29,19 @@ public class Website {
     public String      source;
     public WebsiteItem contentItem;
     public WebsiteItem urlItem;
+    @Nullable
+    public WebsiteItem imageItem;
+    @Nullable
+    public WebsiteItem videoItem;
+
+    /**
+     * If a paginationItem is not null, so the first page to get if the root website (like http://9gag.com) and the
+     * other page url are getted from the last page launch using this paginationItem.
+     *
+     * PaginationItem value if not getter after the first elements selections but at the same level.
+     */
+    @Nullable
+    public WebsiteItem paginationItem;
 
     public Website() {
         this.contentItem = new WebsiteItem();
@@ -73,6 +90,25 @@ public class Website {
         }
         if (urlItem == null) {
             urlItem = new WebsiteItem();
+        }
+    }
+
+    /**
+     * Get the page url from the given page number.
+     *
+     * @param pageNumber the page to get the url from
+     * @param paginationMap the paginationMap is any, to try to get the url from
+     * @return the url that represent the page
+     */
+    public String getPageUrl(int pageNumber, @Nullable Map<Integer, String> paginationMap){
+        if(paginationItem == null){
+            return url +
+                    ((isFirstPageZero) ? pageNumber - 1 : pageNumber) +
+                    urlSuffix;
+        } else if(pageNumber != 0 && paginationMap != null && paginationMap.containsKey(pageNumber)) {
+            return paginationMap.get(pageNumber);
+        } else {
+            return url;
         }
     }
 

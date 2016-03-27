@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.squareup.otto.Subscribe;
@@ -17,6 +16,7 @@ import org.jsoup.select.Selector;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,6 +27,7 @@ import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.model.RichContent;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.util.Utils;
@@ -43,22 +44,24 @@ import okhttp3.Response;
  */
 public class AnecdoteService {
 
-    protected Context        mContext;
-    protected OkHttpClient   mOkHttpClient;
-    protected String         mServiceName;
-    protected Website        mWebsite;
-    protected List<Anecdote> mAnecdotes;
-    protected List<Event>    mFailEvents;
+    protected Context              mContext;
+    protected OkHttpClient         mOkHttpClient;
+    protected String               mServiceName;
+    protected Website              mWebsite;
+    protected List<Anecdote>       mAnecdotes;
+    protected List<Event>          mFailEvents;
+    protected Map<Integer, String> mPaginationMap;
     protected boolean mEnd = false;
 
     public AnecdoteService(Context context, Website website) {
         mContext = context;
         mWebsite = website;
-        mServiceName = mWebsite.name + AnecdoteService.class.getSimpleName();
+        mServiceName = mWebsite.name.replaceAll("\\s", "") + AnecdoteService.class.getSimpleName();
 
         mOkHttpClient = new OkHttpClient();
         mAnecdotes = new ArrayList<>();
         mFailEvents = new ArrayList<>();
+        mPaginationMap = new HashMap<>();
     }
 
     /**
@@ -100,12 +103,10 @@ public class AnecdoteService {
         Request request;
         try {
             request = new Request.Builder()
-                    .url(mWebsite.url +
-                            ((mWebsite.isFirstPageZero) ? pageNumber - 1 : pageNumber) +
-                            mWebsite.urlSuffix)
+                    .url(mWebsite.getPageUrl(pageNumber, mPaginationMap))
                     .header("User-Agent", Utils.getUserAgent())
                     .build();
-        } catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             mFailEvents.add(event);
             postOnUiThread(new RequestFailedEvent(
                     mWebsite.id,
@@ -129,10 +130,10 @@ public class AnecdoteService {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 // We are not on main thread
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     try {
                         processResponse(pageNumber, response);
-                    } catch (Selector.SelectorParseException exception){
+                    } catch (Selector.SelectorParseException exception) {
                         postOnUiThread(new RequestFailedEvent(
                                 mWebsite.id,
                                 "Something went wrong, try another website setting",
@@ -168,84 +169,39 @@ public class AnecdoteService {
         final Elements elements = document.select(mWebsite.selector);
 
         if (elements != null && !elements.isEmpty()) {
-            Element tempElement;
-            String content = "";
-            String url = "";
+            Element tempElement = null;
+            String content;
+            String url;
+            RichContent richContent = null;
 
+            /**
+             * We get each item to select the correct data and apply the WebsiteItem options (replace, prefix, etc).
+             * We pass the first parameter to the getData to not create a new Object each time
+             */
             for (Element element : elements) {
+                //noinspection ConstantConditions
+                content = mWebsite.contentItem.getData(element, tempElement);
+                //noinspection ConstantConditions
+                url = mWebsite.urlItem.getData(element, tempElement);
 
-
-                /////////////////////////
-                // Step 1: create content
-
-                if (!TextUtils.isEmpty(mWebsite.contentItem.prefix)) {
-                    content = mWebsite.contentItem.prefix;
+                if(mWebsite.imageItem != null){
+                    //noinspection ConstantConditions
+                    richContent = new RichContent(RichContent.TYPE_IMAGE, mWebsite.imageItem.getData(element, tempElement));
+                } else if (mWebsite.videoItem != null){
+                    //noinspection ConstantConditions
+                    richContent = new RichContent(RichContent.TYPE_VIDEO, mWebsite.videoItem.getData(element, tempElement));
                 }
 
-                if (TextUtils.isEmpty(mWebsite.contentItem.selector)) {
-                    tempElement = element;
-                } else {
-                    tempElement = element.select(mWebsite.contentItem.selector).get(0);
-                }
+                mAnecdotes.add(new Anecdote(content, url, richContent));
+            }
 
-                if (tempElement != null) {
-                    if (TextUtils.isEmpty(mWebsite.contentItem.attribute)) {
-                        content = tempElement.html();
-                    } else {
-                        content = tempElement.attr(mWebsite.contentItem.attribute);
-                    }
-                }
-
-                if (!TextUtils.isEmpty(mWebsite.contentItem.suffix)) {
-                    content += mWebsite.contentItem.suffix;
-                }
-
-                for (Map.Entry<String, String> entry : mWebsite.contentItem.replaceMap.entrySet()) {
-                    content = content.replaceAll(entry.getKey(), entry.getValue());
-                }
-
-                ////////////////////////
-                // Step 2: create url
-
-                if (!TextUtils.isEmpty(mWebsite.urlItem.prefix)) {
-                    url = mWebsite.urlItem.prefix;
-                }
-
-                if (TextUtils.isEmpty(mWebsite.urlItem.selector)) {
-                    tempElement = element;
-                } else {
-                    tempElement = element.select(mWebsite.urlItem.selector).get(0);
-                }
-
-                if (tempElement != null) {
-                    if (TextUtils.isEmpty(mWebsite.urlItem.attribute)) {
-                        url += tempElement.html();
-                    } else {
-                        url += tempElement.attr(mWebsite.urlItem.attribute);
-                    }
-                }
-
-                if (!TextUtils.isEmpty(mWebsite.urlItem.suffix)) {
-                    url += mWebsite.urlItem.suffix;
-                }
-
-                for (Map.Entry<String, String> entry : mWebsite.urlItem.replaceMap.entrySet()) {
-                    url = url.replaceAll(entry.getKey(), entry.getValue());
-                }
-
-                ////////////////////////
-                // Step 3: create the anecdote
-
-                mAnecdotes.add(new Anecdote(content, url));
-
-                // reset var
-                content = "";
-                url = "";
+            if (mWebsite.paginationItem != null) {
+                mPaginationMap.put(pageNumber + 1, mWebsite.paginationItem.getData(document));
             }
 
             postOnUiThread(new OnAnecdoteLoadedEvent(mWebsite.id, elements.size(), pageNumber));
         } else {
-            Log.d(mServiceName, "No more elements from this");
+            Log.d(mServiceName, "No elements from this");
             mEnd = true;
         }
     }

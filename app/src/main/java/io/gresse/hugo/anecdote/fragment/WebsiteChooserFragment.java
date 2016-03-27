@@ -40,7 +40,7 @@ import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Website;
-import io.gresse.hugo.anecdote.util.SpStorage;
+import io.gresse.hugo.anecdote.storage.SpStorage;
 import io.gresse.hugo.anecdote.util.Utils;
 import okhttp3.Call;
 import okhttp3.Callback;

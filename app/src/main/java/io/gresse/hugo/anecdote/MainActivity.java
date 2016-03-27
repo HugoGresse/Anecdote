@@ -45,7 +45,7 @@ import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
-import io.gresse.hugo.anecdote.util.SpStorage;
+import io.gresse.hugo.anecdote.storage.SpStorage;
 
 
 public class MainActivity extends AppCompatActivity
@@ -87,6 +87,9 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         mNavigationView.setNavigationItemSelectedListener(this);
+
+        // Process migration before getting anything else from shared preferences
+        SpStorage.migrate(this);
 
         setupServices();
         populateNavigationView();

@@ -21,7 +21,7 @@ import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.model.Website;
-import io.gresse.hugo.anecdote.util.SpStorage;
+import io.gresse.hugo.anecdote.storage.SpStorage;
 
 /**
  * FialogFragment to edit or add wesites
