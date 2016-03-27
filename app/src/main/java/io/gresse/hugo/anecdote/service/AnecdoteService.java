@@ -65,6 +65,14 @@ public class AnecdoteService {
     }
 
     /**
+     * Get the Website object
+     * @return website object
+     */
+    public Website getWebsite(){
+        return mWebsite;
+    }
+
+    /**
      * Return the list of anecdotes already loaded by the service
      *
      * @return list of anecdote
@@ -184,12 +192,20 @@ public class AnecdoteService {
                 //noinspection ConstantConditions
                 url = mWebsite.urlItem.getData(element, tempElement);
 
-                if(mWebsite.imageItem != null){
-                    //noinspection ConstantConditions
-                    richContent = new RichContent(RichContent.TYPE_IMAGE, mWebsite.imageItem.getData(element, tempElement));
-                } else if (mWebsite.videoItem != null){
-                    //noinspection ConstantConditions
-                    richContent = new RichContent(RichContent.TYPE_VIDEO, mWebsite.videoItem.getData(element, tempElement));
+                switch (mWebsite.getAdditionalContentType()){
+                    case Website.TYPE_IMAGE:
+                        //noinspection ConstantConditions
+                        richContent = new RichContent(RichContent.TYPE_IMAGE, mWebsite.imageItem.getData(element, tempElement));
+                        break;
+                    case Website.TYPE_VIDEO:
+                        //noinspection ConstantConditions
+                        richContent = new RichContent(RichContent.TYPE_VIDEO, mWebsite.videoItem.getData(element, tempElement));
+                        break;
+                    case Website.TYPE_NONE:
+                        // NOTHING;
+                        break;
+                    default:
+                        Log.e(mServiceName, "Not managed additional content type");
                 }
 
                 mAnecdotes.add(new Anecdote(content, url, richContent));

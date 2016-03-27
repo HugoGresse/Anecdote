@@ -15,6 +15,10 @@ public class Website {
     public static final String SOURCE_LOCAL  = "local";
     public static final String SOURCE_REMOTE = "remote";
 
+    public static final int TYPE_NONE = 0;
+    public static final int TYPE_IMAGE = 1;
+    public static final int TYPE_VIDEO = 2;
+
     // The website id should never be altered
     public int         id;
     public int         version;
@@ -111,6 +115,24 @@ public class Website {
             return url;
         }
     }
+
+    /**
+     * Return the additional content type of the website.
+     *
+     * @return
+     *  - {@link #TYPE_NONE} if no additional content
+     *  - {@link #TYPE_IMAGE} image additional content
+     *  - {@link #TYPE_VIDEO} video additional content
+     */
+    public int getAdditionalContentType(){
+        if(imageItem != null){
+            return TYPE_IMAGE;
+        } else if (videoItem != null){
+            return TYPE_VIDEO;
+        }
+        return TYPE_NONE;
+    }
+
 
     @Override
     public boolean equals(Object o) {

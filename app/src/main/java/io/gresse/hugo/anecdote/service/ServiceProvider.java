@@ -17,7 +17,7 @@ import io.gresse.hugo.anecdote.model.Website;
  */
 public class ServiceProvider {
 
-    protected List<Website>                mWebsites;
+    protected List<Website>                 mWebsites;
     protected Map<Integer, AnecdoteService> mServices;
 
     public ServiceProvider(List<Website> websites) {
@@ -36,13 +36,13 @@ public class ServiceProvider {
     }
 
     public void unregister(Bus bus) {
-        for(Map.Entry<Integer, AnecdoteService> entry : mServices.entrySet()) {
+        for (Map.Entry<Integer, AnecdoteService> entry : mServices.entrySet()) {
             bus.unregister(entry.getValue());
         }
         mServices.clear();
     }
 
-    public AnecdoteService getAnecdoteService(int websiteId){
+    public AnecdoteService getAnecdoteService(int websiteId) {
         return mServices.get(websiteId);
     }
 

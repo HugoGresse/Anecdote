@@ -50,7 +50,7 @@ public class WebsiteItem {
     public String prefix;
 
     /**
-     * The suffit to add to the item
+     * The suffix to add to the item
      */
     @Nullable
     public String suffix;
@@ -60,6 +60,12 @@ public class WebsiteItem {
      * replace the key from.
      */
     public Map<String, String> replaceMap;
+
+    /**
+     * If the current websiteItem fail to be geted from given data, try to fallback to this
+     */
+    @Nullable
+    public WebsiteItem fallbackItem;
 
     public WebsiteItem() {
         suffix = null;
@@ -99,7 +105,10 @@ public class WebsiteItem {
         } else try {
             tempElement = element.select(selector).get(0);
         } catch (IndexOutOfBoundsException exception) {
-            exception.printStackTrace();
+            // No item, we try the fallback if any
+            if(fallbackItem != null){
+                return fallbackItem.getData(element, tempElement);
+            }
             return data;
         }
 

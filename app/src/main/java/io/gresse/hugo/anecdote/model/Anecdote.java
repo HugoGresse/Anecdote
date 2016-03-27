@@ -56,9 +56,6 @@ public class Anecdote {
 
     @Override
     public String toString() {
-        return "DtcQuote{" +
-                "content='" + content + '\'' +
-                ", permalink='" + permalink + '\'' +
-                '}';
+        return "Anecdote content='" + content + "'\', permalink='"+ permalink + '\'';
     }
 }

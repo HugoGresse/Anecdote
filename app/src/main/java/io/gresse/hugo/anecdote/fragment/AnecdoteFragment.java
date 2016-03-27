@@ -29,6 +29,8 @@ import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.AnecdoteAdapter;
+import io.gresse.hugo.anecdote.adapter.ImageAdapter;
+import io.gresse.hugo.anecdote.adapter.TextAdapter;
 import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
@@ -37,6 +39,7 @@ import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.util.Utils;
 
@@ -93,12 +96,9 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new AnecdoteAdapter(this);
-        mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -156,6 +156,28 @@ public class AnecdoteFragment extends Fragment implements
             Log.e(TAG, "Unable to get an AnecdoteService");
             return;
         }
+
+        switch (mAnecdoteService.getWebsite().getAdditionalContentType()){
+            case Website.TYPE_NONE:
+                mAdapter = new TextAdapter(this);
+                break;
+            case Website.TYPE_IMAGE:
+                mAdapter = new ImageAdapter(this);
+                break;
+            case Website.TYPE_VIDEO:
+                mAdapter = new TextAdapter(this);
+                break;
+            default:
+                Log.e(TAG, "Not managed website type");
+                break;
+        }
+
+        if(mAdapter == null){
+            Log.e(TAG, "No adapter");
+            return;
+        }
+
+        mRecyclerView.setAdapter(mAdapter);
 
         // Set default values
         mIsLoadingNewItems = false;

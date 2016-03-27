@@ -44,8 +44,8 @@ import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
-import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.storage.SpStorage;
+import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 
 
 public class MainActivity extends AppCompatActivity
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity
 
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawerLayout, mToolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        mDrawerLayout.setDrawerListener(toggle);
+        mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         mNavigationView.setNavigationItemSelectedListener(this);
