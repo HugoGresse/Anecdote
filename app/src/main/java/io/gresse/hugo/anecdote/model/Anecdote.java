@@ -11,19 +11,19 @@ import org.jsoup.Jsoup;
  */
 public class Anecdote {
 
-    public String content;
-    public String permalink;
+    public String      content;
+    public String      permalink;
     @Nullable
-    public RichContent richContent;
+    public RichContent mixedContent;
 
     public Anecdote(String content, String permalink) {
         this(content, permalink, null);
     }
 
-    public Anecdote(String content, String permalink, @Nullable RichContent richContent) {
+    public Anecdote(String content, String permalink, @Nullable RichContent mixedContent) {
         this.content = content;
         this.permalink = permalink;
-        this.richContent = richContent;
+        this.mixedContent = mixedContent;
     }
 
     /**

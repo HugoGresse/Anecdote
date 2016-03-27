@@ -34,9 +34,7 @@ public class Website {
     public WebsiteItem contentItem;
     public WebsiteItem urlItem;
     @Nullable
-    public WebsiteItem imageItem;
-    @Nullable
-    public WebsiteItem videoItem;
+    public WebsiteItem additionalMixedContentItem;
 
     /**
      * If a paginationItem is not null, so the first page to get if the root website (like http://9gag.com) and the
@@ -117,22 +115,13 @@ public class Website {
     }
 
     /**
-     * Return the additional content type of the website.
+     * Check if has additional mixed content
      *
-     * @return
-     *  - {@link #TYPE_NONE} if no additional content
-     *  - {@link #TYPE_IMAGE} image additional content
-     *  - {@link #TYPE_VIDEO} video additional content
+     * @return true if has additional mixed (image or video) content
      */
-    public int getAdditionalContentType(){
-        if(imageItem != null){
-            return TYPE_IMAGE;
-        } else if (videoItem != null){
-            return TYPE_VIDEO;
-        }
-        return TYPE_NONE;
+    public boolean hasAdditionalContent(){
+        return additionalMixedContentItem != null;
     }
-
 
     @Override
     public boolean equals(Object o) {

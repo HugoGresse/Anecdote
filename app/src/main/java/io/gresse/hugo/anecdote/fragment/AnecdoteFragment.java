@@ -29,7 +29,7 @@ import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.AnecdoteAdapter;
-import io.gresse.hugo.anecdote.adapter.ImageAdapter;
+import io.gresse.hugo.anecdote.adapter.MixedContentAdapter;
 import io.gresse.hugo.anecdote.adapter.TextAdapter;
 import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
 import io.gresse.hugo.anecdote.event.BusProvider;
@@ -39,7 +39,6 @@ import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
-import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.util.Utils;
 
@@ -157,24 +156,10 @@ public class AnecdoteFragment extends Fragment implements
             return;
         }
 
-        switch (mAnecdoteService.getWebsite().getAdditionalContentType()){
-            case Website.TYPE_NONE:
-                mAdapter = new TextAdapter(this);
-                break;
-            case Website.TYPE_IMAGE:
-                mAdapter = new ImageAdapter(this);
-                break;
-            case Website.TYPE_VIDEO:
-                mAdapter = new TextAdapter(this);
-                break;
-            default:
-                Log.e(TAG, "Not managed website type");
-                break;
-        }
-
-        if(mAdapter == null){
-            Log.e(TAG, "No adapter");
-            return;
+        if(mAnecdoteService.getWebsite().hasAdditionalContent()){
+            mAdapter = new MixedContentAdapter(this);
+        } else {
+            mAdapter = new TextAdapter(this);
         }
 
         mRecyclerView.setAdapter(mAdapter);

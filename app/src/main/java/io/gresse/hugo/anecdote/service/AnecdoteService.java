@@ -192,20 +192,9 @@ public class AnecdoteService {
                 //noinspection ConstantConditions
                 url = mWebsite.urlItem.getData(element, tempElement);
 
-                switch (mWebsite.getAdditionalContentType()){
-                    case Website.TYPE_IMAGE:
-                        //noinspection ConstantConditions
-                        richContent = new RichContent(RichContent.TYPE_IMAGE, mWebsite.imageItem.getData(element, tempElement));
-                        break;
-                    case Website.TYPE_VIDEO:
-                        //noinspection ConstantConditions
-                        richContent = new RichContent(RichContent.TYPE_VIDEO, mWebsite.videoItem.getData(element, tempElement));
-                        break;
-                    case Website.TYPE_NONE:
-                        // NOTHING;
-                        break;
-                    default:
-                        Log.e(mServiceName, "Not managed additional content type");
+                if(mWebsite.hasAdditionalContent()){
+                    //noinspection ConstantConditions
+                    richContent = mWebsite.additionalMixedContentItem.getRichData(element, tempElement);
                 }
 
                 mAnecdotes.add(new Anecdote(content, url, richContent));

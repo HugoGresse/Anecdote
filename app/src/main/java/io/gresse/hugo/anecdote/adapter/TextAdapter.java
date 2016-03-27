@@ -2,7 +2,6 @@ package io.gresse.hugo.anecdote.adapter;
 
 import android.graphics.Color;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,7 +21,7 @@ import io.gresse.hugo.anecdote.model.Anecdote;
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
-public class TextAdapter extends RecyclerView.Adapter<TextAdapter.BaseAnecdoteViewHolder> {
+public class TextAdapter extends AnecdoteAdapter{
 
     public static final String TAG = TextAdapter.class.getSimpleName();
 
@@ -41,11 +40,13 @@ public class TextAdapter extends RecyclerView.Adapter<TextAdapter.BaseAnecdoteVi
         mViewHolderListener = viewHolderListener;
     }
 
+    @Override
     public void setData(List<Anecdote> quotes) {
         mAnecdotes = quotes;
         notifyDataSetChanged();
     }
 
+    @Override
     public void setTextStyle(int textSize, boolean rowStriping, int colorBackgroundStripping) {
         mTextSize = textSize;
         mRowStriping = rowStriping;
@@ -92,19 +93,10 @@ public class TextAdapter extends RecyclerView.Adapter<TextAdapter.BaseAnecdoteVi
      * ViewHolder
      ***************************/
 
-    public abstract class BaseAnecdoteViewHolder extends RecyclerView.ViewHolder {
-
-        public BaseAnecdoteViewHolder(View itemView) {
-            super(itemView);
-        }
-
-        public abstract void setData(int position, Anecdote anecdote);
-    }
-
     public class AnecdoteViewHolder extends BaseAnecdoteViewHolder implements View.OnLongClickListener {
 
         @Bind(R.id.contentTextView)
-        TextView textView;
+        TextView mTextView;
 
         public AnecdoteViewHolder(View itemView) {
             super(itemView);
@@ -115,13 +107,13 @@ public class TextAdapter extends RecyclerView.Adapter<TextAdapter.BaseAnecdoteVi
 
         @Override
         public void setData(int position, Anecdote anecdote) {
-            textView.setText(Html.fromHtml(anecdote.content));
-            textView.setTextSize(mTextSize);
+            mTextView.setText(Html.fromHtml(anecdote.content));
+            mTextView.setTextSize(mTextSize);
             if(mRowStriping){
                 if(position % 2 == 0){
-                    textView.setBackgroundColor(mRowStripingBackground);
+                    mTextView.setBackgroundColor(mRowStripingBackground);
                 } else {
-                    textView.setBackgroundColor(Color.TRANSPARENT);
+                    mTextView.setBackgroundColor(Color.TRANSPARENT);
                 }
             }
         }

@@ -25,9 +25,9 @@ import io.gresse.hugo.anecdote.model.Anecdote;
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
-public class ImageAdapter extends AnecdoteAdapter {
+public class MixedContentAdapter extends AnecdoteAdapter {
 
-    public static final String TAG = ImageAdapter.class.getSimpleName();
+    public static final String TAG = MixedContentAdapter.class.getSimpleName();
 
     public static final int VIEW_TYPE_LOAD    = 0;
     public static final int VIEW_TYPE_CONTENT = 1;
@@ -39,7 +39,7 @@ public class ImageAdapter extends AnecdoteAdapter {
     private boolean            mRowStriping;
     private int                mRowStripingBackground;
 
-    public ImageAdapter(@Nullable ViewHolderListener viewHolderListener) {
+    public MixedContentAdapter(@Nullable ViewHolderListener viewHolderListener) {
         mAnecdotes = new ArrayList<>();
         mViewHolderListener = viewHolderListener;
     }
@@ -128,13 +128,13 @@ public class ImageAdapter extends AnecdoteAdapter {
                 }
             }
 
-            if (anecdote.richContent != null) {
-
+            if (anecdote.mixedContent != null) {
                 Glide.with(mImageView.getContext())
-                        .load(anecdote.richContent.contentUrl)
+                        .load(anecdote.mixedContent.contentUrl)
+                        .fitCenter()
                         .into(mImageView);
 
-                Log.d(TAG, "Image uri: " + anecdote.richContent.contentUrl);
+                Log.d(TAG, "Image uri: " + anecdote.mixedContent.contentUrl);
             }
         }
 

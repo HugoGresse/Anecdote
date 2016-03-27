@@ -131,6 +131,23 @@ public class WebsiteItem {
         return data;
     }
 
+    @Nullable
+    public RichContent getRichData(Element element, Element tempElement){
+        String data = getData(element, tempElement);
+        if(TextUtils.isEmpty(data)){
+            return null;
+        }
+
+        if(data.endsWith(".jpg") || data.endsWith(".jpeg") ||
+                data.endsWith(".gif") ||
+                data.endsWith(".png") || data.endsWith(".tiff")){
+            return new RichContent(RichContent.TYPE_IMAGE, data);
+        } else if(data.endsWith(".mp4")){
+            return new RichContent(RichContent.TYPE_VIDEO, data);
+        }
+        return null;
+    }
+
     @Override
     public String toString() {
         return "WebsiteItem{" +
