@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -467,7 +468,7 @@ public class MainActivity extends AppCompatActivity
         Fragment fragment;
         Bundle bundle;
 
-        switch (event.type){
+        switch (event.type) {
             case FullscreenEvent.TYPE_IMAGE:
                 fragment = Fragment.instantiate(this, FullscreenImageFragment.class.getName());
 
@@ -512,13 +513,21 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Subscribe
-    public void changeFullscreenVisibilityEvent(ChangeFullscreenEvent event){
+    public void changeFullscreenVisibilityEvent(ChangeFullscreenEvent event) {
         // TODO: hide appBar when displaying FullscreenFragments, this is not working
 //        if(event.toFullscreen){
 //            mAppBarLayout.animate().translationY(-mAppBarLayout.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
 //        } else {
 //            mAppBarLayout.animate().translationY(0).setInterpolator(new AccelerateInterpolator()).start();
 //        }
+
+        if (event.toFullscreen) {
+            // Hide status bar
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        } else {
+            // Show status bar
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
     }
 
     /***************************
