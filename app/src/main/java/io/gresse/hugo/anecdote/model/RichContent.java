@@ -20,4 +20,11 @@ public class RichContent {
         this.contentUrl = contentUrl;
     }
 
+    @Override
+    public String toString() {
+        return "RichContent{" +
+                "type=" + type +
+                ", contentUrl='" + contentUrl + '\'' +
+                '}';
+    }
 }

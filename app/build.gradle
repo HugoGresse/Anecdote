@@ -83,6 +83,10 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
+    compile 'com.commit451:PhotoView:1.2.4'
+    compile ('io.gresse.hugo.simpleexoplayer:library:0.1.2@aar') {
+        transitive = true;
+    }
 }
 
 

@@ -83,4 +83,7 @@
         <item>24</item>
     </string-array>
 
+
+    <string name="anecdote_image_transition_name" translatable="false">imageTransitionName</string>
+
 </resources>

@@ -14,9 +14,19 @@
         android:paddingLeft="@dimen/padding_anecdoterow"
         android:paddingRight="@dimen/padding_anecdoterow"/>
 
-    <ImageView
-        android:id="@+id/imageView"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="300dp"/>
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:color/black">
+
+        <io.gresse.hugo.anecdote.view.PlayerView
+            android:id="@+id/exoplayerView"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            android:paddingBottom="@dimen/padding_anecdoterow"/>
+
+    </FrameLayout>
 
 </LinearLayout>

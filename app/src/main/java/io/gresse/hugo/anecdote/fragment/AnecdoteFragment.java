@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.PreferenceManager;
@@ -34,6 +35,7 @@ import io.gresse.hugo.anecdote.adapter.TextAdapter;
 import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.event.FullscreenEvent;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
@@ -156,7 +158,7 @@ public class AnecdoteFragment extends Fragment implements
             return;
         }
 
-        if(mAnecdoteService.getWebsite().hasAdditionalContent()){
+        if (mAnecdoteService.getWebsite().hasAdditionalContent()) {
             mAdapter = new MixedContentAdapter(this);
         } else {
             mAdapter = new TextAdapter(this);
@@ -216,7 +218,27 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onClick(Object object) {
+        Pair<Anecdote, View> pair;
+        try {
+            //noinspection unchecked
+            pair = (Pair<Anecdote, View>) object;
+        } catch (ClassCastException e) {
+            Log.w(TAG, "Unable to cast the onClick parameter");
+            return;
+        }
 
+        String image = "";
+        if (pair.first.mixedContent != null) {
+            image = pair.first.mixedContent.contentUrl;
+        }
+
+        BusProvider.getInstance().post(new FullscreenEvent(
+                FullscreenEvent.TYPE_IMAGE,
+                this,
+                pair.second,
+                getString(R.string.anecdote_image_transition_name),
+                image
+        ));
     }
 
     @Override

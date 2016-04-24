@@ -1,7 +1,9 @@
 package io.gresse.hugo.anecdote;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -10,11 +12,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
+import android.transition.Fade;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,13 +36,16 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.fabric.sdk.android.Fabric;
 import io.gresse.hugo.anecdote.event.BusProvider;
+import io.gresse.hugo.anecdote.event.ChangeFullscreenEvent;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.event.FullscreenEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
 import io.gresse.hugo.anecdote.fragment.AnecdoteFragment;
+import io.gresse.hugo.anecdote.fragment.FullscreenImageFragment;
 import io.gresse.hugo.anecdote.fragment.SettingsFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteChooserFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
@@ -46,6 +54,7 @@ import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.storage.SpStorage;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
+import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
 
 public class MainActivity extends AppCompatActivity
@@ -55,6 +64,9 @@ public class MainActivity extends AppCompatActivity
 
     @Bind(R.id.coordinatorLayout)
     public CoordinatorLayout mCoordinatorLayout;
+
+    @Bind(R.id.app_bar_layout)
+    public AppBarLayout mAppBarLayout;
 
     @Bind(R.id.toolbar)
     public Toolbar mToolbar;
@@ -97,7 +109,7 @@ public class MainActivity extends AppCompatActivity
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.startListening(this, this);
 
-        if(SpStorage.isFirstLaunch(this)){
+        if (SpStorage.isFirstLaunch(this)) {
             changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
         }
     }
@@ -175,8 +187,8 @@ public class MainActivity extends AppCompatActivity
     public boolean onNavigationItemSelected(MenuItem item) {
         switch (item.getGroupId()) {
             case R.id.drawer_group_content:
-                for(Website website : mWebsites){
-                    if(website.name.equals(item.getTitle())){
+                for (Website website : mWebsites) {
+                    if (website.name.equals(item.getTitle())) {
                         changeAnecdoteFragment(website);
                         break;
                     }
@@ -201,6 +213,7 @@ public class MainActivity extends AppCompatActivity
      * inner methods
      ***************************/
 
+
     /**
      * Change tu current displayed fragment by a new one.
      *
@@ -209,9 +222,29 @@ public class MainActivity extends AppCompatActivity
      * @param animate         if we want a nice animation or not
      */
     private void changeFragment(Fragment frag, boolean saveInBackstack, boolean animate) {
+        changeFragment(frag, saveInBackstack, animate, null, null);
+    }
+
+    /**
+     */
+    /**
+     * Change tu current displayed fragment by a new one.
+     *
+     * @param frag            the new fragment to display
+     * @param saveInBackstack if we want the fragment to be in backstack
+     * @param animate         if we want a nice animation or not
+     * @param sharedView      the shared view for the transition
+     * @param sharedName      the shared name of the transition
+     */
+    private void changeFragment(Fragment frag,
+                                boolean saveInBackstack,
+                                boolean animate,
+                                @Nullable View sharedView,
+                                @Nullable String sharedName) {
+        String log = "changeFragment: ";
         String backStateName = ((Object) frag).getClass().getName();
 
-        if(frag instanceof AnecdoteFragment){
+        if (frag instanceof AnecdoteFragment) {
             backStateName += frag.getArguments().getInt(AnecdoteFragment.ARGS_WEBSITE_ID);
         }
 
@@ -223,26 +256,31 @@ public class MainActivity extends AppCompatActivity
                 FragmentTransaction transaction = manager.beginTransaction();
 
                 if (animate) {
-                    Log.d(TAG, "Change Fragment: animate");
+                    log += " animate";
                     transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
+                }
+                if (sharedView != null && !TextUtils.isEmpty(sharedName)) {
+                    ViewCompat.setTransitionName(sharedView, sharedName);
+                    transaction.addSharedElement(sharedView, sharedName);
                 }
 
                 transaction.replace(R.id.fragment_container, frag, backStateName);
 
                 if (saveInBackstack) {
-                    Log.d(TAG, "Change Fragment: addToBackTack " + backStateName);
+                    log += " addToBackTack(" + backStateName + ")";
                     transaction.addToBackStack(backStateName);
                 } else {
-                    Log.d(TAG, "Change Fragment: NO addToBackTack " + backStateName);
+                    log += " NO addToBackTack(" + backStateName + ")";
                 }
 
                 transaction.commit();
-            } else if(!fragmentPopped && manager.findFragmentByTag(backStateName) != null) {
-                Log.d(TAG, "Fragment not popped but finded: " + backStateName);
+            } else if (!fragmentPopped && manager.findFragmentByTag(backStateName) != null) {
+                log += " fragment not popped but finded: " + backStateName;
             } else {
-                Log.d(TAG, "Change Fragment: nothing to do : " + backStateName + " fragmentPopped: " + fragmentPopped);
+                log += " nothing to do : " + backStateName + " fragmentPopped: " + fragmentPopped;
                 // custom effect if fragment is already instanciated
             }
+            Log.d(TAG, log);
         } catch (IllegalStateException exception) {
             Log.w(TAG, "Unable to commit fragment, could be activity as been killed in background. " + exception.toString());
         }
@@ -253,7 +291,7 @@ public class MainActivity extends AppCompatActivity
      *
      * @param website the website specification to be displayed in the fragment
      */
-    private void changeAnecdoteFragment(Website website){
+    private void changeAnecdoteFragment(Website website) {
 
         Fragment fragment = Fragment.instantiate(this, AnecdoteFragment.class.getName());
         Bundle bundle = new Bundle();
@@ -264,18 +302,18 @@ public class MainActivity extends AppCompatActivity
 
     private void setupServices() {
         mWebsites = SpStorage.getWebsites(this);
-        if(mServiceProvider != null){
+        if (mServiceProvider != null) {
             mServiceProvider.unregister(BusProvider.getInstance());
         }
         mServiceProvider = new ServiceProvider(mWebsites);
         mServiceProvider.register(this, BusProvider.getInstance());
 
-        if(!mWebsites.isEmpty()){
+        if (!mWebsites.isEmpty()) {
             changeAnecdoteFragment(mWebsites.get(0));
         }
     }
 
-    private void populateNavigationView(){
+    private void populateNavigationView() {
         // Setup NavigationView
         Menu navigationViewMenu = mNavigationView.getMenu();
         navigationViewMenu.clear();
@@ -298,7 +336,7 @@ public class MainActivity extends AppCompatActivity
                     popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                         public boolean onMenuItemClick(MenuItem item) {
 
-                            switch (item.getItemId()){
+                            switch (item.getItemId()) {
                                 case R.id.action_edit:
                                     openWebsiteDialog(website);
                                     break;
@@ -333,7 +371,7 @@ public class MainActivity extends AppCompatActivity
      *
      * @param website website to edit
      */
-    private void openWebsiteDialog(@Nullable Website website){
+    private void openWebsiteDialog(@Nullable Website website) {
         FragmentManager fm = getSupportFragmentManager();
         DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(website);
         dialogFragment.show(fm, dialogFragment.getClass().getSimpleName());
@@ -386,9 +424,9 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeTitle(ChangeTitleEvent event) {
-        if(event.websiteId != null){
-            for(int i = 0; i < mWebsites.size(); i++){
-                if(mWebsites.get(i).id == event.websiteId){
+        if (event.websiteId != null) {
+            for (int i = 0; i < mWebsites.size(); i++) {
+                if (mWebsites.get(i).id == event.websiteId) {
                     mToolbar.setTitle(mWebsites.get(i).name);
                     mNavigationView.getMenu().getItem(i).setChecked(true);
                     break;
@@ -400,19 +438,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Subscribe
-    public void onWebsitesChangeEvent(WebsitesChangeEvent event){
-        if(event.fromWebsiteChooserOverride){
+    public void onWebsitesChangeEvent(WebsitesChangeEvent event) {
+        if (event.fromWebsiteChooserOverride) {
             Log.d(TAG, "onWebsitesChangeEvent: removing all fragments");
             // if we come after a restoration or at the first start
 
             // 1. remove all already added fragment
             FragmentManager fm = getSupportFragmentManager();
-            for(int i = 0; i < fm.getBackStackEntryCount(); ++i) {
+            for (int i = 0; i < fm.getBackStackEntryCount(); ++i) {
                 fm.popBackStack();
             }
             // 2. remove the WebsiteChooserFragment
             Fragment fragment = fm.findFragmentByTag(WebsiteChooserFragment.class.getName());
-            if(fragment != null){
+            if (fragment != null) {
                 FragmentTransaction transaction = fm.beginTransaction();
                 transaction.remove(fragment).commit();
 
@@ -421,6 +459,45 @@ public class MainActivity extends AppCompatActivity
         setupServices();
         populateNavigationView();
         BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());
+    }
+
+    @Subscribe
+    public void onFullscreenEvent(FullscreenEvent event) {
+        switch (event.type){
+            case FullscreenEvent.TYPE_IMAGE:
+                Fragment fragment = Fragment.instantiate(this, FullscreenImageFragment.class.getName());
+
+                // Note that we need the API version check here because the actual transition classes (e.g. Fade)
+                // are not in the support library and are only available in API 21+. The methods we are calling on the Fragment
+                // ARE available in the support library (though they don't do anything on API < 21)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    fragment.setSharedElementEnterTransition(new ImageTransitionSet());
+                    fragment.setEnterTransition(new Fade());
+                    event.currentFragment.setExitTransition(new Fade());
+                    fragment.setSharedElementReturnTransition(new ImageTransitionSet());
+                }
+
+                Bundle bundle = new Bundle();
+                bundle.putString(FullscreenImageFragment.BUNDLE_IMAGEURL, event.imageUrl);
+                fragment.setArguments(bundle);
+
+                changeFragment(fragment, true, false, event.transitionView, event.transitionName);
+                break;
+            case FullscreenEvent.TYPE_VIDEO:
+
+                break;
+
+        }
+    }
+
+    @Subscribe
+    public void changeFullscreenVisibilityEvent(ChangeFullscreenEvent event){
+        // TODO: hide appBar when displaying FullscreenFragments, this is not working
+//        if(event.toFullscreen){
+//            mAppBarLayout.animate().translationY(-mAppBarLayout.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+//        } else {
+//            mAppBarLayout.animate().translationY(0).setInterpolator(new AccelerateInterpolator()).start();
+//        }
     }
 
     /***************************
