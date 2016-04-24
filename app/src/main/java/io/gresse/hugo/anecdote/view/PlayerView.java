@@ -35,6 +35,7 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
     private boolean                 mAutoPlay;
     private boolean                 mPlayInBackground;
     private boolean                 mPreLoad;
+    private boolean                 mIsAttachedToWindow;
 
     public PlayerView(Context context) {
         super(context);
@@ -78,6 +79,7 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
         super.onAttachedToWindow();
 
         Log.i(TAG, "onAttachedToWindow");
+        mIsAttachedToWindow = true;
 
         if (mSimpleExoPlayer == null && !maybeCreatePlayer()) {
             return;
@@ -88,13 +90,13 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
         if (mAutoPlay && !mSimpleExoPlayer.isAutoPlay()) {
             mSimpleExoPlayer.start();
         }
-
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         Log.d(TAG, "onDetachedFromWindow");
+        mIsAttachedToWindow = false;
         if(mSimpleExoPlayer != null && !mSimpleExoPlayer.isReleased()){
             mSimpleExoPlayer.release();
             mSimpleExoPlayer = null;
@@ -158,7 +160,13 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
         if (mSimpleExoPlayer != null) {
             mSimpleExoPlayer.release();
         }
-        maybeCreatePlayer();
+        if(maybeCreatePlayer() && mIsAttachedToWindow){
+            mSimpleExoPlayer.attach(getContext(), this, 0, getId());
+
+            if (mAutoPlay && !mSimpleExoPlayer.isAutoPlay()) {
+                mSimpleExoPlayer.start();
+            }
+        }
     }
 
     /**

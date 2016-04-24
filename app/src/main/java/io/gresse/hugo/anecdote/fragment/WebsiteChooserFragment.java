@@ -33,8 +33,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
 import io.gresse.hugo.anecdote.adapter.WebsiteChooserAdapter;
+import io.gresse.hugo.anecdote.adapter.WebsiteViewHolderListener;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
@@ -54,7 +54,7 @@ import okhttp3.Response;
  * <p/>
  * Created by Hugo Gresse on 03/03/16.
  */
-public class WebsiteChooserFragment extends Fragment implements ViewHolderListener {
+public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolderListener {
 
     @SuppressWarnings("unused")
     public static final String TAG = WebsiteChooserFragment.class.getSimpleName();
@@ -287,10 +287,5 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
                 mSelectedWebsites.add(website);
             }
         }
-    }
-
-    @Override
-    public void onLongClick(Object object) {
-
     }
 }

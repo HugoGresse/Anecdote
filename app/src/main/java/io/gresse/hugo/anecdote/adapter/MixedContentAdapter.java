@@ -2,7 +2,6 @@ package io.gresse.hugo.anecdote.adapter;
 
 import android.graphics.Color;
 import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
 import android.text.Html;
 import android.util.Log;
@@ -33,20 +32,20 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
     public static final String TAG = MixedContentAdapter.class.getSimpleName();
 
-    public static final int VIEW_TYPE_LOAD    = 0;
+    public static final int VIEW_TYPE_LOAD  = 0;
     public static final int VIEW_TYPE_IMAGE = 1;
     public static final int VIEW_TYPE_VIDEO = 2;
 
-    private List<Anecdote>     mAnecdotes;
+    private List<Anecdote>             mAnecdotes;
     @Nullable
-    private ViewHolderListener mViewHolderListener;
-    private int                mTextSize;
-    private boolean            mRowStriping;
-    private int                mRowStripingBackground;
+    private AnecdoteViewHolderListener mAnecdoteViewHolderListener;
+    private int                        mTextSize;
+    private boolean                    mRowStriping;
+    private int                        mRowStripingBackground;
 
-    public MixedContentAdapter(@Nullable ViewHolderListener viewHolderListener) {
+    public MixedContentAdapter(@Nullable AnecdoteViewHolderListener anecdoteViewHolderListener) {
         mAnecdotes = new ArrayList<>();
-        mViewHolderListener = viewHolderListener;
+        mAnecdoteViewHolderListener = anecdoteViewHolderListener;
     }
 
     @Override
@@ -96,9 +95,9 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     public int getItemViewType(int position) {
         if (position + 1 <= mAnecdotes.size()) {
             Anecdote anecdote = mAnecdotes.get(position);
-            if(anecdote.mixedContent != null && anecdote.mixedContent.type == RichContent.TYPE_VIDEO){
+            if (anecdote.mixedContent != null && anecdote.mixedContent.type == RichContent.TYPE_VIDEO) {
                 return VIEW_TYPE_VIDEO;
-            } else if(anecdote.mixedContent != null && anecdote.mixedContent.type == RichContent.TYPE_IMAGE){
+            } else if (anecdote.mixedContent != null && anecdote.mixedContent.type == RichContent.TYPE_IMAGE) {
                 return VIEW_TYPE_IMAGE;
             } else {
                 Log.e(TAG, "unknow type");
@@ -134,10 +133,11 @@ public class MixedContentAdapter extends AnecdoteAdapter {
             mItemView = itemView;
             ButterKnife.bind(this, itemView);
             itemView.setOnLongClickListener(this);
-            if(mPlayerView != null){
-                mPlayerView.setOnLongClickListener(this);
+
+            if (mPlayerView != null) {
+                mPlayerView.setOnClickListener(this);
             }
-            if(mImageView != null){
+            if (mImageView != null) {
                 mImageView.setOnClickListener(this);
             }
         }
@@ -157,9 +157,9 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
             if (anecdote.mixedContent != null) {
                 String log = "setData: " + anecdote.content;
-                switch (anecdote.mixedContent.type){
+                switch (anecdote.mixedContent.type) {
                     case RichContent.TYPE_IMAGE:
-                        if(mImageView != null){
+                        if (mImageView != null) {
 
                             ViewCompat.setTransitionName(mImageView, String.valueOf(position) + "_image");
 
@@ -172,7 +172,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                         log += " /image: " + anecdote.mixedContent.contentUrl;
                         break;
                     case RichContent.TYPE_VIDEO:
-                        if(mPlayerView != null){
+                        if (mPlayerView != null) {
                             mPlayerView.setVideoUrl(anecdote.mixedContent.contentUrl);
                         }
                         log += " /video: " + anecdote.mixedContent.contentUrl;
@@ -184,15 +184,15 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                 }
 
                 Log.d(TAG, log);
-            } else if(mImageView != null){
+            } else if (mImageView != null) {
                 mImageView.setImageResource(android.R.color.transparent);
             }
         }
 
         @Override
         public boolean onLongClick(View v) {
-            if (mViewHolderListener != null) {
-                mViewHolderListener.onLongClick(mAnecdotes.get(getAdapterPosition()));
+            if (mAnecdoteViewHolderListener != null) {
+                mAnecdoteViewHolderListener.onLongClick(mAnecdotes.get(getAdapterPosition()));
                 return true;
             }
             return false;
@@ -200,11 +200,16 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
         @Override
         public void onClick(View v) {
-            if (mViewHolderListener != null) {
-                mViewHolderListener.onClick(
-                        new Pair<Anecdote, View>(
-                                mAnecdotes.get(getAdapterPosition()),
-                                mImageView));
+            if (mAnecdoteViewHolderListener != null) {
+                if(mImageView != null){
+                    mAnecdoteViewHolderListener.onClick(
+                            mAnecdotes.get(getAdapterPosition()),
+                            mImageView);
+                } else if(mPlayerView != null){
+                    mAnecdoteViewHolderListener.onClick(
+                            mAnecdotes.get(getAdapterPosition()),
+                            mPlayerView);
+                }
             }
         }
     }

@@ -28,16 +28,16 @@ public class TextAdapter extends AnecdoteAdapter{
     public static final int VIEW_TYPE_LOAD    = 0;
     public static final int VIEW_TYPE_TEXT    = 1;
 
-    private List<Anecdote>     mAnecdotes;
+    private List<Anecdote>             mAnecdotes;
     @Nullable
-    private ViewHolderListener mViewHolderListener;
-    private int                mTextSize;
-    private boolean            mRowStriping;
-    private int                mRowStripingBackground;
+    private AnecdoteViewHolderListener mAnecdoteViewHolderListener;
+    private int                        mTextSize;
+    private boolean                    mRowStriping;
+    private int                        mRowStripingBackground;
 
-    public TextAdapter(@Nullable ViewHolderListener viewHolderListener) {
+    public TextAdapter(@Nullable AnecdoteViewHolderListener anecdoteViewHolderListener) {
         mAnecdotes = new ArrayList<>();
-        mViewHolderListener = viewHolderListener;
+        mAnecdoteViewHolderListener = anecdoteViewHolderListener;
     }
 
     @Override
@@ -120,8 +120,8 @@ public class TextAdapter extends AnecdoteAdapter{
 
         @Override
         public boolean onLongClick(View v) {
-            if (mViewHolderListener != null) {
-                mViewHolderListener.onLongClick(mAnecdotes.get(getAdapterPosition()));
+            if (mAnecdoteViewHolderListener != null) {
+                mAnecdoteViewHolderListener.onLongClick(mAnecdotes.get(getAdapterPosition()));
                 return true;
             }
             return false;

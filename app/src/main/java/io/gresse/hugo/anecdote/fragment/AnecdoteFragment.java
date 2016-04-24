@@ -9,7 +9,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.util.Pair;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.PreferenceManager;
@@ -32,7 +31,7 @@ import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.AnecdoteAdapter;
 import io.gresse.hugo.anecdote.adapter.MixedContentAdapter;
 import io.gresse.hugo.anecdote.adapter.TextAdapter;
-import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
+import io.gresse.hugo.anecdote.adapter.AnecdoteViewHolderListener;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.FullscreenEvent;
@@ -41,6 +40,7 @@ import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.model.RichContent;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.util.Utils;
 
@@ -51,7 +51,7 @@ import io.gresse.hugo.anecdote.util.Utils;
  */
 public class AnecdoteFragment extends Fragment implements
         SwipeRefreshLayout.OnRefreshListener,
-        ViewHolderListener {
+        AnecdoteViewHolderListener {
 
     private static final String TAG             = AnecdoteFragment.class.getSimpleName();
     public static final  String ARGS_WEBSITE_ID = "key_website_name";
@@ -217,28 +217,39 @@ public class AnecdoteFragment extends Fragment implements
      **************************/
 
     @Override
-    public void onClick(Object object) {
-        Pair<Anecdote, View> pair;
-        try {
-            //noinspection unchecked
-            pair = (Pair<Anecdote, View>) object;
-        } catch (ClassCastException e) {
-            Log.w(TAG, "Unable to cast the onClick parameter");
+    public void onClick(Anecdote anecdote, View view) {
+
+        String contentUrl;
+        if (anecdote.mixedContent == null) {
             return;
         }
 
-        String image = "";
-        if (pair.first.mixedContent != null) {
-            image = pair.first.mixedContent.contentUrl;
+        contentUrl = anecdote.mixedContent.contentUrl;
+
+        switch (anecdote.mixedContent.type){
+            case RichContent.TYPE_IMAGE:
+                BusProvider.getInstance().post(new FullscreenEvent(
+                        FullscreenEvent.TYPE_IMAGE,
+                        this,
+                        view,
+                        getString(R.string.anecdote_image_transition_name),
+                        contentUrl
+                ));
+                break;
+            case RichContent.TYPE_VIDEO:
+                BusProvider.getInstance().post(new FullscreenEvent(
+                        FullscreenEvent.TYPE_VIDEO,
+                        this,
+                        view,
+                        getString(R.string.anecdote_image_transition_name),
+                        contentUrl
+                ));
+                break;
+            default:
+                Log.w(TAG, "Not managed RichContent type");
+                break;
         }
 
-        BusProvider.getInstance().post(new FullscreenEvent(
-                FullscreenEvent.TYPE_IMAGE,
-                this,
-                pair.second,
-                getString(R.string.anecdote_image_transition_name),
-                image
-        ));
     }
 
     @Override

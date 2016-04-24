@@ -18,13 +18,13 @@ public class FullscreenEvent implements Event {
     public Fragment currentFragment;
     public View     transitionView;
     public String   transitionName;
-    public String   imageUrl;
+    public String   contentUrl;
 
-    public FullscreenEvent(int type, Fragment currentFragment, View transitionView, String transitionName, @Nullable String imageUrl) {
+    public FullscreenEvent(int type, Fragment currentFragment, View transitionView, String transitionName, @Nullable String contentUrl) {
         this.type = type;
         this.currentFragment = currentFragment;
         this.transitionView = transitionView;
         this.transitionName = transitionName;
-        this.imageUrl = imageUrl;
+        this.contentUrl = contentUrl;
     }
 }

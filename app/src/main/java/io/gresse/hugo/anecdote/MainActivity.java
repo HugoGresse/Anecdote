@@ -46,6 +46,7 @@ import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
 import io.gresse.hugo.anecdote.fragment.AnecdoteFragment;
 import io.gresse.hugo.anecdote.fragment.FullscreenImageFragment;
+import io.gresse.hugo.anecdote.fragment.FullscreenVideoFragment;
 import io.gresse.hugo.anecdote.fragment.SettingsFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteChooserFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
@@ -463,9 +464,12 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void onFullscreenEvent(FullscreenEvent event) {
+        Fragment fragment;
+        Bundle bundle;
+
         switch (event.type){
             case FullscreenEvent.TYPE_IMAGE:
-                Fragment fragment = Fragment.instantiate(this, FullscreenImageFragment.class.getName());
+                fragment = Fragment.instantiate(this, FullscreenImageFragment.class.getName());
 
                 // Note that we need the API version check here because the actual transition classes (e.g. Fade)
                 // are not in the support library and are only available in API 21+. The methods we are calling on the Fragment
@@ -477,16 +481,33 @@ public class MainActivity extends AppCompatActivity
                     fragment.setSharedElementReturnTransition(new ImageTransitionSet());
                 }
 
-                Bundle bundle = new Bundle();
-                bundle.putString(FullscreenImageFragment.BUNDLE_IMAGEURL, event.imageUrl);
+                bundle = new Bundle();
+                bundle.putString(FullscreenImageFragment.BUNDLE_IMAGEURL, event.contentUrl);
                 fragment.setArguments(bundle);
 
                 changeFragment(fragment, true, false, event.transitionView, event.transitionName);
                 break;
             case FullscreenEvent.TYPE_VIDEO:
+                fragment = Fragment.instantiate(this, FullscreenVideoFragment.class.getName());
 
+                // Note that we need the API version check here because the actual transition classes (e.g. Fade)
+                // are not in the support library and are only available in API 21+. The methods we are calling on the Fragment
+                // ARE available in the support library (though they don't do anything on API < 21)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    fragment.setSharedElementEnterTransition(new ImageTransitionSet());
+                    fragment.setEnterTransition(new Fade());
+                    event.currentFragment.setExitTransition(new Fade());
+                    fragment.setSharedElementReturnTransition(new ImageTransitionSet());
+                }
+
+                bundle = new Bundle();
+                bundle.putString(FullscreenVideoFragment.BUNDLE_VIDEOURL, event.contentUrl);
+                fragment.setArguments(bundle);
+
+                changeFragment(fragment, true, false, event.transitionView, event.transitionName);
                 break;
-
+            default:
+                Log.d(TAG, "Not managed content type");
         }
     }
 
