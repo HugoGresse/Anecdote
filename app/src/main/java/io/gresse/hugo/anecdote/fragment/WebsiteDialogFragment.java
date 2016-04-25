@@ -22,6 +22,7 @@ import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.storage.SpStorage;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 
 /**
  * FialogFragment to edit or add wesites
@@ -110,6 +111,13 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
                 mWebsite.isFirstPageZero = mFirstPageZeroSwitchCompat.isChecked();
 
                 SpStorage.saveWebsite(getContext(), mWebsite);
+
+                if(mEditMode){
+                    FabricUtils.trackWebsiteEdit(mWebsite.name, true);
+                } else {
+                    FabricUtils.trackCustomWebsiteAdded();
+                }
+
                 BusProvider.getInstance().post(new WebsitesChangeEvent());
                 WebsiteDialogFragment.this.getDialog().dismiss();
             }

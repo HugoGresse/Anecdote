@@ -18,6 +18,7 @@ import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeFullscreenEvent;
 import io.gresse.hugo.anecdote.event.EnterTransitionEndEvent;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
@@ -90,6 +91,7 @@ public class FullscreenImageFragment extends Fragment {
         super.onResume();
 
         BusProvider.getInstance().register(this);
+        FabricUtils.trackFragmentView(this, null);
     }
 
     @Override

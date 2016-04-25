@@ -42,6 +42,7 @@ import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.model.RichContent;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 import io.gresse.hugo.anecdote.util.Utils;
 
 /**
@@ -53,8 +54,9 @@ public class AnecdoteFragment extends Fragment implements
         SwipeRefreshLayout.OnRefreshListener,
         AnecdoteViewHolderListener {
 
-    private static final String TAG             = AnecdoteFragment.class.getSimpleName();
-    public static final  String ARGS_WEBSITE_ID = "key_website_name";
+    private static final String TAG               = AnecdoteFragment.class.getSimpleName();
+    public static final  String ARGS_WEBSITE_ID   = "key_website_id";
+    public static final  String ARGS_WEBSITE_NAME = "key_website_name";
 
     @Bind(R.id.swipeRefreshLayout)
     public SwipeRefreshLayout mSwipeRefreshLayout;
@@ -63,6 +65,7 @@ public class AnecdoteFragment extends Fragment implements
     public RecyclerView mRecyclerView;
 
     protected int             mWebsiteId;
+    protected String          mWebsiteName;
     protected AnecdoteAdapter mAdapter;
     protected AnecdoteService mAnecdoteService;
     protected boolean         mIsLoadingNewItems;
@@ -133,6 +136,8 @@ public class AnecdoteFragment extends Fragment implements
 
         BusProvider.getInstance().register(this);
         BusProvider.getInstance().post(new ChangeTitleEvent(mWebsiteId));
+
+        FabricUtils.trackFragmentView(this, mWebsiteName);
     }
 
     @Override
@@ -144,6 +149,7 @@ public class AnecdoteFragment extends Fragment implements
     protected void init() {
         if (getArguments() != null) {
             mWebsiteId = getArguments().getInt(ARGS_WEBSITE_ID);
+            mWebsiteName = getArguments().getString(ARGS_WEBSITE_NAME);
         }
 
         // Get text pref
@@ -226,7 +232,7 @@ public class AnecdoteFragment extends Fragment implements
 
         contentUrl = anecdote.mixedContent.contentUrl;
 
-        switch (anecdote.mixedContent.type){
+        switch (anecdote.mixedContent.type) {
             case RichContent.TYPE_IMAGE:
                 BusProvider.getInstance().post(new FullscreenEvent(
                         FullscreenEvent.TYPE_IMAGE,
@@ -268,6 +274,8 @@ public class AnecdoteFragment extends Fragment implements
                 switch (which) {
                     // Share
                     case 0:
+                        FabricUtils.trackAnecdoteShare(mWebsiteName);
+
                         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                         sharingIntent.setType("text/plain");
 
@@ -284,6 +292,7 @@ public class AnecdoteFragment extends Fragment implements
                     // Open details
                     case 1:
                         try {
+                            FabricUtils.trackAnecdoteDetails(mWebsiteName);
                             Toast.makeText(getActivity(), R.string.open_intent_browser, Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(anecdote.permalink)));
                         } catch (ActivityNotFoundException exception) {
@@ -292,6 +301,7 @@ public class AnecdoteFragment extends Fragment implements
                         break;
                     // Copy
                     case 2:
+                        FabricUtils.trackAnecdoteCopy(mWebsiteName);
                         Toast.makeText(getActivity(), R.string.copied, Toast.LENGTH_SHORT).show();
                         Utils.copyToClipboard(
                                 getActivity(),

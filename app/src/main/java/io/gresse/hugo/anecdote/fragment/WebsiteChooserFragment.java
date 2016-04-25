@@ -41,6 +41,7 @@ import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.storage.SpStorage;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 import io.gresse.hugo.anecdote.util.Utils;
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -144,6 +145,8 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
         if (mWebsites != null && !mWebsites.isEmpty()) {
             mAdapter.setData(mWebsites);
         }
+
+        FabricUtils.trackFragmentView(this, null);
     }
 
     @Override
@@ -162,6 +165,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
             BusProvider.getInstance().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_RESTORE)) {
             SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
+            FabricUtils.trackWebsitesRestored();
             BusProvider.getInstance().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_ADD)) {
             for (Website website : mSelectedWebsites) {

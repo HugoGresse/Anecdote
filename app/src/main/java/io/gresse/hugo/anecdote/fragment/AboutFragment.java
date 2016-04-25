@@ -17,6 +17,7 @@ import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.AboutAdapter;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 
 /**
  * About fragment
@@ -55,6 +56,8 @@ public class AboutFragment extends Fragment implements AboutAdapter.OnClickListe
     public void onResume() {
         super.onResume();
         BusProvider.getInstance().post(new ChangeTitleEvent(getString(R.string.action_about), this.getClass().getName()));
+
+        FabricUtils.trackFragmentView(this, null);
     }
 
     @Override

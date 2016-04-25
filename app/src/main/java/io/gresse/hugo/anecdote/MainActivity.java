@@ -55,10 +55,19 @@ import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.storage.SpStorage;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
-
+/**
+ *
+ * TODO: long click to share
+ * TODO: notify when new website is available
+ * TODO: change firebase to allow versionning
+ * TODO: row stripping by default
+ * TODO: remote website is not editable
+ * TODO: update remote local website
+ */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NetworkConnectivityListener.ConnectivityListener {
 
@@ -87,7 +96,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (isFabricEnable()) {
+        if (FabricUtils.isFabricEnable()) {
             Fabric.with(this, new Crashlytics());
         }
         setContentView(R.layout.activity_main);
@@ -147,9 +156,11 @@ public class MainActivity extends AppCompatActivity
                 if (!mDrawerBackOpen) {
                     mDrawerBackOpen = true;
                     mDrawerLayout.openDrawer(GravityCompat.START);
+                    FabricUtils.trackOnBackPress();
                     return;
                 } else {
                     mDrawerBackOpen = false;
+                    FabricUtils.trackFinishOnBackPress();
                     finish();
                     return;
                 }
@@ -294,10 +305,10 @@ public class MainActivity extends AppCompatActivity
      * @param website the website specification to be displayed in the fragment
      */
     private void changeAnecdoteFragment(Website website) {
-
         Fragment fragment = Fragment.instantiate(this, AnecdoteFragment.class.getName());
         Bundle bundle = new Bundle();
         bundle.putInt(AnecdoteFragment.ARGS_WEBSITE_ID, website.id);
+        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, website.name);
         fragment.setArguments(bundle);
         changeFragment(fragment, true, false);
     }
@@ -345,10 +356,12 @@ public class MainActivity extends AppCompatActivity
                                 case R.id.action_delete:
                                     SpStorage.deleteWebsite(MainActivity.this, website);
                                     BusProvider.getInstance().post(new WebsitesChangeEvent());
+                                    FabricUtils.trackWebsiteDelete(website.name);
                                     break;
                                 case R.id.action_default:
                                     SpStorage.setDefaultWebsite(MainActivity.this, website);
                                     BusProvider.getInstance().post(new WebsitesChangeEvent());
+                                    FabricUtils.trackWebsiteDefault(website.name);
                                     break;
 
                             }
@@ -374,6 +387,11 @@ public class MainActivity extends AppCompatActivity
      * @param website website to edit
      */
     private void openWebsiteDialog(@Nullable Website website) {
+        if(website == null){
+            FabricUtils.trackWebsiteEdit("", false);
+        } else {
+            FabricUtils.trackWebsiteEdit(website.name, false);
+        }
         FragmentManager fm = getSupportFragmentManager();
         DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(website);
         dialogFragment.show(fm, dialogFragment.getClass().getSimpleName());
@@ -390,14 +408,6 @@ public class MainActivity extends AppCompatActivity
         return mServiceProvider.getAnecdoteService(websiteId);
     }
 
-    /**
-     * Return true if fabric is enable, checking the BuildConfig
-     *
-     * @return true if enable, false otherweise
-     */
-    private static boolean isFabricEnable() {
-        return !Configuration.DEBUG;
-    }
 
     /***************************
      * Event
