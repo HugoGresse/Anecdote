@@ -67,6 +67,7 @@ public class AnecdoteFragment extends Fragment implements
     protected int             mWebsiteId;
     protected String          mWebsiteName;
     protected AnecdoteAdapter mAdapter;
+    @Nullable
     protected AnecdoteService mAnecdoteService;
     protected boolean         mIsLoadingNewItems;
 
@@ -197,7 +198,7 @@ public class AnecdoteFragment extends Fragment implements
         mIsLoadingNewItems = false;
         mSwipeRefreshLayout.setRefreshing(false);
 
-        if (dataChanged) {
+        if (dataChanged && mAnecdoteService != null) {
             mAdapter.setData(mAnecdoteService.getAnecdotes());
         }
     }
@@ -213,6 +214,9 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onRefresh() {
+        if(mAnecdoteService == null){
+            return;
+        }
         mAnecdoteService.cleanAnecdotes();
         loadNewAnecdotes(0);
     }

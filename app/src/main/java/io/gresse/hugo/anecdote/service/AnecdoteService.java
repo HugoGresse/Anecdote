@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.Event;
@@ -60,7 +61,7 @@ public class AnecdoteService {
 
         mOkHttpClient = new OkHttpClient();
         mAnecdotes = new ArrayList<>();
-        mFailEvents = new ArrayList<>();
+        mFailEvents = new CopyOnWriteArrayList<>();
         mPaginationMap = new HashMap<>();
     }
 
