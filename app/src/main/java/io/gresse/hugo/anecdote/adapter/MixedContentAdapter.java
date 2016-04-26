@@ -136,9 +136,11 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
             if (mPlayerView != null) {
                 mPlayerView.setOnClickListener(this);
+                mPlayerView.setOnLongClickListener(this);
             }
             if (mImageView != null) {
                 mImageView.setOnClickListener(this);
+                mImageView.setOnLongClickListener(this);
             }
         }
 
