@@ -21,4 +21,13 @@ public class RequestFailedEvent extends AnecdoteEvent {
         this.exception = exception;
         this.pageNumber = pageNumber;
     }
+
+    @Override
+    public String toString() {
+        return "RequestFailedEvent{" +
+                "message='" + message + '\'' +
+                ", exception=" + exception +
+                ", pageNumber=" + pageNumber +
+                '}';
+    }
 }

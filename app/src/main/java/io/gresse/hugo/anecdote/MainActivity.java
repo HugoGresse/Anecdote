@@ -418,6 +418,9 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onRequestFailed(final RequestFailedEvent event) {
         Log.d(TAG, "requestFailed:  " + event.getClass().getCanonicalName());
+        if(Configuration.DEBUG){
+            Log.d(TAG, "RequestFailed: " + event.toString());
+        }
 
         //noinspection WrongConstant
         Snackbar
