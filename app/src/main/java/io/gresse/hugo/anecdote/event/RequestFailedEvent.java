@@ -7,19 +7,19 @@ import android.support.annotation.Nullable;
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
-public class RequestFailedEvent extends AnecdoteEvent {
+public class RequestFailedEvent implements Event {
 
     public String    message;
     @Nullable
     public Exception exception;
+    public Event     originalEvent;
 
-    public int pageNumber;
-
-    public RequestFailedEvent(int websiteId, String message, @Nullable  Exception exception, int pageNumber) {
-        super(websiteId);
+    public RequestFailedEvent(Event originalEvent,
+                              String message,
+                              @Nullable Exception exception) {
+        this.originalEvent = originalEvent;
         this.message = message;
         this.exception = exception;
-        this.pageNumber = pageNumber;
     }
 
     @Override

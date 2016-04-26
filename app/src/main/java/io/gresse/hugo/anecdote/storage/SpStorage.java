@@ -25,7 +25,7 @@ public class SpStorage {
 
     private static final String TAG                = SpStorage.class.getSimpleName();
 
-    public static final  String SP_KEY             = "io.gresse.hugo.anecdote";
+    public static final  String SP_KEY             = "io.gresse.hugo.anecdote.1";
     public static final  String SP_KEY_VERSION     = "version";
     public static final  String SP_KEY_FIRSTLAUNCH = "firstLaunch";
     public static final  String SP_KEY_WEBSITES    = "websites";
@@ -52,7 +52,6 @@ public class SpStorage {
         sharedPreferencesEditor.putInt(SP_KEY_VERSION, version);
         sharedPreferencesEditor.apply();
     }
-
 
     /**
      * Check if it's the first application launch or not
@@ -138,7 +137,6 @@ public class SpStorage {
 //        websites.add(website);
 
 //        return websites;
-
     }
 
     /**
