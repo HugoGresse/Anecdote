@@ -89,7 +89,11 @@ public class MainActivity extends AppCompatActivity
 
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        setupServices();
+        mServiceProvider = new ServiceProvider();
+        mWebsites = SpStorage.getWebsites(this);
+        mServiceProvider.createAnecdoteService(mWebsites);
+        mServiceProvider.register(this, BusProvider.getInstance());
+
         populateNavigationView();
 
         mNetworkConnectivityListener = new NetworkConnectivityListener();
@@ -260,12 +264,11 @@ public class MainActivity extends AppCompatActivity
         changeFragment(fragment, true, false);
     }
 
-    private void setupServices() {
+    private void resetAnecdoteServices() {
         mWebsites = SpStorage.getWebsites(this);
-        if(mServiceProvider != null){
-            mServiceProvider.unregister(BusProvider.getInstance());
-        }
-        mServiceProvider = new ServiceProvider(mWebsites);
+
+        mServiceProvider.unregister(BusProvider.getInstance());
+        mServiceProvider.createAnecdoteService(mWebsites);
         mServiceProvider.register(this, BusProvider.getInstance());
 
         if(!mWebsites.isEmpty()){
@@ -415,7 +418,7 @@ public class MainActivity extends AppCompatActivity
 
             }
         }
-        setupServices();
+        resetAnecdoteServices();
         populateNavigationView();
         BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());
     }

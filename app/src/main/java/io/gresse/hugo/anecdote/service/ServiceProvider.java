@@ -19,35 +19,37 @@ public class ServiceProvider {
 
     protected List<Website>                 mWebsites;
     protected Map<Integer, AnecdoteService> mAnecdoteServices;
-    protected WebsiteApiService mWebsiteApiService;
+    protected WebsiteApiService             mWebsiteApiService;
 
-    public ServiceProvider(List<Website> websites) {
-        mWebsites = websites;
+    public ServiceProvider() {
         mAnecdoteServices = new HashMap<>();
         mWebsiteApiService = new WebsiteApiService();
     }
 
-    public void register(Context context, Bus bus) {
-        AnecdoteService service;
+    public void createAnecdoteService(List<Website> websites) {
+        mWebsites = websites;
 
         for (Website website : mWebsites) {
-            service = new AnecdoteService(website);
-            bus.register(service);
-            mAnecdoteServices.put(website.id, service);
+            mAnecdoteServices.put(website.id, new AnecdoteService(website));
         }
+    }
 
+    public void register(Context context, Bus bus) {
+        for (Map.Entry<Integer, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
+            bus.register(entry.getValue());
+        }
         bus.register(mWebsiteApiService);
     }
 
     public void unregister(Bus bus) {
-        for(Map.Entry<Integer, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
+        for (Map.Entry<Integer, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
             bus.unregister(entry.getValue());
         }
         mAnecdoteServices.clear();
         bus.unregister(mWebsiteApiService);
     }
 
-    public AnecdoteService getAnecdoteService(int websiteId){
+    public AnecdoteService getAnecdoteService(int websiteId) {
         return mAnecdoteServices.get(websiteId);
     }
 
