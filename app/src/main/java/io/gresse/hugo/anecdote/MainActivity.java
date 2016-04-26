@@ -326,7 +326,7 @@ public class MainActivity extends AppCompatActivity
 
     private void populateNavigationView() {
         // Setup NavigationView
-        Menu navigationViewMenu = mNavigationView.getMenu();
+        final Menu navigationViewMenu = mNavigationView.getMenu();
         navigationViewMenu.clear();
 
         for (final Website website : mWebsites) {
@@ -349,6 +349,12 @@ public class MainActivity extends AppCompatActivity
 
                             switch (item.getItemId()) {
                                 case R.id.action_edit:
+                                    // Remove edit button for remote website
+                                    if(!website.isEditable()){
+                                        Toast.makeText(MainActivity.this, R.string.action_website_noteditable_toast, Toast.LENGTH_SHORT).show();
+                                        return false;
+                                    }
+
                                     openWebsiteDialog(website);
                                     break;
                                 case R.id.action_delete:

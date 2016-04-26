@@ -14,6 +14,7 @@
     <string name="action_website_add_custom">Add custom website</string>
     <string name="copied">Copied to clipboard</string>
     <string name="not_implemented" translatable="false">Not implemented</string>
+    <string name="action_website_noteditable_toast">You can\'t edit a remote website</string>
 
     <string name="app_share_credits"> - via Anecdote http://bit.ly/anecdoteapp </string>
 

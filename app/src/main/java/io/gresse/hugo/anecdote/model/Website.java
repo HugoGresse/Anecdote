@@ -123,6 +123,14 @@ public class Website {
         return additionalMixedContentItem != null;
     }
 
+    /**
+     * Check if the user can edit this website manually or not
+     * @return true if editable
+     */
+    public boolean isEditable(){
+        return !source.equals(SOURCE_REMOTE);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
