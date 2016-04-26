@@ -25,6 +25,7 @@ import android.widget.Toast;
 import com.crashlytics.android.Crashlytics;
 import com.squareup.otto.Subscribe;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -32,6 +33,8 @@ import butterknife.ButterKnife;
 import io.fabric.sdk.android.Fabric;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.event.LoadRemoteWebsiteEvent;
+import io.gresse.hugo.anecdote.event.OnRemoteWebsiteResponseEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
@@ -44,6 +47,7 @@ import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
+import io.gresse.hugo.anecdote.service.WebsiteApiService;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.util.SpStorage;
 
@@ -88,14 +92,20 @@ public class MainActivity extends AppCompatActivity
 
         mNavigationView.setNavigationItemSelectedListener(this);
 
-        setupServices();
+        mServiceProvider = new ServiceProvider();
+        mWebsites = SpStorage.getWebsites(this);
+        mServiceProvider.createAnecdoteService(mWebsites);
+        mServiceProvider.register(this, BusProvider.getInstance());
+
         populateNavigationView();
 
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.startListening(this, this);
 
-        if(SpStorage.isFirstLaunch(this)){
+        if(SpStorage.isFirstLaunch(this) || mWebsites.isEmpty()){
             changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
+        } else {
+            changeAnecdoteFragment(mWebsites.get(0));
         }
     }
 
@@ -104,6 +114,9 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
 
         BusProvider.getInstance().register(this);
+        if(!getWebsiteApiService().isWebsitesDownloaded()){
+            BusProvider.getInstance().post(new LoadRemoteWebsiteEvent());
+        }
     }
 
     @Override
@@ -259,12 +272,11 @@ public class MainActivity extends AppCompatActivity
         changeFragment(fragment, true, false);
     }
 
-    private void setupServices() {
+    private void resetAnecdoteServices() {
         mWebsites = SpStorage.getWebsites(this);
-        if(mServiceProvider != null){
-            mServiceProvider.unregister(BusProvider.getInstance());
-        }
-        mServiceProvider = new ServiceProvider(mWebsites);
+
+        mServiceProvider.unregister(BusProvider.getInstance());
+        mServiceProvider.createAnecdoteService(mWebsites);
         mServiceProvider.register(this, BusProvider.getInstance());
 
         if(!mWebsites.isEmpty()){
@@ -347,6 +359,10 @@ public class MainActivity extends AppCompatActivity
         return mServiceProvider.getAnecdoteService(websiteId);
     }
 
+    public WebsiteApiService getWebsiteApiService(){
+        return mServiceProvider.getWebsiteApiService();
+    }
+
     /**
      * Return true if fabric is enable, checking the BuildConfig
      *
@@ -368,15 +384,10 @@ public class MainActivity extends AppCompatActivity
         Snackbar
                 .make(mCoordinatorLayout, event.message, Snackbar.LENGTH_INDEFINITE)
                 .setAction("Retry", new View.OnClickListener() {
-
                     @Override
                     public void onClick(View v) {
-                        AnecdoteService service = MainActivity.this.getAnecdoteService(event.websiteId);
-                        if (service != null) {
-                            service.retryFailedEvent();
-                        }
+                        BusProvider.getInstance().post(event.originalEvent);
                     }
-
                 })
                 .show();
     }
@@ -415,9 +426,38 @@ public class MainActivity extends AppCompatActivity
 
             }
         }
-        setupServices();
+        resetAnecdoteServices();
         populateNavigationView();
         BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());
+    }
+
+    @Subscribe
+    public void onRemoteWebsiteLoaded(OnRemoteWebsiteResponseEvent event) {
+        if (!event.isSuccessful) return;
+        if(mWebsites == null || mWebsites.isEmpty()) return;
+
+        Website tempWebsite;
+        List<Website> newWebsiteList = new ArrayList<>();
+        boolean dataModified = false;
+        for(Website website: mWebsites){
+            int index = event.websiteList.lastIndexOf(website);
+            tempWebsite = event.websiteList.get(index);
+            if(!website.isUpToDate(tempWebsite)){
+                dataModified = true;
+                newWebsiteList.add(tempWebsite);
+            } else {
+                newWebsiteList.add(website);
+            }
+        }
+
+        if(dataModified){
+            Log.i(TAG, "Updating websites configuration");
+            mWebsites = newWebsiteList;
+            SpStorage.saveWebsites(this, mWebsites);
+            resetAnecdoteServices();
+            populateNavigationView();
+            BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());
+        }
     }
 
     /***************************

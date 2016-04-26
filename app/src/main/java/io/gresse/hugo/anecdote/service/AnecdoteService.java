@@ -1,6 +1,5 @@
 package io.gresse.hugo.anecdote.service;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
@@ -19,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.Event;
@@ -43,7 +43,6 @@ import okhttp3.Response;
  */
 public class AnecdoteService {
 
-    protected Context        mContext;
     protected OkHttpClient   mOkHttpClient;
     protected String         mServiceName;
     protected Website        mWebsite;
@@ -51,14 +50,13 @@ public class AnecdoteService {
     protected List<Event>    mFailEvents;
     protected boolean mEnd = false;
 
-    public AnecdoteService(Context context, Website website) {
-        mContext = context;
+    public AnecdoteService(Website website) {
         mWebsite = website;
         mServiceName = mWebsite.name + AnecdoteService.class.getSimpleName();
 
         mOkHttpClient = new OkHttpClient();
         mAnecdotes = new ArrayList<>();
-        mFailEvents = new ArrayList<>();
+        mFailEvents = new CopyOnWriteArrayList<>();
     }
 
     /**
@@ -108,10 +106,9 @@ public class AnecdoteService {
         } catch (IllegalArgumentException exception){
             mFailEvents.add(event);
             postOnUiThread(new RequestFailedEvent(
-                    mWebsite.id,
+                    event,
                     "Website configuration is wrong: " + mWebsite.name,
-                    exception,
-                    pageNumber));
+                    exception));
             return;
         }
 
@@ -121,9 +118,9 @@ public class AnecdoteService {
                 e.printStackTrace();
                 mFailEvents.add(event);
                 postOnUiThread(new RequestFailedEvent(
-                        mWebsite.id, "Unable to load " + mWebsite.name,
-                        e,
-                        pageNumber));
+                        event,
+                        "Unable to load " + mWebsite.name,
+                        e));
             }
 
             @Override
@@ -131,21 +128,19 @@ public class AnecdoteService {
                 // We are not on main thread
                 if(response.isSuccessful()){
                     try {
-                        processResponse(pageNumber, response);
+                        processResponse(event, pageNumber, response);
                     } catch (Selector.SelectorParseException exception){
                         postOnUiThread(new RequestFailedEvent(
-                                mWebsite.id,
+                                event,
                                 "Something went wrong, try another website setting",
-                                exception,
-                                pageNumber));
+                                exception));
                     }
                 } else {
                     mFailEvents.add(event);
                     postOnUiThread(new RequestFailedEvent(
-                            mWebsite.id,
+                            event,
                             "Unable to load website",
-                            null,
-                            pageNumber));
+                            null));
                 }
 
             }
@@ -153,13 +148,16 @@ public class AnecdoteService {
     }
 
 
-    private void processResponse(final int pageNumber, Response response) {
+    private void processResponse(Event event, final int pageNumber, Response response) {
         Document document;
         try {
             document = Jsoup.parse(response.body().string());
         } catch (IOException e) {
             response.body().close();
-            postOnUiThread(new RequestFailedEvent(mWebsite.id, "Unable to parse " + mWebsite.name + " website", null, pageNumber));
+            postOnUiThread(new RequestFailedEvent(
+                    event,
+                    "Unable to parse " + mWebsite.name + " website",
+                    null));
             return;
         } finally {
             response.body().close();
