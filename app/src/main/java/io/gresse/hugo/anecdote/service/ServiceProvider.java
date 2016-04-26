@@ -11,39 +11,47 @@ import java.util.Map;
 import io.gresse.hugo.anecdote.model.Website;
 
 /**
- * Provide different services
+ * Provide different services (that explain a lot)
  * <p/>
  * Created by Hugo Gresse on 14/02/16.
  */
 public class ServiceProvider {
 
-    protected List<Website>                mWebsites;
-    protected Map<Integer, AnecdoteService> mServices;
+    protected List<Website>                 mWebsites;
+    protected Map<Integer, AnecdoteService> mAnecdoteServices;
+    protected WebsiteApiService mWebsiteApiService;
 
     public ServiceProvider(List<Website> websites) {
         mWebsites = websites;
-        mServices = new HashMap<>();
+        mAnecdoteServices = new HashMap<>();
+        mWebsiteApiService = new WebsiteApiService();
     }
 
     public void register(Context context, Bus bus) {
         AnecdoteService service;
 
         for (Website website : mWebsites) {
-            service = new AnecdoteService(context, website);
+            service = new AnecdoteService(website);
             bus.register(service);
-            mServices.put(website.id, service);
+            mAnecdoteServices.put(website.id, service);
         }
+
+        bus.register(mWebsiteApiService);
     }
 
     public void unregister(Bus bus) {
-        for(Map.Entry<Integer, AnecdoteService> entry : mServices.entrySet()) {
+        for(Map.Entry<Integer, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
             bus.unregister(entry.getValue());
         }
-        mServices.clear();
+        mAnecdoteServices.clear();
+        bus.unregister(mWebsiteApiService);
     }
 
     public AnecdoteService getAnecdoteService(int websiteId){
-        return mServices.get(websiteId);
+        return mAnecdoteServices.get(websiteId);
     }
 
+    public WebsiteApiService getWebsiteApiService() {
+        return mWebsiteApiService;
+    }
 }

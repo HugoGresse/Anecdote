@@ -42,6 +42,7 @@ import io.gresse.hugo.anecdote.fragment.SettingsFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteChooserFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.service.WebsiteApiService;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
@@ -347,6 +348,10 @@ public class MainActivity extends AppCompatActivity
         return mServiceProvider.getAnecdoteService(websiteId);
     }
 
+    public WebsiteApiService getWebsiteApiService(){
+        return mServiceProvider.getWebsiteApiService();
+    }
+
     /**
      * Return true if fabric is enable, checking the BuildConfig
      *
@@ -368,15 +373,10 @@ public class MainActivity extends AppCompatActivity
         Snackbar
                 .make(mCoordinatorLayout, event.message, Snackbar.LENGTH_INDEFINITE)
                 .setAction("Retry", new View.OnClickListener() {
-
                     @Override
                     public void onClick(View v) {
-                        AnecdoteService service = MainActivity.this.getAnecdoteService(event.websiteId);
-                        if (service != null) {
-                            service.retryFailedEvent();
-                        }
+                        BusProvider.getInstance().post(event.originalEvent);
                     }
-
                 })
                 .show();
     }

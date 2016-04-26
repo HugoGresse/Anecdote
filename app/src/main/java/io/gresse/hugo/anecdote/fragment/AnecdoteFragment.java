@@ -274,7 +274,8 @@ public class AnecdoteFragment extends Fragment implements
 
     @Subscribe
     public void onRequestFailedEvent(RequestFailedEvent event) {
-        if (event.websiteId != mWebsiteId) return;
+        if (event.originalEvent instanceof LoadNewAnecdoteEvent &&
+                ((LoadNewAnecdoteEvent)event.originalEvent).websiteId  != mWebsiteId) return;
         afterRequestFinished(false);
     }
 

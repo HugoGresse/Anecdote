@@ -1,8 +1,6 @@
 package io.gresse.hugo.anecdote.fragment;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -16,18 +14,12 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import com.squareup.otto.Subscribe;
 
-import java.io.IOException;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -37,16 +29,11 @@ import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
 import io.gresse.hugo.anecdote.adapter.WebsiteChooserAdapter;
 import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.event.LoadRemoteWebsiteEvent;
+import io.gresse.hugo.anecdote.event.OnRemoteWebsiteResponseEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
-import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.util.SpStorage;
-import io.gresse.hugo.anecdote.util.Utils;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * Display a list of website from Firebase so the user can choose which website he want to load after initial
@@ -71,9 +58,6 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
 
     @Nullable
     protected String                mMode;
-    protected OkHttpClient          mOkHttpClient;
-    @Nullable
-    protected Request               mFailRequest;
     private   List<Website>         mWebsites;
     private   WebsiteChooserAdapter mAdapter;
     private   List<Website>         mSelectedWebsites;
@@ -112,18 +96,11 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
         mAdapter = new WebsiteChooserAdapter(this);
         mRecyclerView.setAdapter(mAdapter);
 
-        mOkHttpClient = new OkHttpClient();
-
-        Request request = new Request.Builder()
-                .url("https://crackling-inferno-9530.firebaseio.com/websites.json")
-                .header("User-Agent", Utils.getUserAgent())
-                .build();
-
-        getWebsites(request);
-
         if (!TextUtils.isEmpty(mMode) && mMode.equals(BUNDLE_MODE_ADD)) {
             mSaveButton.setText(R.string.dialog_website_add);
         }
+
+        BusProvider.getInstance().post(new LoadRemoteWebsiteEvent());
     }
 
     @Override
@@ -171,100 +148,48 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
         }
     }
 
-    /***************************
-     * Inner method
-     ***************************/
-
-    private void getWebsites(final Request request) {
-        mFailRequest = null;
-        mOkHttpClient.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-                mFailRequest = request;
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (!response.isSuccessful()) {
-                    mFailRequest = request;
-                    if (getActivity() != null) {
-                        Toast
-                                .makeText(
-                                        getActivity(),
-                                        getActivity().getString(R.string.error_server_unknown),
-                                        Toast.LENGTH_SHORT)
-                                .show();
-                    }
-                    return;
-                }
-                // We are not on main thread
-                String websitesString = response.body().string();
-
-                websitesString = java.net.URLDecoder.decode(websitesString, "UTF-8");
-
-                Type type = new TypeToken<HashMap<String, Website>>() {
-                }.getType();
-
-                Map<String, Website> websites = new Gson().fromJson(websitesString, type);
-
-                if (websites == null || websites.isEmpty()) {
-                    return;
-                }
-
-                mWebsites = new ArrayList<>();
-
-                if (TextUtils.isEmpty(mMode) || mMode.equals(BUNDLE_MODE_RESTORE)) {
-
-                    for (Map.Entry<String, Website> entry : websites.entrySet()) {
-                        mWebsites.add(entry.getValue());
-                    }
-
-                } else if (getContext() != null) {
-                    // We want to add some websites : remove duplicates or already added ones
-                    List<Website> savedWebsite = SpStorage.getWebsites(getActivity());
-
-                    for (Map.Entry<String, Website> entry : websites.entrySet()) {
-                        if (savedWebsite.contains(entry.getValue())) {
-                            continue;
-                        }
-                        mWebsites.add(entry.getValue());
-                    }
-                }
-
-                Collections.sort(mWebsites, new Comparator<Website>() {
-                    @Override
-                    public int compare(Website website, Website website2) {
-                        if (website.like > website2.like) {
-                            return -1;
-                        } else if (website.like < website2.like) {
-                            return 1;
-                        }
-                        return 0;
-                    }
-                });
-
-                if (getActivity() != null) {
-                    new Handler(Looper.getMainLooper()).post(new Runnable() {
-                        @Override
-                        public void run() {
-                            mAdapter.setData(mWebsites);
-                        }
-                    });
-                }
-            }
-        });
-
-    }
 
     /***************************
      * Event
      ***************************/
 
     @Subscribe
-    public void onConnectivityChange(NetworkConnectivityChangeEvent event) {
-        if (mFailRequest != null) {
-            getWebsites(mFailRequest);
+    public void onRemoteWebsiteLoaded(OnRemoteWebsiteResponseEvent event) {
+        if (event.isSuccessful) {
+            mWebsites = new ArrayList<>();
+            mWebsites.addAll(event.websiteList);
+            if (!TextUtils.isEmpty(mMode) && !mMode.equals(BUNDLE_MODE_RESTORE)) {
+                // We want to add some websites : remove duplicates or already added ones
+                List<Website> savedWebsites = SpStorage.getWebsites(getActivity());
+
+                // We cannot iterate on a list and remove item at the same time, need an array
+                for (Website website : mWebsites.toArray(new Website[0])) {
+                    if (savedWebsites.contains(website)) {
+                        mWebsites.remove(website);
+                    }
+                }
+            }
+
+            Collections.sort(mWebsites, new Comparator<Website>() {
+                @Override
+                public int compare(Website website, Website website2) {
+                    if (website.like > website2.like) {
+                        return -1;
+                    } else if (website.like < website2.like) {
+                        return 1;
+                    }
+                    return 0;
+                }
+            });
+
+            mAdapter.setData(mWebsites);
+        } else {
+            Toast
+                    .makeText(
+                            getActivity(),
+                            getActivity().getString(R.string.error_server_unknown),
+                            Toast.LENGTH_SHORT)
+                    .show();
         }
     }
 
@@ -274,11 +199,11 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
 
     @Override
     public void onClick(Object object) {
-        if(object instanceof Integer){
+        if (object instanceof Integer) {
             FragmentManager fm = getActivity().getSupportFragmentManager();
             DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(null);
             dialogFragment.show(fm, dialogFragment.getClass().getSimpleName());
-        } else if (object instanceof Website){
+        } else if (object instanceof Website) {
 
             Website website = (Website) object;
             if (mSelectedWebsites.contains(website)) {

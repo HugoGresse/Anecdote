@@ -14,6 +14,7 @@ public class Website {
 
     // The website id should never be altered
     public int         id;
+    public String      slug;
     public String      name;
     public String      url;
     public String      selector;
@@ -54,7 +55,7 @@ public class Website {
      */
     public void validateData() {
         if (TextUtils.isEmpty(name)) {
-            name = "";
+            name = Long.toHexString(Double.doubleToLongBits(Math.random()));
         }
         if (TextUtils.isEmpty(url)) {
             url = "";
@@ -74,6 +75,14 @@ public class Website {
         if (urlItem == null) {
             urlItem = new WebsiteItem();
         }
+
+        if(TextUtils.isEmpty(slug)){
+            if(source.equals(SOURCE_REMOTE)){
+                slug = "api-" + name;
+            } else {
+                slug = "local-" + name;
+            }
+        }
     }
 
     @Override
@@ -83,7 +92,7 @@ public class Website {
 
         Website website = (Website) o;
 
-        return id == website.id && source.equals(website.source);
+        return slug.equals(website.slug) && source.equals(website.source);
     }
 
     @Override

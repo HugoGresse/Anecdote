@@ -22,7 +22,7 @@ import io.gresse.hugo.anecdote.model.Website;
 public class SpStorage {
 
 
-    public static final String SP_KEY             = "io.gresse.hugo.anecdote";
+    public static final String SP_KEY             = "io.gresse.hugo.anecdote.1";
     public static final String SP_KEY_FIRSTLAUNCH = "firstLaunch";
     public static final String SP_KEY_WEBSITES    = "websites";
 
@@ -69,45 +69,6 @@ public class SpStorage {
         }.getType();
 
         return new Gson().fromJson(settingString, listType);
-    }
-
-    public static String generateDefaultWebsites() {
-        List<Website> websites = new ArrayList<>();
-
-        Website website = new Website(
-                1,
-                "Dans ton chat",
-                "http://danstonchat.com/latest/",
-                "div > div > div > p > a",
-                ".html",
-                25,
-                false
-        );
-
-        website.contentItem.replaceMap.put("<span class=\"decoration\">", "<b>");
-        website.contentItem.replaceMap.put("</span>", "</b>");
-        website.urlItem.attribute = "href";
-
-        websites.add(website);
-
-        website = new Website(
-                2,
-                "Vie de merde",
-                "http://m.viedemerde.fr/?page=",
-                "ul.content > li",
-                "",
-                13,
-                true
-        );
-
-
-        website.contentItem.selector = "p.text";
-        website.urlItem.prefix = "http://m.viedemerde.fr/";
-        website.urlItem.attribute = "id";
-        website.urlItem.replaceMap.put("fml-", "");
-
-        websites.add(website);
-        return new Gson().toJson(websites);
     }
 
     /**
