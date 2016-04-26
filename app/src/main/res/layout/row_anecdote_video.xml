@@ -9,8 +9,8 @@
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/contentTextView"
-        android:paddingTop="@dimen/padding_anecdoterow"
-        android:paddingBottom="16dp"
+        android:paddingTop="@dimen/padding_anecdoterow_half"
+        android:paddingBottom="@dimen/padding_anecdoterow_half"
         android:paddingLeft="@dimen/padding_anecdoterow"
         android:paddingRight="@dimen/padding_anecdoterow"/>
 
@@ -25,7 +25,7 @@
             android:layout_width="match_parent"
             android:layout_height="300dp"
             android:layout_gravity="center"
-            android:paddingBottom="@dimen/padding_anecdoterow"/>
+            android:paddingBottom="@dimen/padding_anecdoterow_half"/>
 
     </FrameLayout>
 

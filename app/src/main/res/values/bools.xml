@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <bool name="pref_rowstripping_default">false</bool>
+    <bool name="pref_rowstripping_default">true</bool>
 
 </resources>

@@ -61,11 +61,9 @@ import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
 /**
  *
- * TODO: long click to share
- * TODO: notify when new website is available
- * TODO: change firebase to allow versionning
- * TODO: row stripping by default
  * TODO: remote website is not editable
+ * TODO: change firebase to allow versionning
+ * TODO: notify when new website is available
  * TODO: update remote local website
  */
 public class MainActivity extends AppCompatActivity
