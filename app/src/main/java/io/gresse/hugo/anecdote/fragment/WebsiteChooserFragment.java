@@ -99,8 +99,6 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
         if (!TextUtils.isEmpty(mMode) && mMode.equals(BUNDLE_MODE_ADD)) {
             mSaveButton.setText(R.string.dialog_website_add);
         }
-
-        BusProvider.getInstance().post(new LoadRemoteWebsiteEvent());
     }
 
     @Override
@@ -120,6 +118,8 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
 
         if (mWebsites != null && !mWebsites.isEmpty()) {
             mAdapter.setData(mWebsites);
+        } else {
+            BusProvider.getInstance().post(new LoadRemoteWebsiteEvent());
         }
     }
 

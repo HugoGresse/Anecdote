@@ -121,12 +121,23 @@ public class WebsiteApiService {
         });
     }
 
+    /**
+     * Check if the service has downloaded the websites
+     */
+    public boolean isWebsitesDownloaded(){
+        return mWebsites != null;
+    }
+
     /***************************
      * Event
      ***************************/
 
     @Subscribe
     public void loadWebsite(LoadRemoteWebsiteEvent event) {
+        if(mWebsites != null && !mWebsites.isEmpty()){
+            BusProvider.getInstance().post(new OnRemoteWebsiteResponseEvent(true, mWebsites));
+            return;
+        }
         if (mFailedEvent == null) {
             getRemoteSetting(event);
         } else {

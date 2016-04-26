@@ -14,6 +14,7 @@ public class Website {
 
     // The website id should never be altered
     public int         id;
+    public int         version;
     public String      slug;
     public String      name;
     public String      url;
@@ -83,6 +84,16 @@ public class Website {
                 slug = "local-" + name;
             }
         }
+    }
+
+    /**
+     * Check if the version missmatch between the two object
+     *
+     * @param website the new website
+     * @return true if up to date, false otherweise
+     */
+    public boolean isUpToDate(Website website){
+        return website.version <= version;
     }
 
     @Override
