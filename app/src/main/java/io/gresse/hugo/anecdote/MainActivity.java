@@ -61,8 +61,6 @@ import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
 /**
  *
- * TODO: remote website is not editable
- * TODO: change firebase to allow versionning
  * TODO: notify when new website is available
  * TODO: update remote local website
  */

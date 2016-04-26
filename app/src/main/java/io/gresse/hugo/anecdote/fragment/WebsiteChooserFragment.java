@@ -32,6 +32,7 @@ import java.util.Map;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.gresse.hugo.anecdote.Configuration;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.WebsiteChooserAdapter;
 import io.gresse.hugo.anecdote.adapter.WebsiteViewHolderListener;
@@ -116,7 +117,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
         mOkHttpClient = new OkHttpClient();
 
         Request request = new Request.Builder()
-                .url("https://crackling-inferno-9530.firebaseio.com/websites.json")
+                .url(Configuration.API_URL)
                 .header("User-Agent", Utils.getUserAgent())
                 .build();
 
