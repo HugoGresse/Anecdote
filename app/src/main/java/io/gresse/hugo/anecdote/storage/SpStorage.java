@@ -96,6 +96,49 @@ public class SpStorage {
         }.getType();
 
         return new Gson().fromJson(settingString, listType);
+
+//        List<Website> websites = new ArrayList<>();
+//
+//
+//        Website website = new Website();
+//
+//        website.url = "http://9gag.com/";
+//        website.itemPerPage = 10;
+//        website.name = "9gag";
+//        website.id = 1;
+//        website.isFirstPageZero = true;
+//        website.selector = ".badge-entry-collection > article";
+//        website.source = Website.SOURCE_REMOTE;
+//
+//        website.paginationItem = new WebsiteItem();
+//        website.paginationItem.type = WebsiteItem.TYPE_PAGINATION;
+//        website.paginationItem.prefix = "http://9gag.com";
+//        website.paginationItem.attribute = "href";
+//        website.paginationItem.selector = ".badge-list-view-element > .loading > .badge-load-more-post";
+//
+//        website.urlItem = new WebsiteItem();
+//        website.urlItem.type = WebsiteItem.TYPE_URL;
+//        website.urlItem.selector = "header > h2 > a";
+//        website.urlItem.prefix = "http://9gag.com";
+//        website.urlItem.attribute = "href";
+//
+//        website.contentItem = new WebsiteItem();
+//        website.contentItem.type = WebsiteItem.TYPE_STRING;
+//        website.contentItem.selector = "header > h2 > a";
+//
+//        website.additionalMixedContentItem = new WebsiteItem();
+//        website.additionalMixedContentItem.type = WebsiteItem.TYPE_VIDEO;
+//        website.additionalMixedContentItem.selector = ".badge-post-container > a > div";
+//        website.additionalMixedContentItem.attribute = "data-mp4";
+//        website.additionalMixedContentItem.fallbackItem = new WebsiteItem();
+//        website.additionalMixedContentItem.fallbackItem.type = WebsiteItem.TYPE_IMAGE;
+//        website.additionalMixedContentItem.fallbackItem.selector = ".badge-post-container > a > img";
+//        website.additionalMixedContentItem.fallbackItem.attribute = "src";
+//
+//        websites.add(website);
+
+//        return websites;
+
     }
 
     /**
