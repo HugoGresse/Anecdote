@@ -66,7 +66,6 @@ import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 /**
  *
  * TODO: move auto website update to somewhere else
- * TODO: track wrong website configuration
  */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NetworkConnectivityListener.ConnectivityListener {

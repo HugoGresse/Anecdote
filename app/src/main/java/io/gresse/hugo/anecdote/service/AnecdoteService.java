@@ -29,6 +29,7 @@ import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.model.RichContent;
 import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.util.Utils;
 import okhttp3.Call;
@@ -204,7 +205,14 @@ public class AnecdoteService {
 
             postOnUiThread(new OnAnecdoteLoadedEvent(mWebsite.id, elements.size(), pageNumber));
         } else {
-            Log.d(mServiceName, "No elements from this");
+            Log.w(mServiceName, "No elements :/");
+            postOnUiThread(new RequestFailedEvent(
+                    event,
+                    "Unable to parse " + mWebsite.name + " website",
+                    null));
+            if(mWebsite.source.equals(Website.SOURCE_REMOTE)){
+                FabricUtils.trackWebsiteWrongConfiguration(mWebsite.name);
+            }
             mEnd = true;
         }
     }

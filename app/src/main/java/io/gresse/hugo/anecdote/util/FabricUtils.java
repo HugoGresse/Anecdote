@@ -197,4 +197,17 @@ public class FabricUtils {
                 new CustomEvent("Setting " + name + " changed")
                         .putCustomAttribute("value", value));
     }
+
+    /**
+     * Track when to data has been retrieved from this website, indicating possibly an issue with the selectors
+     *
+     * @param websiteName the website name
+     */
+    public static void trackWebsiteWrongConfiguration(String websiteName){
+        if (!isFabricEnable()) return;
+
+        Answers.getInstance().logCustom(
+                new CustomEvent("Website wrong configuration")
+                        .putCustomAttribute("Website name", websiteName));
+    }
 }
