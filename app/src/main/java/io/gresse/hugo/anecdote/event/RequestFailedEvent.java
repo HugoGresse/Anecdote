@@ -27,7 +27,6 @@ public class RequestFailedEvent implements Event {
         return "RequestFailedEvent{" +
                 "message='" + message + '\'' +
                 ", exception=" + exception +
-                ", pageNumber=" + pageNumber +
                 '}';
     }
 }

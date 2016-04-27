@@ -24,7 +24,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import io.gresse.hugo.anecdote.Configuration;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.WebsiteChooserAdapter;
 import io.gresse.hugo.anecdote.adapter.WebsiteViewHolderListener;
@@ -36,12 +35,6 @@ import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.storage.SpStorage;
 import io.gresse.hugo.anecdote.util.FabricUtils;
-import io.gresse.hugo.anecdote.util.Utils;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 /**
  * Display a list of website from Firebase so the user can choose which website he want to load after initial
@@ -123,7 +116,6 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
                 getString(R.string.dialog_websitechooser_title),
                 this.getClass().getName()));
 
-
         if (mWebsites != null && !mWebsites.isEmpty()) {
             mAdapter.setData(mWebsites);
         } else {
@@ -174,7 +166,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
                 List<Website> savedWebsites = SpStorage.getWebsites(getActivity());
 
                 // We cannot iterate on a list and remove item at the same time, need an array
-                for (Website website : mWebsites.toArray(new Website[0])) {
+                for (Website website : mWebsites.toArray(new Website[mWebsites.size()])) {
                     if (savedWebsites.contains(website)) {
                         mWebsites.remove(website);
                     }

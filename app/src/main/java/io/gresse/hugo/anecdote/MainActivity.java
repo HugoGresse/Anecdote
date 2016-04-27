@@ -65,8 +65,8 @@ import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
 /**
  *
- * TODO: notify when new website is available
- * TODO: update remote local website
+ * TODO: move auto website update to somewhere else
+ * TODO: track wrong website configuration
  */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NetworkConnectivityListener.ConnectivityListener {
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity
         mServiceProvider.createAnecdoteService(mWebsites);
         mServiceProvider.register(this, BusProvider.getInstance());
 
-        populateNavigationView();
+        populateNavigationView(false);
 
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.startListening(this, this);
@@ -334,7 +334,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void populateNavigationView() {
+    private void populateNavigationView(boolean addNewNotification) {
         // Setup NavigationView
         final Menu navigationViewMenu = mNavigationView.getMenu();
         navigationViewMenu.clear();
@@ -390,6 +390,11 @@ public class MainActivity extends AppCompatActivity
 
         navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_add)
                 .setIcon(R.drawable.ic_action_content_add);
+
+        if(addNewNotification){
+            navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_newwebsite)
+                    .setIcon(R.drawable.ic_action_info_outline);
+        }
 
         navigationViewMenu.setGroupCheckable(R.id.drawer_group_content, true, true);
         navigationViewMenu.getItem(0).setChecked(true);
@@ -484,7 +489,7 @@ public class MainActivity extends AppCompatActivity
             }
         }
         resetAnecdoteServices();
-        populateNavigationView();
+        populateNavigationView(false);
         BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());
     }
 
@@ -574,13 +579,25 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        boolean newNotification = false;
+        int savedWebsiteNumber = SpStorage.getSavedRemoteWebsiteNumber(this);
+        if(savedWebsiteNumber < event.websiteList.size()){
+            // Display new website notification
+            newNotification = true;
+            SpStorage.setSavedRemoteWebsiteNumber(this, event.websiteList.size());
+        } else if(event.websiteList.size() < savedWebsiteNumber){
+            SpStorage.setSavedRemoteWebsiteNumber(this, event.websiteList.size());
+        }
+
         if(dataModified){
             Log.i(TAG, "Updating websites configuration");
             mWebsites = newWebsiteList;
             SpStorage.saveWebsites(this, mWebsites);
             resetAnecdoteServices();
-            populateNavigationView();
+            populateNavigationView(newNotification);
             BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());
+        } else if(newNotification){
+            populateNavigationView(true);
         }
     }
 

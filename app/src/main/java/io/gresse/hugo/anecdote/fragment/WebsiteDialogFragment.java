@@ -41,8 +41,6 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
     public TextInputLayout mUrlTextInputLayout;
     @Bind(R.id.urlEditText)
     public EditText        mUrlEditText;
-    @Bind(R.id.urlSuffixContainer)
-    public TextInputLayout mUrlSuffixTextInputLayout;
     @Bind(R.id.urlSuffixEditText)
     public EditText        mUrlSuffixEditText;
     @Bind(R.id.selectorContainer)

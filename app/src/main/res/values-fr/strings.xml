@@ -55,4 +55,5 @@
     <string name="pref_rowstriping_summary">Ajouter un fond pour séparer les citations</string>
     <string name="pref_textsize_title">Taille du texte</string>
     <string name="action_website_noteditable_toast">Vous ne pouvez pas modifier un site distant</string>
+    <string name="action_website_newwebsite">Nouveaux sites disponible</string>
 </resources>

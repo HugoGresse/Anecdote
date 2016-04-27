@@ -11,6 +11,7 @@
     <string name="action_delete">Delete</string>
     <string name="action_default">Default</string>
     <string name="action_website_add">Add website</string>
+    <string name="action_website_newwebsite">New websites available!</string>
     <string name="action_website_add_custom">Add custom website</string>
     <string name="copied">Copied to clipboard</string>
     <string name="not_implemented" translatable="false">Not implemented</string>

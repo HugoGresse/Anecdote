@@ -23,12 +23,13 @@ import io.gresse.hugo.anecdote.model.WebsiteItem;
  */
 public class SpStorage {
 
-    private static final String TAG                = SpStorage.class.getSimpleName();
+    private static final String TAG = SpStorage.class.getSimpleName();
 
-    public static final  String SP_KEY             = "io.gresse.hugo.anecdote.1";
-    public static final  String SP_KEY_VERSION     = "version";
-    public static final  String SP_KEY_FIRSTLAUNCH = "firstLaunch";
-    public static final  String SP_KEY_WEBSITES    = "websites";
+    public static final String SP_KEY                   = "io.gresse.hugo.anecdote.1";
+    public static final String SP_KEY_VERSION           = "version";
+    public static final String SP_KEY_FIRSTLAUNCH       = "firstLaunch";
+    public static final String SP_KEY_WEBSITES          = "websites";
+    public static final String SP_KEY_WEBSITE_REMOTE_NB = "websitesRemoteNumber";
 
     /**
      * Return the version code number
@@ -221,6 +222,28 @@ public class SpStorage {
         }
         Collections.swap(websites, 0, websiteToSwap);
         saveWebsites(context, websites);
+    }
+
+    /**
+     * Get the number of websites last time checked
+     * @param context app context
+     * @return number of websites
+     */
+    public static int getSavedRemoteWebsiteNumber(Context context){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
+        return sharedPreferences.getInt(SP_KEY_WEBSITE_REMOTE_NB, 0);
+    }
+
+    /**
+     * Set saved remite website number
+     *
+     * @param context app context
+     * @param number the number of remote website last time checked
+     */
+    public static void setSavedRemoteWebsiteNumber(Context context, int number){
+        SharedPreferences.Editor sharedPreferencesEditor = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE).edit();
+        sharedPreferencesEditor.putInt(SP_KEY_WEBSITE_REMOTE_NB, number);
+        sharedPreferencesEditor.apply();
     }
 
     /**
