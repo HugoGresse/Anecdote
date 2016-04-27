@@ -565,11 +565,19 @@ public class MainActivity extends AppCompatActivity
         if (!event.isSuccessful) return;
         if(mWebsites == null || mWebsites.isEmpty()) return;
 
+        /****
+         * Check remote website and local to update local configuration if needed
+         */
         Website tempWebsite;
         List<Website> newWebsiteList = new ArrayList<>();
         boolean dataModified = false;
         for(Website website: mWebsites){
             int index = event.websiteList.lastIndexOf(website);
+
+            // This remote website has not been found locally, skip it
+            if(index == -1){
+                continue;
+            }
             tempWebsite = event.websiteList.get(index);
             if(!website.isUpToDate(tempWebsite)){
                 dataModified = true;
