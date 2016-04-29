@@ -10,7 +10,8 @@ import android.transition.Transition;
 import android.transition.TransitionSet;
 import android.util.AttributeSet;
 
-import io.gresse.hugo.anecdote.event.BusProvider;
+import org.greenrobot.eventbus.EventBus;
+
 import io.gresse.hugo.anecdote.event.EnterTransitionEndEvent;
 
 /**
@@ -57,7 +58,7 @@ public class ImageTransitionSet extends TransitionSet implements Transition.Tran
 
     @Override
     public void onTransitionEnd(Transition transition) {
-        BusProvider.getInstance().post(new EnterTransitionEndEvent());
+        EventBus.getDefault().post(new EnterTransitionEndEvent());
     }
 
     @Override

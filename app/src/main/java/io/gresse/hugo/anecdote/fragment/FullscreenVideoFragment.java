@@ -10,10 +10,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.greenrobot.eventbus.EventBus;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeFullscreenEvent;
 import io.gresse.hugo.anecdote.util.FabricUtils;
 import io.gresse.hugo.anecdote.view.PlayerView;
@@ -38,7 +39,7 @@ public class FullscreenVideoFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        BusProvider.getInstance().post(new ChangeFullscreenEvent(true));
+        EventBus.getDefault().post(new ChangeFullscreenEvent(true));
 
         if (getArguments() != null) {
             mVideoUrl = getArguments().getString(BUNDLE_VIDEOURL);
@@ -73,20 +74,20 @@ public class FullscreenVideoFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
 
-        BusProvider.getInstance().post(new ChangeFullscreenEvent(false));
+        EventBus.getDefault().post(new ChangeFullscreenEvent(false));
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        BusProvider.getInstance().register(this);
+        EventBus.getDefault().register(this);
         FabricUtils.trackFragmentView(this, null);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        BusProvider.getInstance().unregister(this);
+        EventBus.getDefault().unregister(this);
     }
 }

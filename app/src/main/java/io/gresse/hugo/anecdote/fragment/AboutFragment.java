@@ -11,11 +11,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import org.greenrobot.eventbus.EventBus;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.AboutAdapter;
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.util.FabricUtils;
 
@@ -55,7 +56,7 @@ public class AboutFragment extends Fragment implements AboutAdapter.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
-        BusProvider.getInstance().post(new ChangeTitleEvent(getString(R.string.action_about), this.getClass().getName()));
+        EventBus.getDefault().post(new ChangeTitleEvent(getString(R.string.action_about), this.getClass().getName()));
 
         FabricUtils.trackFragmentView(this, null);
     }

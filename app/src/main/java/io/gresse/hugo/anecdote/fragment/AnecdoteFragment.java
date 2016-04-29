@@ -22,17 +22,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.squareup.otto.Subscribe;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.AnecdoteAdapter;
+import io.gresse.hugo.anecdote.adapter.AnecdoteViewHolderListener;
 import io.gresse.hugo.anecdote.adapter.MixedContentAdapter;
 import io.gresse.hugo.anecdote.adapter.TextAdapter;
-import io.gresse.hugo.anecdote.adapter.AnecdoteViewHolderListener;
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.FullscreenEvent;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteEvent;
@@ -135,8 +135,8 @@ public class AnecdoteFragment extends Fragment implements
     public void onResume() {
         super.onResume();
 
-        BusProvider.getInstance().register(this);
-        BusProvider.getInstance().post(new ChangeTitleEvent(mWebsiteId));
+        EventBus.getDefault().register(this);
+        EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteId));
 
         FabricUtils.trackFragmentView(this, mWebsiteName);
     }
@@ -144,7 +144,7 @@ public class AnecdoteFragment extends Fragment implements
     @Override
     public void onPause() {
         super.onPause();
-        BusProvider.getInstance().unregister(this);
+        EventBus.getDefault().unregister(this);
     }
 
     protected void init() {
@@ -204,7 +204,7 @@ public class AnecdoteFragment extends Fragment implements
     }
 
     protected void loadNewAnecdotes(int start) {
-        BusProvider.getInstance().post(new LoadNewAnecdoteEvent(mWebsiteId, start));
+        EventBus.getDefault().post(new LoadNewAnecdoteEvent(mWebsiteId, start));
     }
 
 
@@ -238,7 +238,7 @@ public class AnecdoteFragment extends Fragment implements
 
         switch (anecdote.mixedContent.type) {
             case RichContent.TYPE_IMAGE:
-                BusProvider.getInstance().post(new FullscreenEvent(
+                EventBus.getDefault().post(new FullscreenEvent(
                         FullscreenEvent.TYPE_IMAGE,
                         this,
                         view,
@@ -247,7 +247,7 @@ public class AnecdoteFragment extends Fragment implements
                 ));
                 break;
             case RichContent.TYPE_VIDEO:
-                BusProvider.getInstance().post(new FullscreenEvent(
+                EventBus.getDefault().post(new FullscreenEvent(
                         FullscreenEvent.TYPE_VIDEO,
                         this,
                         view,
@@ -342,6 +342,6 @@ public class AnecdoteFragment extends Fragment implements
     @Subscribe
     public void onUpdateAnecdoteFragment(UpdateAnecdoteFragmentEvent event) {
         init();
-        BusProvider.getInstance().post(new ChangeTitleEvent(mWebsiteId));
+        EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteId));
     }
 }

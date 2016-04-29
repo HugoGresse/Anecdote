@@ -29,7 +29,9 @@ import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
-import com.squareup.otto.Subscribe;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +39,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.fabric.sdk.android.Fabric;
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeFullscreenEvent;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.FullscreenEvent;
@@ -57,9 +58,9 @@ import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
+import io.gresse.hugo.anecdote.service.WebsiteApiService;
 import io.gresse.hugo.anecdote.storage.SpStorage;
 import io.gresse.hugo.anecdote.util.FabricUtils;
-import io.gresse.hugo.anecdote.service.WebsiteApiService;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity
         mServiceProvider = new ServiceProvider();
         mWebsites = SpStorage.getWebsites(this);
         mServiceProvider.createAnecdoteService(mWebsites);
-        mServiceProvider.register(this, BusProvider.getInstance());
+        mServiceProvider.register(this, EventBus.getDefault());
 
         populateNavigationView(false);
 
@@ -133,9 +134,9 @@ public class MainActivity extends AppCompatActivity
     public void onResume() {
         super.onResume();
 
-        BusProvider.getInstance().register(this);
+        EventBus.getDefault().register(this);
         if(!getWebsiteApiService().isWebsitesDownloaded()){
-            BusProvider.getInstance().post(new LoadRemoteWebsiteEvent());
+            EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
         }
     }
 
@@ -143,13 +144,13 @@ public class MainActivity extends AppCompatActivity
     public void onPause() {
         super.onPause();
 
-        BusProvider.getInstance().unregister(this);
+        EventBus.getDefault().unregister(this);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mServiceProvider.unregister(BusProvider.getInstance());
+        mServiceProvider.unregister(EventBus.getDefault());
         mNetworkConnectivityListener.stopListening();
     }
 
@@ -323,9 +324,9 @@ public class MainActivity extends AppCompatActivity
     private void resetAnecdoteServices() {
         mWebsites = SpStorage.getWebsites(this);
 
-        mServiceProvider.unregister(BusProvider.getInstance());
+        mServiceProvider.unregister(EventBus.getDefault());
         mServiceProvider.createAnecdoteService(mWebsites);
-        mServiceProvider.register(this, BusProvider.getInstance());
+        mServiceProvider.register(this, EventBus.getDefault());
 
         if (!mWebsites.isEmpty()) {
             changeAnecdoteFragment(mWebsites.get(0));
@@ -367,12 +368,12 @@ public class MainActivity extends AppCompatActivity
                                     break;
                                 case R.id.action_delete:
                                     SpStorage.deleteWebsite(MainActivity.this, website);
-                                    BusProvider.getInstance().post(new WebsitesChangeEvent());
+                                    EventBus.getDefault().post(new WebsitesChangeEvent());
                                     FabricUtils.trackWebsiteDelete(website.name);
                                     break;
                                 case R.id.action_default:
                                     SpStorage.setDefaultWebsite(MainActivity.this, website);
-                                    BusProvider.getInstance().post(new WebsitesChangeEvent());
+                                    EventBus.getDefault().post(new WebsitesChangeEvent());
                                     FabricUtils.trackWebsiteDefault(website.name);
                                     break;
 
@@ -446,7 +447,7 @@ public class MainActivity extends AppCompatActivity
                 .setAction("Retry", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        BusProvider.getInstance().post(event.originalEvent);
+                        EventBus.getDefault().post(event.originalEvent);
                     }
                 })
                 .show();
@@ -488,7 +489,7 @@ public class MainActivity extends AppCompatActivity
         }
         resetAnecdoteServices();
         populateNavigationView(false);
-        BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());
+        EventBus.getDefault().post(new UpdateAnecdoteFragmentEvent());
     }
 
     @Subscribe
@@ -601,7 +602,7 @@ public class MainActivity extends AppCompatActivity
             SpStorage.saveWebsites(this, mWebsites);
             resetAnecdoteServices();
             populateNavigationView(newNotification);
-            BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());
+            EventBus.getDefault().post(new UpdateAnecdoteFragmentEvent());
         } else if(newNotification){
             populateNavigationView(true);
         }
@@ -614,6 +615,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnectivityChange(NetworkConnectivityListener.State state) {
         Log.d(TAG, "onConnectivityChange: " + state);
-        BusProvider.getInstance().post(new NetworkConnectivityChangeEvent(state));
+        EventBus.getDefault().post(new NetworkConnectivityChangeEvent(state));
     }
 }

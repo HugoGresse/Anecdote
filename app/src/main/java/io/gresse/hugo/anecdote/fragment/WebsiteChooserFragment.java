@@ -14,7 +14,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.squareup.otto.Subscribe;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,7 +28,6 @@ import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.WebsiteChooserAdapter;
 import io.gresse.hugo.anecdote.adapter.WebsiteViewHolderListener;
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.event.OnRemoteWebsiteResponseEvent;
@@ -111,15 +111,15 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
     @Override
     public void onResume() {
         super.onResume();
-        BusProvider.getInstance().register(this);
-        BusProvider.getInstance().post(new ChangeTitleEvent(
+        EventBus.getDefault().register(this);
+        EventBus.getDefault().post(new ChangeTitleEvent(
                 getString(R.string.dialog_websitechooser_title),
                 this.getClass().getName()));
 
         if (mWebsites != null && !mWebsites.isEmpty()) {
             mAdapter.setData(mWebsites);
         } else {
-            BusProvider.getInstance().post(new LoadRemoteWebsiteEvent());
+            EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
         }
 
         FabricUtils.trackFragmentView(this, null);
@@ -128,7 +128,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
     @Override
     public void onPause() {
         super.onPause();
-        BusProvider.getInstance().unregister(this);
+        EventBus.getDefault().unregister(this);
     }
 
     @OnClick(R.id.saveButton)
@@ -138,16 +138,16 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
         if (TextUtils.isEmpty(mMode)) {
             SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
             SpStorage.setFirstLaunch(getActivity(), false);
-            BusProvider.getInstance().post(new WebsitesChangeEvent(true));
+            EventBus.getDefault().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_RESTORE)) {
             SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
             FabricUtils.trackWebsitesRestored();
-            BusProvider.getInstance().post(new WebsitesChangeEvent(true));
+            EventBus.getDefault().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_ADD)) {
             for (Website website : mSelectedWebsites) {
                 SpStorage.saveWebsite(getActivity(), website);
             }
-            BusProvider.getInstance().post(new WebsitesChangeEvent(false));
+            EventBus.getDefault().post(new WebsitesChangeEvent(false));
         }
     }
 

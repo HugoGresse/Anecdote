@@ -22,6 +22,7 @@ Features
 
 TODO
 --------
+- 9gag HOT & trending
 - website to manage Anecdote websites
 - manage one page site (no pagination)
 - guide to add website (a follow through user step)

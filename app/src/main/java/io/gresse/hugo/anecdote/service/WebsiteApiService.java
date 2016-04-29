@@ -7,7 +7,9 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.squareup.otto.Subscribe;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -17,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 
 import io.gresse.hugo.anecdote.Configuration;
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.Event;
 import io.gresse.hugo.anecdote.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.event.OnRemoteWebsiteResponseEvent;
@@ -117,7 +118,7 @@ public class WebsiteApiService {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                BusProvider.getInstance().post(event);
+                EventBus.getDefault().post(event);
             }
         });
     }
@@ -136,7 +137,7 @@ public class WebsiteApiService {
     @Subscribe
     public void loadWebsite(LoadRemoteWebsiteEvent event) {
         if(mWebsites != null && !mWebsites.isEmpty()){
-            BusProvider.getInstance().post(new OnRemoteWebsiteResponseEvent(true, mWebsites));
+            EventBus.getDefault().post(new OnRemoteWebsiteResponseEvent(true, mWebsites));
             return;
         }
         if (mFailedEvent == null) {

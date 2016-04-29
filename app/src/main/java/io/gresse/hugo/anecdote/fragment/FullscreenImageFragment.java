@@ -10,12 +10,13 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.squareup.otto.Subscribe;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeFullscreenEvent;
 import io.gresse.hugo.anecdote.event.EnterTransitionEndEvent;
 import io.gresse.hugo.anecdote.util.FabricUtils;
@@ -42,7 +43,7 @@ public class FullscreenImageFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        BusProvider.getInstance().post(new ChangeFullscreenEvent(true));
+        EventBus.getDefault().post(new ChangeFullscreenEvent(true));
 
         if (getArguments() != null) {
             mImageUrl = getArguments().getString(BUNDLE_IMAGEURL);
@@ -83,21 +84,21 @@ public class FullscreenImageFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
 
-        BusProvider.getInstance().post(new ChangeFullscreenEvent(false));
+        EventBus.getDefault().post(new ChangeFullscreenEvent(false));
     }
 
     @Override
     public void onResume() {
         super.onResume();
 
-        BusProvider.getInstance().register(this);
+        EventBus.getDefault().register(this);
         FabricUtils.trackFragmentView(this, null);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        BusProvider.getInstance().unregister(this);
+        EventBus.getDefault().unregister(this);
     }
 
 

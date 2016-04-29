@@ -4,8 +4,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.preference.PreferenceFragmentCompat;
 
+import org.greenrobot.eventbus.EventBus;
+
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.util.FabricUtils;
@@ -25,7 +26,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onResume() {
         super.onResume();
-        BusProvider.getInstance().post(new ChangeTitleEvent(getString(R.string.action_settings), null));
+        EventBus.getDefault().post(new ChangeTitleEvent(getString(R.string.action_settings), null));
         FabricUtils.trackFragmentView(this, null);
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
@@ -33,7 +34,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onPause() {
         super.onPause();
-        BusProvider.getInstance().post(new UpdateAnecdoteFragmentEvent());
+        EventBus.getDefault().post(new UpdateAnecdoteFragmentEvent());
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
 

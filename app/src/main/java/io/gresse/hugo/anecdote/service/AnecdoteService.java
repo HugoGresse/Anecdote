@@ -5,8 +5,8 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.squareup.otto.Subscribe;
-
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.Event;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
@@ -93,7 +92,7 @@ public class AnecdoteService {
     public void retryFailedEvent() {
         if (!mFailEvents.isEmpty()) {
             for (Event event : mFailEvents) {
-                BusProvider.getInstance().post(event);
+                EventBus.getDefault().post(event);
             }
             mFailEvents.clear();
         }
@@ -226,7 +225,7 @@ public class AnecdoteService {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                BusProvider.getInstance().post(event);
+                EventBus.getDefault().post(event);
             }
         });
     }

@@ -15,10 +15,11 @@ import android.widget.EditText;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.greenrobot.eventbus.EventBus;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.model.Website;
 import io.gresse.hugo.anecdote.storage.SpStorage;
@@ -116,7 +117,7 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
                     FabricUtils.trackCustomWebsiteAdded();
                 }
 
-                BusProvider.getInstance().post(new WebsitesChangeEvent());
+                EventBus.getDefault().post(new WebsitesChangeEvent());
                 WebsiteDialogFragment.this.getDialog().dismiss();
             }
         });
