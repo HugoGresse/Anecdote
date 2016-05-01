@@ -25,6 +25,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.WebsiteChooserAdapter;
 import io.gresse.hugo.anecdote.adapter.WebsiteViewHolderListener;
@@ -116,8 +117,9 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
                 getString(R.string.dialog_websitechooser_title),
                 this.getClass().getName()));
 
-        if (mWebsites != null && !mWebsites.isEmpty()) {
-            mAdapter.setData(mWebsites);
+        MainActivity mainActivity = ((MainActivity)getActivity());
+        if (mainActivity.getWebsiteApiService().isWebsitesDownloaded()){
+            setAdapterData(mainActivity.getWebsiteApiService().getWebsites());
         } else {
             EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
         }
@@ -151,16 +153,10 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
         }
     }
 
-
-    /***************************
-     * Event
-     ***************************/
-
-    @Subscribe
-    public void onRemoteWebsiteLoaded(OnRemoteWebsiteResponseEvent event) {
-        if (event.isSuccessful) {
-            mWebsites = new ArrayList<>();
-            mWebsites.addAll(event.websiteList);
+    private void setAdapterData(List<Website> websites){
+        mWebsites = new ArrayList<>();
+        mWebsites.addAll(websites);
+        if(mWebsites != null && !mWebsites.isEmpty()){
             if (!TextUtils.isEmpty(mMode) && !mMode.equals(BUNDLE_MODE_RESTORE)) {
                 // We want to add some websites : remove duplicates or already added ones
                 List<Website> savedWebsites = SpStorage.getWebsites(getActivity());
@@ -186,6 +182,17 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
             });
 
             mAdapter.setData(mWebsites);
+        }
+    }
+
+    /***************************
+     * Event
+     ***************************/
+
+    @Subscribe
+    public void onRemoteWebsiteLoaded(OnRemoteWebsiteResponseEvent event) {
+        if (event.isSuccessful) {
+            setAdapterData(event.websiteList);
         } else {
             Toast
                     .makeText(

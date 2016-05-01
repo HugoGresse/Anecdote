@@ -44,6 +44,7 @@ public class WebsiteApiService {
     protected LoadRemoteWebsiteEvent mFailedEvent;
     private   OkHttpClient           mOkHttpClient;
     private   List<Website>          mWebsites;
+    private Request mCurrentRequest;
 
     public WebsiteApiService() {
 
@@ -56,16 +57,17 @@ public class WebsiteApiService {
      * @param event the original event
      */
     private void getRemoteSetting(final LoadRemoteWebsiteEvent event) {
-        Request request = new Request.Builder()
+        mCurrentRequest = new Request.Builder()
                 .url(Configuration.API_URL)
                 .build();
 
         Log.d(TAG, "newCall");
 
-        mOkHttpClient.newCall(request).enqueue(new Callback() {
+        mOkHttpClient.newCall(mCurrentRequest).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
                 Log.e(TAG, "onFailure", e);
+                mCurrentRequest = null;
                 mFailedEvent = event;
                 postEventToMainThread(new RequestFailedEvent(
                         event,
@@ -75,6 +77,7 @@ public class WebsiteApiService {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                mCurrentRequest = null;
                 if (!response.isSuccessful()) {
                     mFailedEvent = event;
                     postEventToMainThread(new RequestFailedEvent(
@@ -130,6 +133,11 @@ public class WebsiteApiService {
         return mWebsites != null;
     }
 
+    @Nullable
+    public List<Website> getWebsites(){
+        return mWebsites;
+    }
+
     /***************************
      * Event
      ***************************/
@@ -140,6 +148,11 @@ public class WebsiteApiService {
             EventBus.getDefault().post(new OnRemoteWebsiteResponseEvent(true, mWebsites));
             return;
         }
+
+        if(mCurrentRequest != null){
+            return;
+        }
+
         if (mFailedEvent == null) {
             getRemoteSetting(event);
         } else {

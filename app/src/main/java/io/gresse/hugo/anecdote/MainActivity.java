@@ -65,7 +65,8 @@ import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
 /**
- *
+ * TODO - when all websites is removed, display websiteChooser
+ * TODO : WebsiteChoose display websites already added.
  */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NetworkConnectivityListener.ConnectivityListener {
