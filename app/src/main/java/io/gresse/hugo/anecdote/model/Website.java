@@ -32,6 +32,7 @@ public class Website {
     public int         color;
     public int         like;
     public String      source;
+    public String      userAgent;
     public WebsiteItem contentItem;
     public WebsiteItem urlItem;
     @Nullable

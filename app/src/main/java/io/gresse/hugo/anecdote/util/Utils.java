@@ -3,6 +3,9 @@ package io.gresse.hugo.anecdote.util;
 import android.content.Context;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
+
+import io.gresse.hugo.anecdote.model.Website;
 
 /**
  * Generals utils
@@ -22,6 +25,19 @@ public class Utils {
     public static String getUserAgent() {
         return "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1 " + Build.MODEL +
                 ") AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.95 Mobile Safari/537.36";
+    }
+
+    /**
+     * Return the user agent sent on all request. It will choose between our local custom user agent or given
+     * useragent for this website.
+     *
+     * @return the user agent
+     */
+    public static String getUserAgent(Website website) {
+        if(TextUtils.isEmpty(website.userAgent)){
+            return getUserAgent();
+        }
+        return website.userAgent;
     }
 
     /**

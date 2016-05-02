@@ -110,7 +110,7 @@ public class AnecdoteService {
         try {
             request = new Request.Builder()
                     .url(mWebsite.getPageUrl(pageNumber, mPaginationMap))
-                    .header("User-Agent", Utils.getUserAgent())
+                    .header("User-Agent", Utils.getUserAgent(mWebsite))
                     .build();
         } catch (IllegalArgumentException exception) {
             mFailEvents.add(event);
