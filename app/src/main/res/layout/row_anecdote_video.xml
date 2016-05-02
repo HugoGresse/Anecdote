@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/contentTextView"
+        android:paddingTop="@dimen/padding_anecdoterow_half"
+        android:paddingBottom="@dimen/padding_anecdoterow_half"
+        android:paddingLeft="@dimen/padding_anecdoterow"
+        android:paddingRight="@dimen/padding_anecdoterow"/>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:background="@android:color/black">
+
+        <io.gresse.hugo.anecdote.view.PlayerView
+            android:id="@+id/exoplayerView"
+            android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:layout_gravity="center"
+            android:paddingBottom="@dimen/padding_anecdoterow_half"/>
+
+    </FrameLayout>
+
+</LinearLayout>

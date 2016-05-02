@@ -7,7 +7,9 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import com.squareup.otto.Subscribe;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -16,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.gresse.hugo.anecdote.event.BusProvider;
+import io.gresse.hugo.anecdote.Configuration;
 import io.gresse.hugo.anecdote.event.Event;
 import io.gresse.hugo.anecdote.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.event.OnRemoteWebsiteResponseEvent;
@@ -42,6 +44,7 @@ public class WebsiteApiService {
     protected LoadRemoteWebsiteEvent mFailedEvent;
     private   OkHttpClient           mOkHttpClient;
     private   List<Website>          mWebsites;
+    private Request mCurrentRequest;
 
     public WebsiteApiService() {
 
@@ -54,16 +57,17 @@ public class WebsiteApiService {
      * @param event the original event
      */
     private void getRemoteSetting(final LoadRemoteWebsiteEvent event) {
-        Request request = new Request.Builder()
-                .url("https://crackling-inferno-9530.firebaseio.com/websites.json")
+        mCurrentRequest = new Request.Builder()
+                .url(Configuration.API_URL)
                 .build();
 
         Log.d(TAG, "newCall");
 
-        mOkHttpClient.newCall(request).enqueue(new Callback() {
+        mOkHttpClient.newCall(mCurrentRequest).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, final IOException e) {
                 Log.e(TAG, "onFailure", e);
+                mCurrentRequest = null;
                 mFailedEvent = event;
                 postEventToMainThread(new RequestFailedEvent(
                         event,
@@ -73,6 +77,7 @@ public class WebsiteApiService {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                mCurrentRequest = null;
                 if (!response.isSuccessful()) {
                     mFailedEvent = event;
                     postEventToMainThread(new RequestFailedEvent(
@@ -116,7 +121,7 @@ public class WebsiteApiService {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                BusProvider.getInstance().post(event);
+                EventBus.getDefault().post(event);
             }
         });
     }
@@ -128,6 +133,11 @@ public class WebsiteApiService {
         return mWebsites != null;
     }
 
+    @Nullable
+    public List<Website> getWebsites(){
+        return mWebsites;
+    }
+
     /***************************
      * Event
      ***************************/
@@ -135,9 +145,14 @@ public class WebsiteApiService {
     @Subscribe
     public void loadWebsite(LoadRemoteWebsiteEvent event) {
         if(mWebsites != null && !mWebsites.isEmpty()){
-            BusProvider.getInstance().post(new OnRemoteWebsiteResponseEvent(true, mWebsites));
+            EventBus.getDefault().post(new OnRemoteWebsiteResponseEvent(true, mWebsites));
             return;
         }
+
+        if(mCurrentRequest != null){
+            return;
+        }
+
         if (mFailedEvent == null) {
             getRemoteSetting(event);
         } else {

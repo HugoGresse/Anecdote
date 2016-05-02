@@ -22,11 +22,13 @@ Features
 
 TODO
 --------
+- 9gag HOT & trending
 - website to manage Anecdote websites
 - manage one page site (no pagination)
-- implement urlItem and contentItem on website dialog
 - guide to add website (a follow through user step)
 - filter by country
+- remove Otto to use EventBus
+- inapp browser
 
 
 Contribution

@@ -2,7 +2,7 @@ package io.gresse.hugo.anecdote.service;
 
 import android.content.Context;
 
-import com.squareup.otto.Bus;
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,19 +34,19 @@ public class ServiceProvider {
         }
     }
 
-    public void register(Context context, Bus bus) {
+    public void register(Context context, EventBus eventBus) {
         for (Map.Entry<Integer, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
-            bus.register(entry.getValue());
+            eventBus.register(entry.getValue());
         }
-        bus.register(mWebsiteApiService);
+        eventBus.register(mWebsiteApiService);
     }
 
-    public void unregister(Bus bus) {
+    public void unregister(EventBus eventBus) {
         for (Map.Entry<Integer, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
-            bus.unregister(entry.getValue());
+            eventBus.unregister(entry.getValue());
         }
         mAnecdoteServices.clear();
-        bus.unregister(mWebsiteApiService);
+        eventBus.unregister(mWebsiteApiService);
     }
 
     public AnecdoteService getAnecdoteService(int websiteId) {

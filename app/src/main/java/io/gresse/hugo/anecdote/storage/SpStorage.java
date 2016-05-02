@@ -1,8 +1,9 @@
-package io.gresse.hugo.anecdote.util;
+package io.gresse.hugo.anecdote.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -13,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 
 import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.model.WebsiteItem;
 
 /**
  * Utility class to store stuff in sharedPreferences
@@ -21,11 +23,36 @@ import io.gresse.hugo.anecdote.model.Website;
  */
 public class SpStorage {
 
+    private static final String TAG = SpStorage.class.getSimpleName();
 
-    public static final String SP_KEY             = "io.gresse.hugo.anecdote.1";
-    public static final String SP_KEY_FIRSTLAUNCH = "firstLaunch";
-    public static final String SP_KEY_WEBSITES    = "websites";
+    public static final String SP_KEY                   = "io.gresse.hugo.anecdote.1";
+    public static final String SP_KEY_VERSION           = "version";
+    public static final String SP_KEY_FIRSTLAUNCH       = "firstLaunch";
+    public static final String SP_KEY_WEBSITES          = "websites";
+    public static final String SP_KEY_WEBSITE_REMOTE_NB = "websitesRemoteNumber";
 
+    /**
+     * Return the version code number
+     *
+     * @param context app context
+     * @return version number, starting at 0
+     */
+    public static int getVersion(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
+        return sharedPreferences.getInt(SP_KEY_VERSION, 0);
+    }
+
+    /**
+     * Set the current sharedpref versions, matching app versionCode
+     *
+     * @param context app context
+     * @param version the version to switch to
+     */
+    public static void setVersion(Context context, int version) {
+        SharedPreferences.Editor sharedPreferencesEditor = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE).edit();
+        sharedPreferencesEditor.putInt(SP_KEY_VERSION, version);
+        sharedPreferencesEditor.apply();
+    }
 
     /**
      * Check if it's the first application launch or not
@@ -79,7 +106,7 @@ public class SpStorage {
      */
     public static void saveWebsites(Context context, List<Website> websites) {
         SharedPreferences.Editor sharedPreferencesEditor = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE).edit();
-        for(Website website : websites){
+        for (Website website : websites) {
             website.validateData();
         }
         sharedPreferencesEditor.putString(SP_KEY_WEBSITES, new Gson().toJson(websites));
@@ -155,5 +182,52 @@ public class SpStorage {
         saveWebsites(context, websites);
     }
 
+    /**
+     * Get the number of websites last time checked
+     * @param context app context
+     * @return number of websites
+     */
+    public static int getSavedRemoteWebsiteNumber(Context context){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
+        return sharedPreferences.getInt(SP_KEY_WEBSITE_REMOTE_NB, 0);
+    }
+
+    /**
+     * Set saved remite website number
+     *
+     * @param context app context
+     * @param number the number of remote website last time checked
+     */
+    public static void setSavedRemoteWebsiteNumber(Context context, int number){
+        SharedPreferences.Editor sharedPreferencesEditor = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE).edit();
+        sharedPreferencesEditor.putInt(SP_KEY_WEBSITE_REMOTE_NB, number);
+        sharedPreferencesEditor.apply();
+    }
+
+    /**
+     * Migrate the current saved data to new formats
+     *
+     * @param context app context
+     */
+    public static void migrate(Context context) {
+        List<Website> websites = getWebsites(context);
+
+        /**
+         * v0.4.0 migration (type in WebsiteItem)
+         *
+         * the first/previous version is considered as 0 as version was implemented starting app v0.4.0
+         */
+        if (getVersion(context) == 0) {
+            if (websites != null) {
+                for (Website website : websites) {
+                    website.urlItem.type = WebsiteItem.TYPE_URL;
+                    Log.d("eee", "set urlType to URL");
+                }
+            }
+            setVersion(context, 5); // 5 = 0.4.0
+            saveWebsites(context, websites);
+            Log.i(TAG, "Migrating from 0 > 5 done");
+        }
+    }
 
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="app_name">Anecdote</string>
 
     <string name="navigation_drawer_open">Ouvrir le tiroir de navigation</string>
     <string name="navigation_drawer_close">Fermer le tiroir de navigation</string>
@@ -54,4 +55,6 @@
     <string name="pref_rowstriping_title">Séparation des citations</string>
     <string name="pref_rowstriping_summary">Ajouter un fond pour séparer les citations</string>
     <string name="pref_textsize_title">Taille du texte</string>
+    <string name="action_website_noteditable_toast">Vous ne pouvez pas modifier un site distant</string>
+    <string name="action_website_newwebsite">Nouveaux sites disponible</string>
 </resources>

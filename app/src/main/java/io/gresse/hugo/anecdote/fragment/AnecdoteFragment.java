@@ -22,22 +22,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.squareup.otto.Subscribe;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.AnecdoteAdapter;
-import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
-import io.gresse.hugo.anecdote.event.BusProvider;
+import io.gresse.hugo.anecdote.adapter.AnecdoteViewHolderListener;
+import io.gresse.hugo.anecdote.adapter.MixedContentAdapter;
+import io.gresse.hugo.anecdote.adapter.TextAdapter;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.event.FullscreenEvent;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.model.RichContent;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 import io.gresse.hugo.anecdote.util.Utils;
 
 /**
@@ -47,10 +52,11 @@ import io.gresse.hugo.anecdote.util.Utils;
  */
 public class AnecdoteFragment extends Fragment implements
         SwipeRefreshLayout.OnRefreshListener,
-        ViewHolderListener {
+        AnecdoteViewHolderListener {
 
-    private static final String TAG             = AnecdoteFragment.class.getSimpleName();
-    public static final  String ARGS_WEBSITE_ID = "key_website_name";
+    private static final String TAG               = AnecdoteFragment.class.getSimpleName();
+    public static final  String ARGS_WEBSITE_ID   = "key_website_id";
+    public static final  String ARGS_WEBSITE_NAME = "key_website_name";
 
     @Bind(R.id.swipeRefreshLayout)
     public SwipeRefreshLayout mSwipeRefreshLayout;
@@ -59,7 +65,9 @@ public class AnecdoteFragment extends Fragment implements
     public RecyclerView mRecyclerView;
 
     protected int             mWebsiteId;
+    protected String          mWebsiteName;
     protected AnecdoteAdapter mAdapter;
+    @Nullable
     protected AnecdoteService mAnecdoteService;
     protected boolean         mIsLoadingNewItems;
 
@@ -93,12 +101,9 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-
         mLayoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(mLayoutManager);
 
-        mAdapter = new AnecdoteAdapter(this);
-        mRecyclerView.setAdapter(mAdapter);
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -130,19 +135,22 @@ public class AnecdoteFragment extends Fragment implements
     public void onResume() {
         super.onResume();
 
-        BusProvider.getInstance().register(this);
-        BusProvider.getInstance().post(new ChangeTitleEvent(mWebsiteId));
+        EventBus.getDefault().register(this);
+        EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteId));
+
+        FabricUtils.trackFragmentView(this, mWebsiteName);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        BusProvider.getInstance().unregister(this);
+        EventBus.getDefault().unregister(this);
     }
 
     protected void init() {
         if (getArguments() != null) {
             mWebsiteId = getArguments().getInt(ARGS_WEBSITE_ID);
+            mWebsiteName = getArguments().getString(ARGS_WEBSITE_NAME);
         }
 
         // Get text pref
@@ -156,6 +164,14 @@ public class AnecdoteFragment extends Fragment implements
             Log.e(TAG, "Unable to get an AnecdoteService");
             return;
         }
+
+        if (mAnecdoteService.getWebsite().hasAdditionalContent()) {
+            mAdapter = new MixedContentAdapter(this);
+        } else {
+            mAdapter = new TextAdapter(this);
+        }
+
+        mRecyclerView.setAdapter(mAdapter);
 
         // Set default values
         mIsLoadingNewItems = false;
@@ -182,13 +198,13 @@ public class AnecdoteFragment extends Fragment implements
         mIsLoadingNewItems = false;
         mSwipeRefreshLayout.setRefreshing(false);
 
-        if (dataChanged) {
+        if (dataChanged && mAnecdoteService != null) {
             mAdapter.setData(mAnecdoteService.getAnecdotes());
         }
     }
 
     protected void loadNewAnecdotes(int start) {
-        BusProvider.getInstance().post(new LoadNewAnecdoteEvent(mWebsiteId, start));
+        EventBus.getDefault().post(new LoadNewAnecdoteEvent(mWebsiteId, start));
     }
 
 
@@ -198,6 +214,9 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onRefresh() {
+        if(mAnecdoteService == null){
+            return;
+        }
         mAnecdoteService.cleanAnecdotes();
         loadNewAnecdotes(0);
     }
@@ -208,7 +227,38 @@ public class AnecdoteFragment extends Fragment implements
      **************************/
 
     @Override
-    public void onClick(Object object) {
+    public void onClick(Anecdote anecdote, View view) {
+
+        String contentUrl;
+        if (anecdote.mixedContent == null) {
+            return;
+        }
+
+        contentUrl = anecdote.mixedContent.contentUrl;
+
+        switch (anecdote.mixedContent.type) {
+            case RichContent.TYPE_IMAGE:
+                EventBus.getDefault().post(new FullscreenEvent(
+                        FullscreenEvent.TYPE_IMAGE,
+                        this,
+                        view,
+                        getString(R.string.anecdote_image_transition_name),
+                        contentUrl
+                ));
+                break;
+            case RichContent.TYPE_VIDEO:
+                EventBus.getDefault().post(new FullscreenEvent(
+                        FullscreenEvent.TYPE_VIDEO,
+                        this,
+                        view,
+                        getString(R.string.anecdote_image_transition_name),
+                        contentUrl
+                ));
+                break;
+            default:
+                Log.w(TAG, "Not managed RichContent type");
+                break;
+        }
 
     }
 
@@ -228,6 +278,8 @@ public class AnecdoteFragment extends Fragment implements
                 switch (which) {
                     // Share
                     case 0:
+                        FabricUtils.trackAnecdoteShare(mWebsiteName);
+
                         Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
                         sharingIntent.setType("text/plain");
 
@@ -244,6 +296,7 @@ public class AnecdoteFragment extends Fragment implements
                     // Open details
                     case 1:
                         try {
+                            FabricUtils.trackAnecdoteDetails(mWebsiteName);
                             Toast.makeText(getActivity(), R.string.open_intent_browser, Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(anecdote.permalink)));
                         } catch (ActivityNotFoundException exception) {
@@ -252,6 +305,7 @@ public class AnecdoteFragment extends Fragment implements
                         break;
                     // Copy
                     case 2:
+                        FabricUtils.trackAnecdoteCopy(mWebsiteName);
                         Toast.makeText(getActivity(), R.string.copied, Toast.LENGTH_SHORT).show();
                         Utils.copyToClipboard(
                                 getActivity(),
@@ -288,6 +342,6 @@ public class AnecdoteFragment extends Fragment implements
     @Subscribe
     public void onUpdateAnecdoteFragment(UpdateAnecdoteFragmentEvent event) {
         init();
-        BusProvider.getInstance().post(new ChangeTitleEvent(mWebsiteId));
+        EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteId));
     }
 }
