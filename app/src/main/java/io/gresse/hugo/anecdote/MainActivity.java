@@ -331,6 +331,8 @@ public class MainActivity extends AppCompatActivity
 
         if (!mWebsites.isEmpty()) {
             changeAnecdoteFragment(mWebsites.get(0));
+        } else {
+            changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
         }
     }
 
