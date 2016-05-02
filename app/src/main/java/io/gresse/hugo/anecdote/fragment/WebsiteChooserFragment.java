@@ -153,6 +153,12 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
         }
     }
 
+    /**
+     * Set the adapter data by copying the given data to a new object and removing already added website.
+     * It will also sort the list by the most liked website first
+     *
+     * @param websites data to display
+     */
     private void setAdapterData(List<Website> websites){
         mWebsites = new ArrayList<>();
         mWebsites.addAll(websites);
