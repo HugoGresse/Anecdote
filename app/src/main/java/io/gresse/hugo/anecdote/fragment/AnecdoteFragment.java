@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -326,16 +327,20 @@ public class AnecdoteFragment extends Fragment implements
      * Event
      ***************************/
 
-    @Subscribe
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onRequestFailedEvent(RequestFailedEvent event) {
         if (event.originalEvent instanceof LoadNewAnecdoteEvent &&
                 ((LoadNewAnecdoteEvent)event.originalEvent).websiteId  != mWebsiteId) return;
+
+        EventBus.getDefault().removeStickyEvent(event.getClass());
         afterRequestFinished(false);
     }
 
-    @Subscribe
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onAnecdoteReceived(OnAnecdoteLoadedEvent event) {
         if (event.websiteId != mWebsiteId) return;
+
+        EventBus.getDefault().removeStickyEvent(event.getClass());
         afterRequestFinished(true);
     }
 

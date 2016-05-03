@@ -225,7 +225,11 @@ public class AnecdoteService {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                EventBus.getDefault().post(event);
+                if(event instanceof OnAnecdoteLoadedEvent || event instanceof RequestFailedEvent){
+                    EventBus.getDefault().postSticky(event);
+                } else {
+                    EventBus.getDefault().post(event);
+                }
             }
         });
     }
