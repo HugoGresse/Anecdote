@@ -13,13 +13,12 @@
 
 
 ############
-# otto
+# EventBus
 -keepattributes *Annotation*
 -keepclassmembers class ** {
-    @com.squareup.otto.Subscribe public *;
-    @com.squareup.otto.Produce public *;
+    @org.greenrobot.eventbus.Subscribe <methods>;
 }
-
+-keep enum org.greenrobot.eventbus.ThreadMode { *; }
 
 ############
 # Butter Knife
