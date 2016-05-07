@@ -294,7 +294,7 @@ public class MainActivity extends AppCompatActivity
                 transaction.commit();
 
                 // If some snackbar is display, hide it
-                if (mSnackbar != null) {
+                if (mSnackbar != null && mSnackbar.isShownOrQueued()) {
                     mSnackbar.dismiss();
                 }
 
@@ -623,5 +623,8 @@ public class MainActivity extends AppCompatActivity
     public void onConnectivityChange(NetworkConnectivityListener.State state) {
         Log.d(TAG, "onConnectivityChange: " + state);
         EventBus.getDefault().post(new NetworkConnectivityChangeEvent(state));
+        if(state == NetworkConnectivityListener.State.CONNECTED && mSnackbar != null && mSnackbar.isShownOrQueued()){
+            mSnackbar.dismiss();
+        }
     }
 }
