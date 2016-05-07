@@ -27,7 +27,6 @@ public class Website {
     public String      url;
     public String      selector;
     public String      urlSuffix;
-    public int         itemPerPage;
     public boolean     isFirstPageZero;
     public int         color;
     public int         like;
@@ -66,7 +65,6 @@ public class Website {
         this.url = url;
         this.selector = selector;
         this.urlSuffix = urlSuffix;
-        this.itemPerPage = itemPerPage;
         this.isFirstPageZero = isFirstPageZero;
     }
 
@@ -85,9 +83,6 @@ public class Website {
         }
         if (TextUtils.isEmpty(urlSuffix)) {
             urlSuffix = "";
-        }
-        if (itemPerPage <= 0) {
-            itemPerPage = 1;
         }
         if (contentItem == null) {
             contentItem = new WebsiteItem();
@@ -176,7 +171,6 @@ public class Website {
                 "\n, url='" + url + "'" +
                 "\n, selector='" + selector + "'" +
                 "\n, urlSuffix='" + urlSuffix + "'" +
-                "\n, itemPerPage=" + itemPerPage +
                 "\n, isFirstPageZero=" + isFirstPageZero +
                 "\n, color=" + color +
                 "\n, like=" + like +

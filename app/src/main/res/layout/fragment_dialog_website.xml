@@ -69,20 +69,6 @@
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/itemPerPageContainer">
-
-        <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/itemPerPageEditText"
-            android:inputType="number"
-            android:hint="@string/dialog_website_itemperpage_hint"/>
-
-    </android.support.design.widget.TextInputLayout>
-
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/firstPageZeroContainer">
 
         <android.support.v7.widget.SwitchCompat

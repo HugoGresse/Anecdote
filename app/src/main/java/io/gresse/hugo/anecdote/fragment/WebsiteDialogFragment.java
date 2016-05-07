@@ -48,10 +48,6 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
     public TextInputLayout mSelectorTextInputLayout;
     @Bind(R.id.selectorEditText)
     public EditText        mSelectorEditText;
-    @Bind(R.id.itemPerPageContainer)
-    public TextInputLayout mItemPerPageInputLayout;
-    @Bind(R.id.itemPerPageEditText)
-    public EditText        mItemPerPageEditText;
     @Bind(R.id.firstPageZeroSwitchCompat)
     public SwitchCompat    mFirstPageZeroSwitchCompat;
     @Bind(R.id.saveButton)
@@ -106,7 +102,6 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
                 mWebsite.url = mUrlEditText.getText().toString();
                 mWebsite.urlSuffix = mUrlSuffixEditText.getText().toString();
                 mWebsite.selector = mSelectorEditText.getText().toString();
-                mWebsite.itemPerPage = Integer.parseInt(mItemPerPageEditText.getText().toString());
                 mWebsite.isFirstPageZero = mFirstPageZeroSwitchCompat.isChecked();
 
                 SpStorage.saveWebsite(getContext(), mWebsite);
@@ -141,7 +136,6 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
         mUrlEditText.setText(mWebsite.url);
         mUrlSuffixEditText.setText(mWebsite.urlSuffix);
         mSelectorEditText.setText(mWebsite.selector);
-        mItemPerPageEditText.setText(String.valueOf(mWebsite.itemPerPage));
         mFirstPageZeroSwitchCompat.setChecked(mWebsite.isFirstPageZero);
     }
 
@@ -174,17 +168,6 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
             mSelectorTextInputLayout.setErrorEnabled(false);
         }
 
-        if (TextUtils.isEmpty(mItemPerPageEditText.getText().toString())) {
-            mItemPerPageInputLayout.setErrorEnabled(true);
-            mItemPerPageInputLayout.setError(getContext().getString(R.string.dialog_website_error_itemperpage));
-            mItemPerPageEditText.requestLayout();
-            return false;
-        } else {
-            mItemPerPageInputLayout.setErrorEnabled(false);
-        }
-
         return true;
     }
-
-
 }
