@@ -21,7 +21,7 @@ import io.gresse.hugo.anecdote.view.PlayerView;
 
 /**
  * Fullscreen video
- *
+ * <p/>
  * Created by Hugo Gresse on 24/04/16.
  */
 public class FullscreenVideoFragment extends Fragment {
@@ -59,7 +59,7 @@ public class FullscreenVideoFragment extends Fragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if(!TextUtils.isEmpty(mVideoUrl)){
+        if (!TextUtils.isEmpty(mVideoUrl)) {
             mPlayerView.setVideoUrl(mVideoUrl);
         }
     }

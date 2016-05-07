@@ -69,7 +69,7 @@ public class FullscreenImageFragment extends Fragment {
                 .into(mImageView);
 
         // No transition compatible
-        if(Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP){
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             new PhotoViewAttacher(mImageView);
         }
     }

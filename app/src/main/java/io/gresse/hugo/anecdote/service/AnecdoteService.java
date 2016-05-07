@@ -64,9 +64,10 @@ public class AnecdoteService {
 
     /**
      * Get the Website object
+     *
      * @return website object
      */
-    public Website getWebsite(){
+    public Website getWebsite() {
         return mWebsite;
     }
 
@@ -189,7 +190,7 @@ public class AnecdoteService {
                 //noinspection ConstantConditions
                 url = mWebsite.urlItem.getData(element, tempElement);
 
-                if(mWebsite.hasAdditionalContent()){
+                if (mWebsite.hasAdditionalContent()) {
                     //noinspection ConstantConditions
                     richContent = mWebsite.additionalMixedContentItem.getRichData(element, tempElement);
                 }
@@ -208,7 +209,7 @@ public class AnecdoteService {
                     event,
                     "Unable to parse " + mWebsite.name + " website",
                     null));
-            if(mWebsite.source.equals(Website.SOURCE_REMOTE)){
+            if (mWebsite.source.equals(Website.SOURCE_REMOTE)) {
                 FabricUtils.trackWebsiteWrongConfiguration(mWebsite.name);
             }
             mEnd = true;
@@ -224,7 +225,7 @@ public class AnecdoteService {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                if(event instanceof OnAnecdoteLoadedEvent || event instanceof RequestFailedEvent){
+                if (event instanceof OnAnecdoteLoadedEvent || event instanceof RequestFailedEvent) {
                     EventBus.getDefault().postSticky(event);
                 } else {
                     EventBus.getDefault().post(event);

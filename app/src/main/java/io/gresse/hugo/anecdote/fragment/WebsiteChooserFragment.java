@@ -117,8 +117,8 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
                 getString(R.string.dialog_websitechooser_title),
                 this.getClass().getName()));
 
-        MainActivity mainActivity = ((MainActivity)getActivity());
-        if (mainActivity.getWebsiteApiService().isWebsitesDownloaded()){
+        MainActivity mainActivity = ((MainActivity) getActivity());
+        if (mainActivity.getWebsiteApiService().isWebsitesDownloaded()) {
             setAdapterData(mainActivity.getWebsiteApiService().getWebsites());
         } else {
             EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
@@ -159,10 +159,10 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
      *
      * @param websites data to display
      */
-    private void setAdapterData(List<Website> websites){
+    private void setAdapterData(List<Website> websites) {
         mWebsites = new ArrayList<>();
         mWebsites.addAll(websites);
-        if(mWebsites != null && !mWebsites.isEmpty()){
+        if (mWebsites != null && !mWebsites.isEmpty()) {
             if (!TextUtils.isEmpty(mMode) && !mMode.equals(BUNDLE_MODE_RESTORE)) {
                 // We want to add some websites : remove duplicates or already added ones
                 List<Website> savedWebsites = SpStorage.getWebsites(getActivity());

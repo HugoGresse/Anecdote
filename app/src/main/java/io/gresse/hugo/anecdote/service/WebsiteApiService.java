@@ -44,7 +44,7 @@ public class WebsiteApiService {
     protected LoadRemoteWebsiteEvent mFailedEvent;
     private   OkHttpClient           mOkHttpClient;
     private   List<Website>          mWebsites;
-    private Request mCurrentRequest;
+    private   Request                mCurrentRequest;
 
     public WebsiteApiService() {
 
@@ -129,12 +129,12 @@ public class WebsiteApiService {
     /**
      * Check if the service has downloaded the websites
      */
-    public boolean isWebsitesDownloaded(){
+    public boolean isWebsitesDownloaded() {
         return mWebsites != null;
     }
 
     @Nullable
-    public List<Website> getWebsites(){
+    public List<Website> getWebsites() {
         return mWebsites;
     }
 
@@ -144,12 +144,12 @@ public class WebsiteApiService {
 
     @Subscribe
     public void loadWebsite(LoadRemoteWebsiteEvent event) {
-        if(mWebsites != null && !mWebsites.isEmpty()){
+        if (mWebsites != null && !mWebsites.isEmpty()) {
             EventBus.getDefault().post(new OnRemoteWebsiteResponseEvent(true, mWebsites));
             return;
         }
 
-        if(mCurrentRequest != null){
+        if (mCurrentRequest != null) {
             return;
         }
 

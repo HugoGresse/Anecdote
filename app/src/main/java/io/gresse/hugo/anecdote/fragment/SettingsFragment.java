@@ -13,7 +13,7 @@ import io.gresse.hugo.anecdote.util.FabricUtils;
 
 /**
  * Anecdote preferences fragment
- *
+ * <p/>
  * Created by Hugo Gresse on 06/03/16.
  */
 public class SettingsFragment extends PreferenceFragmentCompat implements SharedPreferences.OnSharedPreferenceChangeListener {
@@ -39,15 +39,15 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     }
 
     /***************************
-     *  implements SharedPreferences.OnSharedPreferenceChangeListener
+     * implements SharedPreferences.OnSharedPreferenceChangeListener
      ***************************/
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         String value = "";
-        if(key.equals(getString(R.string.pref_rowstriping_key))){
+        if (key.equals(getString(R.string.pref_rowstriping_key))) {
             value = String.valueOf(sharedPreferences.getBoolean(key, false));
-        } else if(key.equals(getString(R.string.pref_textsize_key))){
+        } else if (key.equals(getString(R.string.pref_textsize_key))) {
             value = String.valueOf(sharedPreferences.getString(key, null));
         }
 
