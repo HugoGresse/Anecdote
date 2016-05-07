@@ -1,10 +1,8 @@
 package io.gresse.hugo.anecdote.fragment;
 
-import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -45,6 +43,7 @@ import io.gresse.hugo.anecdote.model.RichContent;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.util.FabricUtils;
 import io.gresse.hugo.anecdote.util.Utils;
+import io.gresse.hugo.anecdote.util.chrome.ChromeCustomTabsManager;
 
 /**
  * A generic anecdote fragment
@@ -78,10 +77,15 @@ public class AnecdoteFragment extends Fragment implements
     // TODO: check all loaded
     private boolean             mAllAnecdotesLoaded;
 
+    @Nullable
+    private ChromeCustomTabsManager mChromeCustomTabsManager;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+        mChromeCustomTabsManager = new ChromeCustomTabsManager(getActivity());
+        mChromeCustomTabsManager.bindCustomTabsService(getActivity());
     }
 
     // Inflate the view for the fragment based on layout XML
@@ -146,6 +150,14 @@ public class AnecdoteFragment extends Fragment implements
     public void onPause() {
         super.onPause();
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public void onStop() {
+        if(mChromeCustomTabsManager != null){
+            mChromeCustomTabsManager.unbindCustomTabsService(getActivity());
+        }
+        super.onStop();
     }
 
     protected void init() {
@@ -271,6 +283,10 @@ public class AnecdoteFragment extends Fragment implements
         final Anecdote anecdote = (Anecdote) object;
         // Open a dialog picker on item long click to choose between Open details, Share or copy the content
 
+        if(mChromeCustomTabsManager != null){
+            mChromeCustomTabsManager.mayLaunch(anecdote.permalink);
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setItems(R.array.anecdote_dialog, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int which) {
@@ -296,13 +312,8 @@ public class AnecdoteFragment extends Fragment implements
                         break;
                     // Open details
                     case 1:
-                        try {
-                            FabricUtils.trackAnecdoteDetails(mWebsiteName);
-                            Toast.makeText(getActivity(), R.string.open_intent_browser, Toast.LENGTH_SHORT).show();
-                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(anecdote.permalink)));
-                        } catch (ActivityNotFoundException exception) {
-                            Toast.makeText(getActivity(), R.string.open_intent_browser_error, Toast.LENGTH_SHORT).show();
-                        }
+                        FabricUtils.trackAnecdoteDetails(mWebsiteName);
+                        mChromeCustomTabsManager.openChrome(getActivity(), anecdote);
                         break;
                     // Copy
                     case 2:

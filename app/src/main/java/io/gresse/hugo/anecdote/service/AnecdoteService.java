@@ -156,7 +156,6 @@ public class AnecdoteService {
         });
     }
 
-
     private void processResponse(Event event, final int pageNumber, Response response) {
         Document document;
         try {
