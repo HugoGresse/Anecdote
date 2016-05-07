@@ -3,7 +3,6 @@ package io.gresse.hugo.anecdote;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -75,9 +74,6 @@ public class MainActivity extends AppCompatActivity
     @Bind(R.id.coordinatorLayout)
     public CoordinatorLayout mCoordinatorLayout;
 
-    @Bind(R.id.app_bar_layout)
-    public AppBarLayout mAppBarLayout;
-
     @Bind(R.id.toolbar)
     public Toolbar mToolbar;
 
@@ -91,6 +87,7 @@ public class MainActivity extends AppCompatActivity
     protected boolean                     mDrawerBackOpen;
     protected NetworkConnectivityListener mNetworkConnectivityListener;
     protected List<Website>               mWebsites;
+    protected Snackbar                    mSnackbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,7 +120,7 @@ public class MainActivity extends AppCompatActivity
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.startListening(this, this);
 
-        if(SpStorage.isFirstLaunch(this) || mWebsites.isEmpty()){
+        if (SpStorage.isFirstLaunch(this) || mWebsites.isEmpty()) {
             changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
         } else {
             changeAnecdoteFragment(mWebsites.get(0));
@@ -135,7 +132,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
 
         EventBus.getDefault().register(this);
-        if(!getWebsiteApiService().isWebsitesDownloaded()){
+        if (!getWebsiteApiService().isWebsitesDownloaded()) {
             EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
         }
     }
@@ -295,6 +292,12 @@ public class MainActivity extends AppCompatActivity
                 }
 
                 transaction.commit();
+
+                // If some snackbar is display, hide it
+                if (mSnackbar != null) {
+                    mSnackbar.dismiss();
+                }
+
             } else if (!fragmentPopped && manager.findFragmentByTag(backStateName) != null) {
                 log += " fragment not popped but finded: " + backStateName;
             } else {
@@ -361,7 +364,7 @@ public class MainActivity extends AppCompatActivity
                             switch (item.getItemId()) {
                                 case R.id.action_edit:
                                     // Remove edit button for remote website
-                                    if(!website.isEditable()){
+                                    if (!website.isEditable()) {
                                         Toast.makeText(MainActivity.this, R.string.action_website_noteditable_toast, Toast.LENGTH_SHORT).show();
                                         return false;
                                     }
@@ -392,7 +395,7 @@ public class MainActivity extends AppCompatActivity
         navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_add)
                 .setIcon(R.drawable.ic_action_content_add);
 
-        if(addNewNotification){
+        if (addNewNotification) {
             navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_newwebsite)
                     .setIcon(R.drawable.ic_action_info_outline);
         }
@@ -407,7 +410,7 @@ public class MainActivity extends AppCompatActivity
      * @param website website to edit
      */
     private void openWebsiteDialog(@Nullable Website website) {
-        if(website == null){
+        if (website == null) {
             FabricUtils.trackWebsiteEdit("", false);
         } else {
             FabricUtils.trackWebsiteEdit(website.name, false);
@@ -428,7 +431,7 @@ public class MainActivity extends AppCompatActivity
         return mServiceProvider.getAnecdoteService(websiteId);
     }
 
-    public WebsiteApiService getWebsiteApiService(){
+    public WebsiteApiService getWebsiteApiService() {
         return mServiceProvider.getWebsiteApiService();
     }
 
@@ -439,16 +442,18 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onRequestFailed(final RequestFailedEvent event) {
         Log.d(TAG, "requestFailed:  " + event.getClass().getCanonicalName());
-        if(Configuration.DEBUG){
+        if (Configuration.DEBUG) {
             Log.d(TAG, "RequestFailed: " + event.toString());
         }
 
         //noinspection WrongConstant
-        Snackbar
-                .make(mCoordinatorLayout, event.message, Snackbar.LENGTH_INDEFINITE)
+        mSnackbar = Snackbar
+                .make(mCoordinatorLayout, event.message, Snackbar.LENGTH_INDEFINITE);
+        mSnackbar
                 .setAction("Retry", new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        mSnackbar = null;
                         EventBus.getDefault().post(event.originalEvent);
                     }
                 })
@@ -564,7 +569,7 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onRemoteWebsiteLoaded(OnRemoteWebsiteResponseEvent event) {
         if (!event.isSuccessful) return;
-        if(mWebsites == null || mWebsites.isEmpty()) return;
+        if (mWebsites == null || mWebsites.isEmpty()) return;
 
         /****
          * Check remote website and local to update local configuration if needed
@@ -572,15 +577,15 @@ public class MainActivity extends AppCompatActivity
         Website tempWebsite;
         List<Website> newWebsiteList = new ArrayList<>();
         boolean dataModified = false;
-        for(Website website: mWebsites){
+        for (Website website : mWebsites) {
             int index = event.websiteList.lastIndexOf(website);
 
             // This remote website has not been found locally, skip it
-            if(index == -1){
+            if (index == -1) {
                 continue;
             }
             tempWebsite = event.websiteList.get(index);
-            if(!website.isUpToDate(tempWebsite)){
+            if (!website.isUpToDate(tempWebsite)) {
                 dataModified = true;
                 newWebsiteList.add(tempWebsite);
             } else {
@@ -590,22 +595,22 @@ public class MainActivity extends AppCompatActivity
 
         boolean newNotification = false;
         int savedWebsiteNumber = SpStorage.getSavedRemoteWebsiteNumber(this);
-        if(savedWebsiteNumber < event.websiteList.size()){
+        if (savedWebsiteNumber < event.websiteList.size()) {
             // Display new website notification
             newNotification = true;
             SpStorage.setSavedRemoteWebsiteNumber(this, event.websiteList.size());
-        } else if(event.websiteList.size() < savedWebsiteNumber){
+        } else if (event.websiteList.size() < savedWebsiteNumber) {
             SpStorage.setSavedRemoteWebsiteNumber(this, event.websiteList.size());
         }
 
-        if(dataModified){
+        if (dataModified) {
             Log.i(TAG, "Updating websites configuration");
             mWebsites = newWebsiteList;
             SpStorage.saveWebsites(this, mWebsites);
             resetAnecdoteServices();
             populateNavigationView(newNotification);
             EventBus.getDefault().post(new UpdateAnecdoteFragmentEvent());
-        } else if(newNotification){
+        } else if (newNotification) {
             populateNavigationView(true);
         }
     }
