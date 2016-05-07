@@ -125,7 +125,7 @@ public class Website {
     public String getPageUrl(int pageNumber, @Nullable Map<Integer, String> paginationMap){
         if(paginationItem == null){
             return url +
-                    ((isFirstPageZero) ? pageNumber - 1 : pageNumber) +
+                    ((isFirstPageZero) ? pageNumber : pageNumber + 1) +
                     urlSuffix;
         } else if(pageNumber != 0 && paginationMap != null && paginationMap.containsKey(pageNumber)) {
             return paginationMap.get(pageNumber);

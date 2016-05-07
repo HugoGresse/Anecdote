@@ -240,16 +240,9 @@ public class AnecdoteService {
     @Subscribe
     public void loadNextAnecdoteEvent(LoadNewAnecdoteEvent event) {
         if (event.websiteId != mWebsite.id) return;
-
-        int page = 1;
-        int estimatedCurrentPage = event.start / mWebsite.itemPerPage;
-        if (estimatedCurrentPage >= 1) {
-            page += estimatedCurrentPage;
-        }
-        // Log.d(TAG, "loadNexAnecdoteEvent start:" + event.start + " page:" + page);
-        downloadLatest(event, page);
+        int pageNumber = event.page;
+        downloadLatest(event, pageNumber);
     }
-
 
     /**
      * Called by child service

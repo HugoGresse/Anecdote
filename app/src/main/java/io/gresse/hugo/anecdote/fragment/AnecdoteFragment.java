@@ -74,6 +74,7 @@ public class AnecdoteFragment extends Fragment implements
     private LinearLayoutManager mLayoutManager;
     private int                 mTotalItemCount;
     private int                 mLastVisibleItem;
+    private int                 mNextPageNumber;
     // TODO: check all loaded
     private boolean             mAllAnecdotesLoaded;
 
@@ -118,10 +119,10 @@ public class AnecdoteFragment extends Fragment implements
                 mLastVisibleItem = mLayoutManager.findLastVisibleItemPosition();
 
                 // Scrolled to bottom. Do something here.
-                if (!mIsLoadingNewItems && mLastVisibleItem == mTotalItemCount - 1 && !mAllAnecdotesLoaded) {
+                if (!mIsLoadingNewItems && mLastVisibleItem == mTotalItemCount - 4 && !mAllAnecdotesLoaded) {
                     mIsLoadingNewItems = true;
                     Log.d(TAG, "Scrolled to end, load new anecdotes");
-                    loadNewAnecdotes(mTotalItemCount);
+                    loadNewAnecdotes(mNextPageNumber);
                 }
             }
         });
@@ -154,7 +155,7 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onStop() {
-        if(mChromeCustomTabsManager != null){
+        if (mChromeCustomTabsManager != null) {
             mChromeCustomTabsManager.unbindCustomTabsService(getActivity());
         }
         super.onStop();
@@ -195,10 +196,11 @@ public class AnecdoteFragment extends Fragment implements
             // noinspection deprecation
             mAdapter.setTextStyle(textSize, rowStripping, getResources().getColor(R.color.colorBackgroundStripping));
         }
+
         mAdapter.setData(mAnecdoteService.getAnecdotes());
 
         if (mAnecdoteService.getAnecdotes().isEmpty()) {
-            loadNewAnecdotes(0);
+            loadNewAnecdotes(mNextPageNumber);
         }
     }
 
@@ -212,12 +214,18 @@ public class AnecdoteFragment extends Fragment implements
         mSwipeRefreshLayout.setRefreshing(false);
 
         if (dataChanged && mAnecdoteService != null) {
+            mNextPageNumber++;
             mAdapter.setData(mAnecdoteService.getAnecdotes());
         }
     }
 
-    protected void loadNewAnecdotes(int start) {
-        EventBus.getDefault().post(new LoadNewAnecdoteEvent(mWebsiteId, start));
+    /**
+     * Post a new event to load a new event page
+     *
+     * @param page the page to load
+     */
+    protected void loadNewAnecdotes(int page) {
+        EventBus.getDefault().post(new LoadNewAnecdoteEvent(mWebsiteId, page));
     }
 
 
@@ -227,11 +235,11 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onRefresh() {
-        if(mAnecdoteService == null){
+        if (mAnecdoteService == null) {
             return;
         }
         mAnecdoteService.cleanAnecdotes();
-        loadNewAnecdotes(0);
+        loadNewAnecdotes(mNextPageNumber = 0);
     }
 
 
@@ -283,7 +291,7 @@ public class AnecdoteFragment extends Fragment implements
         final Anecdote anecdote = (Anecdote) object;
         // Open a dialog picker on item long click to choose between Open details, Share or copy the content
 
-        if(mChromeCustomTabsManager != null){
+        if (mChromeCustomTabsManager != null) {
             mChromeCustomTabsManager.mayLaunch(anecdote.permalink);
         }
 
@@ -341,7 +349,7 @@ public class AnecdoteFragment extends Fragment implements
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onRequestFailedEvent(RequestFailedEvent event) {
         if (event.originalEvent instanceof LoadNewAnecdoteEvent &&
-                ((LoadNewAnecdoteEvent)event.originalEvent).websiteId  != mWebsiteId) return;
+                ((LoadNewAnecdoteEvent) event.originalEvent).websiteId != mWebsiteId) return;
 
         EventBus.getDefault().removeStickyEvent(event.getClass());
         afterRequestFinished(false);
