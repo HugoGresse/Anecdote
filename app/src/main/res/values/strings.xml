@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name" translatable="false">Anecdote</string>
+    <string name="app_name">Quote</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -11,9 +11,11 @@
     <string name="action_delete">Delete</string>
     <string name="action_default">Default</string>
     <string name="action_website_add">Add website</string>
+    <string name="action_website_newwebsite">New websites available!</string>
     <string name="action_website_add_custom">Add custom website</string>
     <string name="copied">Copied to clipboard</string>
     <string name="not_implemented" translatable="false">Not implemented</string>
+    <string name="action_website_noteditable_toast">You can\'t edit a remote website</string>
 
     <string name="app_share_credits"> - via Anecdote http://bit.ly/anecdoteapp </string>
 
@@ -59,6 +61,9 @@
         <item>Gson by Google http://github.com/google/gson</item>
         <item>Jsoup by Jonathan Hedley http://jsoup.org/</item>
         <item>ButterKnife by Jake Wharton http://jakewharton.github.io/butterknife/</item>
+        <item>Glide by Bumptech http://github.com/bumptech/glide</item>
+        <item>PhotoView by Chris Banes http://github.com/chrisbanes/PhotoView</item>
+        <item>SimpleExoPlayer by Hugo Gresse http://github.com/HugoGresse/SimpleExoPlayer</item>
     </string-array>
 
     <!-- Strings related to Settings -->
@@ -82,5 +87,9 @@
         <item>18</item>
         <item>24</item>
     </string-array>
+
+
+    <string name="anecdote_image_transition_name" translatable="false">imageTransitionName</string>
+    <string name="anecdote_video_transition_name" translatable="false">videoTransitionName</string>
 
 </resources>

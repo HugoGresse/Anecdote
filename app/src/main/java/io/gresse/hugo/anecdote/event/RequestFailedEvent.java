@@ -21,4 +21,12 @@ public class RequestFailedEvent implements Event {
         this.message = message;
         this.exception = exception;
     }
+
+    @Override
+    public String toString() {
+        return "RequestFailedEvent{" +
+                "message='" + message + '\'' +
+                ", exception=" + exception +
+                '}';
+    }
 }

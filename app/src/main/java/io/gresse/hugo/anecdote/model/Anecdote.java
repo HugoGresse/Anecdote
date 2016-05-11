@@ -1,20 +1,29 @@
 package io.gresse.hugo.anecdote.model;
 
+import android.support.annotation.Nullable;
+
 import org.jsoup.Jsoup;
 
 /**
- * A single DTC quote
+ * A single anecdote
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
 public class Anecdote {
 
-    public String content;
-    public String permalink;
+    public String      content;
+    public String      permalink;
+    @Nullable
+    public RichContent mixedContent;
 
     public Anecdote(String content, String permalink) {
+        this(content, permalink, null);
+    }
+
+    public Anecdote(String content, String permalink, @Nullable RichContent mixedContent) {
         this.content = content;
         this.permalink = permalink;
+        this.mixedContent = mixedContent;
     }
 
     /**
@@ -47,9 +56,6 @@ public class Anecdote {
 
     @Override
     public String toString() {
-        return "DtcQuote{" +
-                "content='" + content + '\'' +
-                ", permalink='" + permalink + '\'' +
-                '}';
+        return "Anecdote content='" + content + "'\', permalink='"+ permalink + '\'';
     }
 }

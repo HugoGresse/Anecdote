@@ -8,4 +8,5 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="padding_anecdoterow">32dp</dimen>
+    <dimen name="padding_anecdoterow_half">16dp</dimen>
 </resources>

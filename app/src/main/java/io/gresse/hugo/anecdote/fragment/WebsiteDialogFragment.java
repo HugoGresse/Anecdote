@@ -15,13 +15,15 @@ import android.widget.EditText;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.greenrobot.eventbus.EventBus;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.model.Website;
-import io.gresse.hugo.anecdote.util.SpStorage;
+import io.gresse.hugo.anecdote.storage.SpStorage;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 
 /**
  * FialogFragment to edit or add wesites
@@ -40,18 +42,12 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
     public TextInputLayout mUrlTextInputLayout;
     @Bind(R.id.urlEditText)
     public EditText        mUrlEditText;
-    @Bind(R.id.urlSuffixContainer)
-    public TextInputLayout mUrlSuffixTextInputLayout;
     @Bind(R.id.urlSuffixEditText)
     public EditText        mUrlSuffixEditText;
     @Bind(R.id.selectorContainer)
     public TextInputLayout mSelectorTextInputLayout;
     @Bind(R.id.selectorEditText)
     public EditText        mSelectorEditText;
-    @Bind(R.id.itemPerPageContainer)
-    public TextInputLayout mItemPerPageInputLayout;
-    @Bind(R.id.itemPerPageEditText)
-    public EditText        mItemPerPageEditText;
     @Bind(R.id.firstPageZeroSwitchCompat)
     public SwitchCompat    mFirstPageZeroSwitchCompat;
     @Bind(R.id.saveButton)
@@ -62,7 +58,7 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
 
     public static WebsiteDialogFragment newInstance(@Nullable Website website) {
         WebsiteDialogFragment frag = new WebsiteDialogFragment();
-        if(website != null){
+        if (website != null) {
             Bundle args = new Bundle();
             args.putString(ARGS_WEBSITE, new Gson().toJson(website));
             frag.setArguments(args);
@@ -82,7 +78,7 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        int width = (int)(getResources().getDisplayMetrics().widthPixels*0.90);
+        int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90);
         getDialog().getWindow().setLayout(width, getDialog().getWindow().getAttributes().height);
 
         if (getArguments() != null && !TextUtils.isEmpty(getArguments().getString(ARGS_WEBSITE))) {
@@ -99,18 +95,24 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(!isDataCorrect()){
+                if (!isDataCorrect()) {
                     return;
                 }
                 mWebsite.name = mNameEditText.getText().toString();
                 mWebsite.url = mUrlEditText.getText().toString();
                 mWebsite.urlSuffix = mUrlSuffixEditText.getText().toString();
                 mWebsite.selector = mSelectorEditText.getText().toString();
-                mWebsite.itemPerPage = Integer.parseInt(mItemPerPageEditText.getText().toString());
                 mWebsite.isFirstPageZero = mFirstPageZeroSwitchCompat.isChecked();
 
                 SpStorage.saveWebsite(getContext(), mWebsite);
-                BusProvider.getInstance().post(new WebsitesChangeEvent());
+
+                if (mEditMode) {
+                    FabricUtils.trackWebsiteEdit(mWebsite.name, true);
+                } else {
+                    FabricUtils.trackCustomWebsiteAdded();
+                }
+
+                EventBus.getDefault().post(new WebsitesChangeEvent());
                 WebsiteDialogFragment.this.getDialog().dismiss();
             }
         });
@@ -134,13 +136,12 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
         mUrlEditText.setText(mWebsite.url);
         mUrlSuffixEditText.setText(mWebsite.urlSuffix);
         mSelectorEditText.setText(mWebsite.selector);
-        mItemPerPageEditText.setText(String.valueOf(mWebsite.itemPerPage));
         mFirstPageZeroSwitchCompat.setChecked(mWebsite.isFirstPageZero);
     }
 
-    protected boolean isDataCorrect(){
+    protected boolean isDataCorrect() {
 
-        if(TextUtils.isEmpty(mNameEditText.getText().toString())){
+        if (TextUtils.isEmpty(mNameEditText.getText().toString())) {
             mNameTextInputLayout.setErrorEnabled(true);
             mNameTextInputLayout.setError(getContext().getString(R.string.dialog_website_error_name));
             mNameEditText.requestLayout();
@@ -149,7 +150,7 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
             mNameTextInputLayout.setErrorEnabled(false);
         }
 
-        if(TextUtils.isEmpty(mUrlEditText.getText().toString())){
+        if (TextUtils.isEmpty(mUrlEditText.getText().toString())) {
             mUrlTextInputLayout.setErrorEnabled(true);
             mUrlTextInputLayout.setError(getContext().getString(R.string.dialog_website_error_url));
             mUrlEditText.requestLayout();
@@ -158,7 +159,7 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
             mUrlTextInputLayout.setErrorEnabled(false);
         }
 
-        if(TextUtils.isEmpty(mSelectorEditText.getText().toString())){
+        if (TextUtils.isEmpty(mSelectorEditText.getText().toString())) {
             mSelectorTextInputLayout.setErrorEnabled(true);
             mSelectorTextInputLayout.setError(getContext().getString(R.string.dialog_website_error_selector));
             mSelectorEditText.requestLayout();
@@ -167,17 +168,6 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
             mSelectorTextInputLayout.setErrorEnabled(false);
         }
 
-        if(TextUtils.isEmpty(mItemPerPageEditText.getText().toString())){
-            mItemPerPageInputLayout.setErrorEnabled(true);
-            mItemPerPageInputLayout.setError(getContext().getString(R.string.dialog_website_error_itemperpage));
-            mItemPerPageEditText.requestLayout();
-            return false;
-        } else {
-            mItemPerPageInputLayout.setErrorEnabled(false);
-        }
-
         return true;
     }
-
-
 }

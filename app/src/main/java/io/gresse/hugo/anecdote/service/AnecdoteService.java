@@ -3,11 +3,10 @@ package io.gresse.hugo.anecdote.service;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.squareup.otto.Subscribe;
-
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,18 +15,20 @@ import org.jsoup.select.Selector;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import io.gresse.hugo.anecdote.event.BusProvider;
 import io.gresse.hugo.anecdote.event.Event;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.model.RichContent;
 import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.util.Utils;
 import okhttp3.Call;
@@ -43,20 +44,31 @@ import okhttp3.Response;
  */
 public class AnecdoteService {
 
-    protected OkHttpClient   mOkHttpClient;
-    protected String         mServiceName;
-    protected Website        mWebsite;
-    protected List<Anecdote> mAnecdotes;
-    protected List<Event>    mFailEvents;
+    protected OkHttpClient         mOkHttpClient;
+    protected String               mServiceName;
+    protected Website              mWebsite;
+    protected List<Anecdote>       mAnecdotes;
+    protected List<Event>          mFailEvents;
+    protected Map<Integer, String> mPaginationMap;
     protected boolean mEnd = false;
 
     public AnecdoteService(Website website) {
         mWebsite = website;
-        mServiceName = mWebsite.name + AnecdoteService.class.getSimpleName();
+        mServiceName = mWebsite.name.replaceAll("\\s", "") + AnecdoteService.class.getSimpleName();
 
         mOkHttpClient = new OkHttpClient();
         mAnecdotes = new ArrayList<>();
         mFailEvents = new CopyOnWriteArrayList<>();
+        mPaginationMap = new HashMap<>();
+    }
+
+    /**
+     * Get the Website object
+     *
+     * @return website object
+     */
+    public Website getWebsite() {
+        return mWebsite;
     }
 
     /**
@@ -81,7 +93,7 @@ public class AnecdoteService {
     public void retryFailedEvent() {
         if (!mFailEvents.isEmpty()) {
             for (Event event : mFailEvents) {
-                BusProvider.getInstance().post(event);
+                EventBus.getDefault().post(event);
             }
             mFailEvents.clear();
         }
@@ -98,12 +110,10 @@ public class AnecdoteService {
         Request request;
         try {
             request = new Request.Builder()
-                    .url(mWebsite.url +
-                            ((mWebsite.isFirstPageZero) ? pageNumber - 1 : pageNumber) +
-                            mWebsite.urlSuffix)
-                    .header("User-Agent", Utils.getUserAgent())
+                    .url(mWebsite.getPageUrl(pageNumber, mPaginationMap))
+                    .header("User-Agent", Utils.getUserAgent(mWebsite))
                     .build();
-        } catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             mFailEvents.add(event);
             postOnUiThread(new RequestFailedEvent(
                     event,
@@ -126,10 +136,10 @@ public class AnecdoteService {
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 // We are not on main thread
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     try {
                         processResponse(event, pageNumber, response);
-                    } catch (Selector.SelectorParseException exception){
+                    } catch (Selector.SelectorParseException exception) {
                         postOnUiThread(new RequestFailedEvent(
                                 event,
                                 "Something went wrong, try another website setting",
@@ -146,7 +156,6 @@ public class AnecdoteService {
             }
         });
     }
-
 
     private void processResponse(Event event, final int pageNumber, Response response) {
         Document document;
@@ -166,84 +175,43 @@ public class AnecdoteService {
         final Elements elements = document.select(mWebsite.selector);
 
         if (elements != null && !elements.isEmpty()) {
-            Element tempElement;
-            String content = "";
-            String url = "";
+            Element tempElement = null;
+            String content;
+            String url;
+            RichContent richContent = null;
 
+            /**
+             * We get each item to select the correct data and apply the WebsiteItem options (replace, prefix, etc).
+             * We pass the first parameter to the getData to not create a new Object each time
+             */
             for (Element element : elements) {
+                //noinspection ConstantConditions
+                content = mWebsite.contentItem.getData(element, tempElement);
+                //noinspection ConstantConditions
+                url = mWebsite.urlItem.getData(element, tempElement);
 
-
-                /////////////////////////
-                // Step 1: create content
-
-                if (!TextUtils.isEmpty(mWebsite.contentItem.prefix)) {
-                    content = mWebsite.contentItem.prefix;
+                if (mWebsite.hasAdditionalContent()) {
+                    //noinspection ConstantConditions
+                    richContent = mWebsite.additionalMixedContentItem.getRichData(element, tempElement);
                 }
 
-                if (TextUtils.isEmpty(mWebsite.contentItem.selector)) {
-                    tempElement = element;
-                } else {
-                    tempElement = element.select(mWebsite.contentItem.selector).get(0);
-                }
+                mAnecdotes.add(new Anecdote(content, url, richContent));
+            }
 
-                if (tempElement != null) {
-                    if (TextUtils.isEmpty(mWebsite.contentItem.attribute)) {
-                        content = tempElement.html();
-                    } else {
-                        content = tempElement.attr(mWebsite.contentItem.attribute);
-                    }
-                }
-
-                if (!TextUtils.isEmpty(mWebsite.contentItem.suffix)) {
-                    content += mWebsite.contentItem.suffix;
-                }
-
-                for (Map.Entry<String, String> entry : mWebsite.contentItem.replaceMap.entrySet()) {
-                    content = content.replaceAll(entry.getKey(), entry.getValue());
-                }
-
-                ////////////////////////
-                // Step 2: create url
-
-                if (!TextUtils.isEmpty(mWebsite.urlItem.prefix)) {
-                    url = mWebsite.urlItem.prefix;
-                }
-
-                if (TextUtils.isEmpty(mWebsite.urlItem.selector)) {
-                    tempElement = element;
-                } else {
-                    tempElement = element.select(mWebsite.urlItem.selector).get(0);
-                }
-
-                if (tempElement != null) {
-                    if (TextUtils.isEmpty(mWebsite.urlItem.attribute)) {
-                        url += tempElement.html();
-                    } else {
-                        url += tempElement.attr(mWebsite.urlItem.attribute);
-                    }
-                }
-
-                if (!TextUtils.isEmpty(mWebsite.urlItem.suffix)) {
-                    url += mWebsite.urlItem.suffix;
-                }
-
-                for (Map.Entry<String, String> entry : mWebsite.urlItem.replaceMap.entrySet()) {
-                    url = url.replaceAll(entry.getKey(), entry.getValue());
-                }
-
-                ////////////////////////
-                // Step 3: create the anecdote
-
-                mAnecdotes.add(new Anecdote(content, url));
-
-                // reset var
-                content = "";
-                url = "";
+            if (mWebsite.paginationItem != null) {
+                mPaginationMap.put(pageNumber + 1, mWebsite.paginationItem.getData(document));
             }
 
             postOnUiThread(new OnAnecdoteLoadedEvent(mWebsite.id, elements.size(), pageNumber));
         } else {
-            Log.d(mServiceName, "No more elements from this");
+            Log.w(mServiceName, "No elements :/");
+            postOnUiThread(new RequestFailedEvent(
+                    event,
+                    "Unable to parse " + mWebsite.name + " website",
+                    null));
+            if (mWebsite.source.equals(Website.SOURCE_REMOTE)) {
+                FabricUtils.trackWebsiteWrongConfiguration(mWebsite.name);
+            }
             mEnd = true;
         }
     }
@@ -257,7 +225,11 @@ public class AnecdoteService {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                BusProvider.getInstance().post(event);
+                if (event instanceof OnAnecdoteLoadedEvent || event instanceof RequestFailedEvent) {
+                    EventBus.getDefault().postSticky(event);
+                } else {
+                    EventBus.getDefault().post(event);
+                }
             }
         });
     }
@@ -269,16 +241,9 @@ public class AnecdoteService {
     @Subscribe
     public void loadNextAnecdoteEvent(LoadNewAnecdoteEvent event) {
         if (event.websiteId != mWebsite.id) return;
-
-        int page = 1;
-        int estimatedCurrentPage = event.start / mWebsite.itemPerPage;
-        if (estimatedCurrentPage >= 1) {
-            page += estimatedCurrentPage;
-        }
-        // Log.d(TAG, "loadNexAnecdoteEvent start:" + event.start + " page:" + page);
-        downloadLatest(event, page);
+        int pageNumber = event.page;
+        downloadLatest(event, pageNumber);
     }
-
 
     /**
      * Called by child service

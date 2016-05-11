@@ -4,15 +4,15 @@ import android.support.annotation.Nullable;
 
 /**
  * Requested when we need ot change the Toolbar title
- *
+ * <p/>
  * Created by Hugo Gresse on 14/02/16.
  */
 public class ChangeTitleEvent implements Event {
 
     @Nullable
-    public String title;
+    public String  title;
     @Nullable
-    public String className;
+    public String  className;
     @Nullable
     public Integer websiteId;
 
@@ -23,6 +23,7 @@ public class ChangeTitleEvent implements Event {
 
     /**
      * If it's a website related event
+     *
      * @param websiteId the website displayed
      */
     public ChangeTitleEvent(@Nullable Integer websiteId) {

@@ -1,6 +1,9 @@
 package io.gresse.hugo.anecdote.model;
 
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
+
+import java.util.Map;
 
 /**
  * Represent a unique content provider such as VDM or DTC to be used to get and parse data from the website.
@@ -12,6 +15,10 @@ public class Website {
     public static final String SOURCE_LOCAL  = "local";
     public static final String SOURCE_REMOTE = "remote";
 
+    public static final int TYPE_NONE = 0;
+    public static final int TYPE_IMAGE = 1;
+    public static final int TYPE_VIDEO = 2;
+
     // The website id should never be altered
     public int         id;
     public int         version;
@@ -20,13 +27,24 @@ public class Website {
     public String      url;
     public String      selector;
     public String      urlSuffix;
-    public int         itemPerPage;
     public boolean     isFirstPageZero;
     public int         color;
     public int         like;
     public String      source;
+    public String      userAgent;
     public WebsiteItem contentItem;
     public WebsiteItem urlItem;
+    @Nullable
+    public WebsiteItem additionalMixedContentItem;
+
+    /**
+     * If a paginationItem is not null, so the first page to get if the root website (like http://9gag.com) and the
+     * other page url are getted from the last page launch using this paginationItem.
+     *
+     * PaginationItem value if not getter after the first elements selections but at the same level.
+     */
+    @Nullable
+    public WebsiteItem paginationItem;
 
     public Website() {
         this.contentItem = new WebsiteItem();
@@ -47,7 +65,6 @@ public class Website {
         this.url = url;
         this.selector = selector;
         this.urlSuffix = urlSuffix;
-        this.itemPerPage = itemPerPage;
         this.isFirstPageZero = isFirstPageZero;
     }
 
@@ -66,9 +83,6 @@ public class Website {
         }
         if (TextUtils.isEmpty(urlSuffix)) {
             urlSuffix = "";
-        }
-        if (itemPerPage <= 0) {
-            itemPerPage = 1;
         }
         if (contentItem == null) {
             contentItem = new WebsiteItem();
@@ -96,6 +110,42 @@ public class Website {
         return website.version <= version;
     }
 
+    /**
+     * Get the page url from the given page number.
+     *
+     * @param pageNumber the page to get the url from
+     * @param paginationMap the paginationMap is any, to try to get the url from
+     * @return the url that represent the page
+     */
+    public String getPageUrl(int pageNumber, @Nullable Map<Integer, String> paginationMap){
+        if(paginationItem == null){
+            return url +
+                    ((isFirstPageZero) ? pageNumber : pageNumber + 1) +
+                    urlSuffix;
+        } else if(pageNumber != 0 && paginationMap != null && paginationMap.containsKey(pageNumber)) {
+            return paginationMap.get(pageNumber);
+        } else {
+            return url;
+        }
+    }
+
+    /**
+     * Check if has additional mixed content
+     *
+     * @return true if has additional mixed (image or video) content
+     */
+    public boolean hasAdditionalContent(){
+        return additionalMixedContentItem != null;
+    }
+
+    /**
+     * Check if the user can edit this website manually or not
+     * @return true if editable
+     */
+    public boolean isEditable(){
+        return !source.equals(SOURCE_REMOTE);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -121,7 +171,6 @@ public class Website {
                 "\n, url='" + url + "'" +
                 "\n, selector='" + selector + "'" +
                 "\n, urlSuffix='" + urlSuffix + "'" +
-                "\n, itemPerPage=" + itemPerPage +
                 "\n, isFirstPageZero=" + isFirstPageZero +
                 "\n, color=" + color +
                 "\n, like=" + like +

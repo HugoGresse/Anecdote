@@ -2,10 +2,10 @@ package io.gresse.hugo.anecdote.event;
 
 /**
  * An anecdote related event
- *
+ * <p/>
  * Created by Hugo Gresse on 28/02/16.
  */
-public abstract class AnecdoteEvent implements Event{
+public abstract class AnecdoteEvent implements Event {
 
     public int websiteId;
 

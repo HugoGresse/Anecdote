@@ -33,11 +33,11 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
      * Null list = no data, empty list = data loaded but nothing to display
      */
     @Nullable
-    private List<Website>      mWebsites;
+    private List<Website>             mWebsites;
     @Nullable
-    private ViewHolderListener mViewHolderListener;
+    private WebsiteViewHolderListener mViewHolderListener;
 
-    public WebsiteChooserAdapter(@Nullable ViewHolderListener viewHolderListener) {
+    public WebsiteChooserAdapter(@Nullable WebsiteViewHolderListener viewHolderListener) {
         mViewHolderListener = viewHolderListener;
     }
 

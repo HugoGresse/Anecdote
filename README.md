@@ -3,14 +3,14 @@
 </a>
 # Anecdote 
 
-Simply display VDM and DTC content in a basic interface
+Simply display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9gag, Se couchez moins bête, Bash.org in a simple interface. 
 
 <a href="https://play.google.com/store/apps/details?id=io.gresse.hugo.anecdote&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img width="200px" alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a>
 
 ![home](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/screen_home.png)
 ![edit](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/screen_edit.png)
 
-_This application is not related in anyway with [viedemerde.fr](http://viedemerde.fr/) or [danstonchat.com](http://danstonchat.com/). All contents belongs to them._
+_This application contents does not belong to the application._
 
 Features
 --------
@@ -18,13 +18,14 @@ Features
 - infinit scroll
 - pull to refresh
 - manually adding websites (for expert) via HTML parsing
+- remote websites configuration update
 - no persistent data, no strange permissions, no ad
 
 TODO
 --------
+- 9gag HOT & trending
 - website to manage Anecdote websites
 - manage one page site (no pagination)
-- implement urlItem and contentItem on website dialog
 - guide to add website (a follow through user step)
 - filter by country
 

@@ -14,7 +14,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.squareup.otto.Subscribe;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,16 +25,17 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.adapter.ViewHolderListener;
 import io.gresse.hugo.anecdote.adapter.WebsiteChooserAdapter;
-import io.gresse.hugo.anecdote.event.BusProvider;
+import io.gresse.hugo.anecdote.adapter.WebsiteViewHolderListener;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.event.OnRemoteWebsiteResponseEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.model.Website;
-import io.gresse.hugo.anecdote.util.SpStorage;
+import io.gresse.hugo.anecdote.storage.SpStorage;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 
 /**
  * Display a list of website from Firebase so the user can choose which website he want to load after initial
@@ -41,7 +43,7 @@ import io.gresse.hugo.anecdote.util.SpStorage;
  * <p/>
  * Created by Hugo Gresse on 03/03/16.
  */
-public class WebsiteChooserFragment extends Fragment implements ViewHolderListener {
+public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolderListener {
 
     @SuppressWarnings("unused")
     public static final String TAG = WebsiteChooserFragment.class.getSimpleName();
@@ -110,23 +112,25 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
     @Override
     public void onResume() {
         super.onResume();
-        BusProvider.getInstance().register(this);
-        BusProvider.getInstance().post(new ChangeTitleEvent(
+        EventBus.getDefault().register(this);
+        EventBus.getDefault().post(new ChangeTitleEvent(
                 getString(R.string.dialog_websitechooser_title),
                 this.getClass().getName()));
 
-
-        if (mWebsites != null && !mWebsites.isEmpty()) {
-            mAdapter.setData(mWebsites);
+        MainActivity mainActivity = ((MainActivity) getActivity());
+        if (mainActivity.getWebsiteApiService().isWebsitesDownloaded()) {
+            setAdapterData(mainActivity.getWebsiteApiService().getWebsites());
         } else {
-            BusProvider.getInstance().post(new LoadRemoteWebsiteEvent());
+            EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
         }
+
+        FabricUtils.trackFragmentView(this, null);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        BusProvider.getInstance().unregister(this);
+        EventBus.getDefault().unregister(this);
     }
 
     @OnClick(R.id.saveButton)
@@ -136,34 +140,35 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
         if (TextUtils.isEmpty(mMode)) {
             SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
             SpStorage.setFirstLaunch(getActivity(), false);
-            BusProvider.getInstance().post(new WebsitesChangeEvent(true));
+            EventBus.getDefault().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_RESTORE)) {
             SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
-            BusProvider.getInstance().post(new WebsitesChangeEvent(true));
+            FabricUtils.trackWebsitesRestored();
+            EventBus.getDefault().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_ADD)) {
             for (Website website : mSelectedWebsites) {
                 SpStorage.saveWebsite(getActivity(), website);
             }
-            BusProvider.getInstance().post(new WebsitesChangeEvent(false));
+            EventBus.getDefault().post(new WebsitesChangeEvent(false));
         }
     }
 
-
-    /***************************
-     * Event
-     ***************************/
-
-    @Subscribe
-    public void onRemoteWebsiteLoaded(OnRemoteWebsiteResponseEvent event) {
-        if (event.isSuccessful) {
-            mWebsites = new ArrayList<>();
-            mWebsites.addAll(event.websiteList);
+    /**
+     * Set the adapter data by copying the given data to a new object and removing already added website.
+     * It will also sort the list by the most liked website first
+     *
+     * @param websites data to display
+     */
+    private void setAdapterData(List<Website> websites) {
+        mWebsites = new ArrayList<>();
+        mWebsites.addAll(websites);
+        if (mWebsites != null && !mWebsites.isEmpty()) {
             if (!TextUtils.isEmpty(mMode) && !mMode.equals(BUNDLE_MODE_RESTORE)) {
                 // We want to add some websites : remove duplicates or already added ones
                 List<Website> savedWebsites = SpStorage.getWebsites(getActivity());
 
                 // We cannot iterate on a list and remove item at the same time, need an array
-                for (Website website : mWebsites.toArray(new Website[0])) {
+                for (Website website : mWebsites.toArray(new Website[mWebsites.size()])) {
                     if (savedWebsites.contains(website)) {
                         mWebsites.remove(website);
                     }
@@ -183,6 +188,17 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
             });
 
             mAdapter.setData(mWebsites);
+        }
+    }
+
+    /***************************
+     * Event
+     ***************************/
+
+    @Subscribe
+    public void onRemoteWebsiteLoaded(OnRemoteWebsiteResponseEvent event) {
+        if (event.isSuccessful) {
+            setAdapterData(event.websiteList);
         } else {
             Toast
                     .makeText(
@@ -212,10 +228,5 @@ public class WebsiteChooserFragment extends Fragment implements ViewHolderListen
                 mSelectedWebsites.add(website);
             }
         }
-    }
-
-    @Override
-    public void onLongClick(Object object) {
-
     }
 }
