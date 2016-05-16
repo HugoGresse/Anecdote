@@ -23,7 +23,6 @@ Features
 TODO
 --------
 - website to manage Anecdote websites
-- manage one page site (no pagination)
 - guide to add website (a follow through user step)
 - filter by country
 

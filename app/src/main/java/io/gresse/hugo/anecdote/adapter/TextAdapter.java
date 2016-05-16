@@ -21,23 +21,25 @@ import io.gresse.hugo.anecdote.model.Anecdote;
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
-public class TextAdapter extends AnecdoteAdapter{
+public class TextAdapter extends AnecdoteAdapter {
 
     public static final String TAG = TextAdapter.class.getSimpleName();
 
-    public static final int VIEW_TYPE_LOAD    = 0;
-    public static final int VIEW_TYPE_TEXT    = 1;
+    public static final int VIEW_TYPE_LOAD = 0;
+    public static final int VIEW_TYPE_TEXT = 1;
 
     private List<Anecdote>             mAnecdotes;
+    private boolean                    mIsSinglePage;
     @Nullable
     private AnecdoteViewHolderListener mAnecdoteViewHolderListener;
     private int                        mTextSize;
     private boolean                    mRowStriping;
     private int                        mRowStripingBackground;
 
-    public TextAdapter(@Nullable AnecdoteViewHolderListener anecdoteViewHolderListener) {
+    public TextAdapter(@Nullable AnecdoteViewHolderListener anecdoteViewHolderListener, boolean isSinglePage) {
         mAnecdotes = new ArrayList<>();
         mAnecdoteViewHolderListener = anecdoteViewHolderListener;
+        mIsSinglePage = isSinglePage;
     }
 
     @Override
@@ -77,6 +79,9 @@ public class TextAdapter extends AnecdoteAdapter{
 
     @Override
     public int getItemCount() {
+        if(!mAnecdotes.isEmpty() && mIsSinglePage){
+            return mAnecdotes.size();
+        }
         return mAnecdotes.size() + 1;
     }
 
@@ -109,8 +114,8 @@ public class TextAdapter extends AnecdoteAdapter{
         public void setData(int position, Anecdote anecdote) {
             mTextView.setText(Html.fromHtml(anecdote.content));
             mTextView.setTextSize(mTextSize);
-            if(mRowStriping){
-                if(position % 2 == 0){
+            if (mRowStriping) {
+                if (position % 2 == 0) {
                     mTextView.setBackgroundColor(mRowStripingBackground);
                 } else {
                     mTextView.setBackgroundColor(Color.TRANSPARENT);

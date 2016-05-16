@@ -118,8 +118,12 @@ public class AnecdoteFragment extends Fragment implements
                 mTotalItemCount = mLayoutManager.getItemCount();
                 mLastVisibleItem = mLayoutManager.findLastVisibleItemPosition();
 
+
                 // Scrolled to bottom. Do something here.
                 if (!mIsLoadingNewItems && mLastVisibleItem == mTotalItemCount - 4 && !mAllAnecdotesLoaded) {
+                    if(mAnecdoteService != null && mAnecdoteService.getWebsite().isSinglePage){
+                        return;
+                    }
                     mIsLoadingNewItems = true;
                     Log.d(TAG, "Scrolled to end, load new anecdotes");
                     loadNewAnecdotes(mNextPageNumber);
@@ -180,9 +184,9 @@ public class AnecdoteFragment extends Fragment implements
         }
 
         if (mAnecdoteService.getWebsite().hasAdditionalContent()) {
-            mAdapter = new MixedContentAdapter(this);
+            mAdapter = new MixedContentAdapter(this, mAnecdoteService.getWebsite().isSinglePage);
         } else {
-            mAdapter = new TextAdapter(this);
+            mAdapter = new TextAdapter(this, mAnecdoteService.getWebsite().isSinglePage);
         }
 
         mRecyclerView.setAdapter(mAdapter);

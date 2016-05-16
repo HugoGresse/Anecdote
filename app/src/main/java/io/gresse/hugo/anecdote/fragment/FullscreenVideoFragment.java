@@ -81,13 +81,11 @@ public class FullscreenVideoFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        EventBus.getDefault().register(this);
         FabricUtils.trackFragmentView(this, null);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        EventBus.getDefault().unregister(this);
     }
 }

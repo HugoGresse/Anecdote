@@ -122,6 +122,7 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
         setIntentAction(activity, builder, anecdote);
 
         builder.setShowTitle(true);
+        builder.enableUrlBarHiding();
         builder.setToolbarColor(mToolbarBackgroundColor);
         builder.setSecondaryToolbarColor(activity.getResources().getColor(android.R.color.white));
         builder.setStartAnimations(activity, R.anim.slide_in_right, R.anim.hold);
@@ -149,6 +150,5 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
                 anecdote.getPlainTextContent() + " " + activity.getString(R.string.app_share_credits),
                 PendingIntent.getActivity(activity, 0, sharingIntent, 0),
                 false);
-        //startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.anecdote_share_title)));
     }
 }
