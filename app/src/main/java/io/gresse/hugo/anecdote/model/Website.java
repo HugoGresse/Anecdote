@@ -28,6 +28,7 @@ public class Website {
     public String      selector;
     public String      urlSuffix;
     public boolean     isFirstPageZero;
+    public boolean     isSinglePage = true;
     public int         color;
     public int         like;
     public String      source;
@@ -167,15 +168,20 @@ public class Website {
     public String toString() {
         return "Website{" +
                 "id=" + id +
-                "\n, name='" + name + "'" +
-                "\n, url='" + url + "'" +
-                "\n, selector='" + selector + "'" +
-                "\n, urlSuffix='" + urlSuffix + "'" +
-                "\n, isFirstPageZero=" + isFirstPageZero +
-                "\n, color=" + color +
-                "\n, like=" + like +
-                "\n, contentItem=" + contentItem +
-                "\n, urlItem=" + urlItem +
+                ", version=" + version +
+                ", slug='" + slug + '\'' +
+                ", name='" + name + '\'' +
+                ", url='" + url + '\'' +
+                ", selector='" + selector + '\'' +
+                ", urlSuffix='" + urlSuffix + '\'' +
+                ", isFirstPageZero=" + isFirstPageZero +
+                ", isSinglePage=" + isSinglePage +
+                ", color=" + color +
+                ", like=" + like +
+                ", source='" + source + '\'' +
+                ", userAgent='" + userAgent + '\'' +
+                ", contentItem=" + contentItem +
+                ", urlItem=" + urlItem +
                 '}';
     }
 }

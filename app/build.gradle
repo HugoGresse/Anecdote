@@ -22,8 +22,8 @@ android {
         applicationId "io.gresse.hugo.anecdote"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 8
-        versionName "0.4.2"
+        versionCode 9
+        versionName "0.4.3"
         archivesBaseName = "anecdote-" + versionName
     }
 
@@ -85,7 +85,7 @@ dependencies {
         transitive = true;
     }
     compile 'com.commit451:PhotoView:1.2.4'
-    compile ('io.gresse.hugo.simpleexoplayer:library:0.1.2@aar') {
+    compile ('io.gresse.hugo.simpleexoplayer:library:0.1.3@aar') {
         transitive = true;
     }
 }

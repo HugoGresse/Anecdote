@@ -37,15 +37,17 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     public static final int VIEW_TYPE_VIDEO = 2;
 
     private List<Anecdote>             mAnecdotes;
+    private boolean                    mIsSinglePage;
     @Nullable
     private AnecdoteViewHolderListener mAnecdoteViewHolderListener;
     private int                        mTextSize;
     private boolean                    mRowStriping;
     private int                        mRowStripingBackground;
 
-    public MixedContentAdapter(@Nullable AnecdoteViewHolderListener anecdoteViewHolderListener) {
+    public MixedContentAdapter(@Nullable AnecdoteViewHolderListener anecdoteViewHolderListener, boolean isSinglePage) {
         mAnecdotes = new ArrayList<>();
         mAnecdoteViewHolderListener = anecdoteViewHolderListener;
+        mIsSinglePage = isSinglePage;
     }
 
     @Override
@@ -88,6 +90,9 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
     @Override
     public int getItemCount() {
+        if (!mAnecdotes.isEmpty() && mIsSinglePage) {
+            return mAnecdotes.size();
+        }
         return mAnecdotes.size() + 1;
     }
 
@@ -203,11 +208,11 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         @Override
         public void onClick(View v) {
             if (mAnecdoteViewHolderListener != null) {
-                if(mImageView != null){
+                if (mImageView != null) {
                     mAnecdoteViewHolderListener.onClick(
                             mAnecdotes.get(getAdapterPosition()),
                             mImageView);
-                } else if(mPlayerView != null){
+                } else if (mPlayerView != null) {
                     mAnecdoteViewHolderListener.onClick(
                             mAnecdotes.get(getAdapterPosition()),
                             mPlayerView);
