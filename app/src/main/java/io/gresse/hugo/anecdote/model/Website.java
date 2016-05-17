@@ -28,7 +28,7 @@ public class Website {
     public String      selector;
     public String      urlSuffix;
     public boolean     isFirstPageZero;
-    public boolean     isSinglePage = true;
+    public boolean     isSinglePage;
     public int         color;
     public int         like;
     public String      source;
