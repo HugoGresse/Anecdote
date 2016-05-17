@@ -22,8 +22,8 @@ android {
         applicationId "io.gresse.hugo.anecdote"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 9
-        versionName "0.4.3"
+        versionCode 10
+        versionName "0.4.4"
         archivesBaseName = "anecdote-" + versionName
     }
 
