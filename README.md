@@ -3,7 +3,7 @@
 </a>
 # Anecdote 
 
-Simply display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9gag, Se couchez moins bête, Bash.org in a simple interface. 
+Simply display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9GAG, Se couchez moins bête, Bash.org in a simple interface. 
 
 <a href="https://play.google.com/store/apps/details?id=io.gresse.hugo.anecdote&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img width="200px" alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a>
 
@@ -23,10 +23,11 @@ Features
 
 TODO
 --------
-- 9gag HOT & trending
 - website to manage Anecdote websites
+- social button below the anecdote (share, copy, open)
 - guide to add website (a follow through user step)
 - filter by country
+- offline management by task to download data at a given time
 
 
 Contribution

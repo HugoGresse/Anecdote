@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity
     public NavigationView mNavigationView;
 
     protected ServiceProvider             mServiceProvider;
-    protected boolean                     mDrawerBackOpen;
     protected NetworkConnectivityListener mNetworkConnectivityListener;
     protected List<Website>               mWebsites;
     protected Snackbar                    mSnackbar;
@@ -153,22 +152,13 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(GravityCompat.START) && !mDrawerBackOpen) {
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             int fragmentCount = getSupportFragmentManager().getBackStackEntryCount();
             if (fragmentCount == 1) {
-                if (!mDrawerBackOpen) {
-                    mDrawerBackOpen = true;
-                    mDrawerLayout.openDrawer(GravityCompat.START);
-                    FabricUtils.trackOnBackPress();
-                    return;
-                } else {
-                    mDrawerBackOpen = false;
-                    FabricUtils.trackFinishOnBackPress();
-                    finish();
-                    return;
-                }
+                finish();
+                return;
             }
             super.onBackPressed();
         }

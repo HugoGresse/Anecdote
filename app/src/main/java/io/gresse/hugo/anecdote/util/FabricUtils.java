@@ -27,24 +27,6 @@ public class FabricUtils {
     }
 
     /**
-     * When the user use the back to display website list
-     */
-    public static void trackOnBackPress() {
-        if (!isFabricEnable()) return;
-
-        Answers.getInstance().logCustom(new CustomEvent("Back pressed"));
-    }
-
-    /**
-     * When the user really want to leave the application on back pressed
-     */
-    public static void trackFinishOnBackPress() {
-        if (!isFabricEnable()) return;
-
-        Answers.getInstance().logCustom(new CustomEvent("Back pressed closing app"));
-    }
-
-    /**
      * Track fragment view, should be called in onResume
      *
      * @param fragment   the fragment name to track
