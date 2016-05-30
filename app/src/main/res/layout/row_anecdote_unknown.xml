@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="New Text"
+        android:id="@+id/contentTextView"
+        android:paddingTop="@dimen/padding_anecdoterow_half"
+        android:paddingLeft="@dimen/padding_anecdoterow"
+        android:paddingRight="@dimen/padding_anecdoterow"/>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:id="@+id/openLinearLayout"
+        android:layout_marginEnd="@dimen/padding_anecdoterow_half"
+        android:layout_marginRight="@dimen/padding_anecdoterow_half"
+        android:layout_marginStart="@dimen/padding_anecdoterow_half"
+        android:layout_marginLeft="@dimen/padding_anecdoterow_half"
+        android:layout_marginBottom="@dimen/padding_anecdoterow"
+        android:background="?attr/selectableItemBackground"
+        android:paddingTop="@dimen/padding_anecdoterow_half"
+        android:paddingBottom="@dimen/padding_anecdoterow_half"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/anecdote_open_inbrowser"
+            android:id="@+id/openTextView"
+            android:paddingLeft="@dimen/padding_anecdoterow_half"
+            android:paddingStart="@dimen/padding_anecdoterow_half"
+            android:paddingRight="@dimen/padding_anecdoterow"
+            android:paddingEnd="@dimen/padding_anecdoterow"
+            android:textStyle="bold"
+            android:gravity="center_vertical"
+            android:drawablePadding="16dp"/>
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:id="@+id/imageView2"
+            android:src="@drawable/ic_navigation_arrow_back"
+            android:rotation="180"
+            android:contentDescription=""
+            android:baselineAlignBottom="false"
+            android:paddingEnd="14dp"
+            android:paddingStart="14dp"
+            android:layout_gravity="end"/>
+
+    </LinearLayout>
+
+
+</LinearLayout>
