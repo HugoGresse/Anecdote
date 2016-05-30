@@ -1,20 +1,19 @@
-<a id="status-image-popup" class="open-popup" href="#" title="build status image" name="status-images" data-ember-action="944">
-<img src="https://travis-ci.org/HugoGresse/Anecdote.svg" alt="build:started">
-</a>
 # Anecdote 
 
-Simply display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9GAG, Se couchez moins bête, Bash.org in a simple interface. 
+Simply display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9GAG, Se couchez moins bête, Bash.org in a **simple** interface. 
 
-<a href="https://play.google.com/store/apps/details?id=io.gresse.hugo.anecdote&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img width="200px" alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a>
+<a href="https://play.google.com/store/apps/details?id=io.gresse.hugo.anecdote&utm_source=global_co&utm_medium=prtnr&utm_content=Mar2515&utm_campaign=PartBadge&pcampaignid=MKT-AC-global-none-all-co-pr-py-PartBadges-Oct1515-1"><img width="200px" alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/apps/en-play-badge.png" /></a> <a id="status-image-popup" class="open-popup" href="#" title="build status image" name="status-images" data-ember-action="944">
+<img src="https://travis-ci.org/HugoGresse/Anecdote.svg" alt="build:started">
+</a>
 
-![home](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/screen_home.png)
-![edit](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/screen_edit.png)
+![9GAG Feed](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/design/screenshots/9gag.png)
+![Websites](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/design/screenshots/website_selector.png)
 
 _This application contents does not belong to the application._
 
 Features
 --------
-- display DansTonChat.com, VieDeMerde.fr, fmlife.com and much more (choose on first start which websites you want to read, based on Anecdote database)
+- display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9GAG, Se couchez moins bête, Bash.org and much more (choose on first start which websites you want to read, based on Anecdote database)
 - infinit scroll
 - pull to refresh
 - manually adding websites (for expert) via HTML parsing
