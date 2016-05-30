@@ -21,6 +21,7 @@ import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.model.RichContent;
+import io.gresse.hugo.anecdote.util.FabricUtils;
 import io.gresse.hugo.anecdote.view.PlayerView;
 
 /**
@@ -32,9 +33,10 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
     public static final String TAG = MixedContentAdapter.class.getSimpleName();
 
-    public static final int VIEW_TYPE_LOAD  = 0;
-    public static final int VIEW_TYPE_IMAGE = 1;
-    public static final int VIEW_TYPE_VIDEO = 2;
+    public static final int VIEW_TYPE_LOAD    = 0;
+    public static final int VIEW_TYPE_IMAGE   = 1;
+    public static final int VIEW_TYPE_VIDEO   = 2;
+    public static final int VIEW_TYPE_UNKNOWN = 3;
 
     private List<Anecdote>             mAnecdotes;
     private boolean                    mIsSinglePage;
@@ -69,12 +71,14 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         View v;
         switch (viewType) {
             default:
+                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote_unknown, parent, false);
+                return new UnknownViewHolder(v);
             case VIEW_TYPE_IMAGE:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote_image, parent, false);
-                return new AnecdoteViewHolder(v);
+                return new ImageViewHolder(v);
             case VIEW_TYPE_VIDEO:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote_video, parent, false);
-                return new AnecdoteViewHolder(v);
+                return new VideoViewHolder(v);
             case VIEW_TYPE_LOAD:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_loader, parent, false);
                 return new LoadViewHolder(v);
@@ -104,10 +108,11 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                 return VIEW_TYPE_VIDEO;
             } else if (anecdote.mixedContent != null && anecdote.mixedContent.type == RichContent.TYPE_IMAGE) {
                 return VIEW_TYPE_IMAGE;
-            } else {
-                Log.e(TAG, "unknow type");
+            } else if (anecdote.mixedContent != null) {
+                FabricUtils.trackError("MixedContentAdapter", "Unknow type: " + anecdote.mixedContent.type);
+                Log.e(TAG, "Unknow type: " + anecdote.mixedContent.type);
             }
-            return VIEW_TYPE_IMAGE;
+            return VIEW_TYPE_UNKNOWN;
         } else {
             return VIEW_TYPE_LOAD;
         }
@@ -117,36 +122,19 @@ public class MixedContentAdapter extends AnecdoteAdapter {
      * ViewHolder
      ***************************/
 
-    public class AnecdoteViewHolder extends BaseAnecdoteViewHolder implements View.OnLongClickListener, View.OnClickListener {
+    public abstract class MixedBaseViewHolder extends BaseAnecdoteViewHolder implements View.OnLongClickListener {
 
         View mItemView;
 
         @Bind(R.id.contentTextView)
         TextView mTextView;
 
-        @Nullable
-        @Bind(R.id.imageView)
-        ImageView mImageView;
-
-        @Nullable
-        @Bind(R.id.exoplayerView)
-        PlayerView mPlayerView;
-
-        public AnecdoteViewHolder(View itemView) {
+        public MixedBaseViewHolder(View itemView) {
             super(itemView);
 
             mItemView = itemView;
             ButterKnife.bind(this, itemView);
             itemView.setOnLongClickListener(this);
-
-            if (mPlayerView != null) {
-                mPlayerView.setOnClickListener(this);
-                mPlayerView.setOnLongClickListener(this);
-            }
-            if (mImageView != null) {
-                mImageView.setOnClickListener(this);
-                mImageView.setOnLongClickListener(this);
-            }
         }
 
         @Override
@@ -161,39 +149,48 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                     mItemView.setBackgroundColor(Color.TRANSPARENT);
                 }
             }
+        }
 
-            if (anecdote.mixedContent != null) {
-                String log = "setData: " + anecdote.content;
-                switch (anecdote.mixedContent.type) {
-                    case RichContent.TYPE_IMAGE:
-                        if (mImageView != null) {
-
-                            ViewCompat.setTransitionName(mImageView, String.valueOf(position) + "_image");
-
-                            Glide.with(mImageView.getContext())
-                                    .load(anecdote.mixedContent.contentUrl)
-                                    .fitCenter()
-                                    .into(mImageView);
-
-                        }
-                        log += " /image: " + anecdote.mixedContent.contentUrl;
-                        break;
-                    case RichContent.TYPE_VIDEO:
-                        if (mPlayerView != null) {
-                            mPlayerView.setVideoUrl(anecdote.mixedContent.contentUrl);
-                        }
-                        log += " /video: " + anecdote.mixedContent.contentUrl;
-
-                        break;
-                    default:
-                        Log.w(TAG, "Unknown RichContent type");
-                        break;
-                }
-
-                Log.d(TAG, log);
-            } else if (mImageView != null) {
-                mImageView.setImageResource(android.R.color.transparent);
+        @Override
+        public boolean onLongClick(View v) {
+            if (mAnecdoteViewHolderListener != null) {
+                mAnecdoteViewHolderListener.onLongClick(mAnecdotes.get(getAdapterPosition()));
+                return true;
             }
+            return false;
+        }
+
+    }
+
+    public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
+
+        @Bind(R.id.imageView)
+        ImageView mImageView;
+
+        public ImageViewHolder(View itemView) {
+            super(itemView);
+
+            if (mImageView != null) {
+                mImageView.setOnClickListener(this);
+                mImageView.setOnLongClickListener(this);
+            }
+        }
+
+        @Override
+        public void setData(int position, Anecdote anecdote) {
+            super.setData(position, anecdote);
+            if (anecdote.mixedContent == null) {
+                return;
+            }
+            String log = "setData: url:" + anecdote.mixedContent.contentUrl + " content:" + anecdote.content;
+
+            ViewCompat.setTransitionName(mImageView, String.valueOf(position) + "_image");
+            Glide.with(mImageView.getContext())
+                    .load(anecdote.mixedContent.contentUrl)
+                    .fitCenter()
+                    .into(mImageView);
+
+            Log.d(TAG, log);
         }
 
         @Override
@@ -212,11 +209,67 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                     mAnecdoteViewHolderListener.onClick(
                             mAnecdotes.get(getAdapterPosition()),
                             mImageView);
-                } else if (mPlayerView != null) {
-                    mAnecdoteViewHolderListener.onClick(
-                            mAnecdotes.get(getAdapterPosition()),
-                            mPlayerView);
                 }
+            }
+        }
+    }
+
+    public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
+
+        @Bind(R.id.exoplayerView)
+        PlayerView mPlayerView;
+
+        public VideoViewHolder(View itemView) {
+            super(itemView);
+
+            if (mPlayerView != null) {
+                mPlayerView.setOnClickListener(this);
+                mPlayerView.setOnLongClickListener(this);
+            }
+        }
+
+        @Override
+        public void setData(int position, Anecdote anecdote) {
+            super.setData(position, anecdote);
+            if (mPlayerView != null && anecdote.mixedContent != null) {
+                mPlayerView.setVideoUrl(anecdote.mixedContent.contentUrl);
+            }
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (mAnecdoteViewHolderListener != null) {
+                mAnecdoteViewHolderListener.onClick(
+                        mAnecdotes.get(getAdapterPosition()),
+                        mPlayerView);
+            }
+        }
+    }
+
+
+    public class UnknownViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
+
+        @Bind(R.id.openLinearLayout)
+        public View mContainerLayout;
+
+        public UnknownViewHolder(View itemView) {
+            super(itemView);
+
+            mContainerLayout.setOnClickListener(this);
+        }
+
+        @Override
+        public void setData(int position, Anecdote anecdote) {
+            super.setData(position, anecdote);
+        }
+
+        @Override
+        public void onClick(View v) {
+            if (mAnecdoteViewHolderListener != null) {
+                Log.d(TAG, "onClick");
+                mAnecdoteViewHolderListener.onClick(
+                        mAnecdotes.get(getAdapterPosition()),
+                        null);
             }
         }
     }

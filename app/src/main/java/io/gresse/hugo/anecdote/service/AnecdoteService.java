@@ -112,6 +112,7 @@ public class AnecdoteService {
             request = new Request.Builder()
                     .url(mWebsite.getPageUrl(pageNumber, mPaginationMap))
                     .header("User-Agent", Utils.getUserAgent(mWebsite))
+                    .header("Cache-Control", " no-transform")
                     .build();
         } catch (IllegalArgumentException exception) {
             mFailEvents.add(event);

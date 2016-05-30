@@ -253,9 +253,12 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onClick(Anecdote anecdote, View view) {
-
         String contentUrl;
         if (anecdote.mixedContent == null) {
+            if (mChromeCustomTabsManager != null) {
+                FabricUtils.trackAnecdoteDetails(mWebsiteName);
+                mChromeCustomTabsManager.openChrome(getActivity(), anecdote);
+            }
             return;
         }
 

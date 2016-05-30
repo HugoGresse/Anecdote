@@ -27,24 +27,6 @@ public class FabricUtils {
     }
 
     /**
-     * When the user use the back to display website list
-     */
-    public static void trackOnBackPress() {
-        if (!isFabricEnable()) return;
-
-        Answers.getInstance().logCustom(new CustomEvent("Back pressed"));
-    }
-
-    /**
-     * When the user really want to leave the application on back pressed
-     */
-    public static void trackFinishOnBackPress() {
-        if (!isFabricEnable()) return;
-
-        Answers.getInstance().logCustom(new CustomEvent("Back pressed closing app"));
-    }
-
-    /**
      * Track fragment view, should be called in onResume
      *
      * @param fragment   the fragment name to track
@@ -64,6 +46,21 @@ public class FabricUtils {
         Answers.getInstance().logContentView(new ContentViewEvent()
                 .putContentName(name)
                 .putContentType("Fragment"));
+    }
+
+    /**
+     * Track an undetermined error
+     *
+     * @param key   the key error
+     * @param value the error detail
+     */
+    public static void trackError(String key, String value) {
+        if (!isFabricEnable()) return;
+
+        CustomEvent event = new CustomEvent("Error");
+        event.putCustomAttribute(key, value);
+
+        Answers.getInstance().logCustom(event);
     }
 
     /**
@@ -172,11 +169,24 @@ public class FabricUtils {
     }
 
     /**
+     * Track when the anecdote is opened with the "Read more" or open in browser button
+     *
+     * @param websiteName the website name
+     */
+    public static void trackAnecdoteReadMore(String websiteName) {
+        if (!isFabricEnable()) return;
+
+        Answers.getInstance().logCustom(
+                new CustomEvent("Anecdote read more")
+                        .putCustomAttribute("Website name", websiteName));
+    }
+
+    /**
      * Track the click on third parties library
      *
      * @param thirdPartiesName the name of the third parties
      */
-    public static void trackThirdPartiesClick(String thirdPartiesName){
+    public static void trackThirdPartiesClick(String thirdPartiesName) {
         if (!isFabricEnable()) return;
 
         Answers.getInstance().logCustom(
@@ -187,10 +197,10 @@ public class FabricUtils {
     /**
      * Track the new value assigned to a setting
      *
-     * @param name the setting key
+     * @param name  the setting key
      * @param value the setting new value
      */
-    public static void trackSettingChange(String name, String value){
+    public static void trackSettingChange(String name, String value) {
         if (!isFabricEnable()) return;
 
         Answers.getInstance().logCustom(
@@ -203,7 +213,7 @@ public class FabricUtils {
      *
      * @param websiteName the website name
      */
-    public static void trackWebsiteWrongConfiguration(String websiteName){
+    public static void trackWebsiteWrongConfiguration(String websiteName) {
         if (!isFabricEnable()) return;
 
         Answers.getInstance().logCustom(
