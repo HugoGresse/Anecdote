@@ -32,7 +32,7 @@ TODO
 
 Contribution
 ------
-Fill free to contribute to this application (fork and make a pull-request). 
+Feel free to contribute to this application (fork and make a pull-request). 
 
 Author
 ------
