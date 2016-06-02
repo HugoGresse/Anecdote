@@ -124,10 +124,10 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
     public abstract class MixedBaseViewHolder extends BaseAnecdoteViewHolder implements View.OnLongClickListener {
 
-        View mItemView;
+        private View mItemView;
 
         @Bind(R.id.contentTextView)
-        TextView mTextView;
+        protected TextView mTextView;
 
         public MixedBaseViewHolder(View itemView) {
             super(itemView);
@@ -165,7 +165,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
 
         @Bind(R.id.imageView)
-        ImageView mImageView;
+        protected ImageView mImageView;
 
         public ImageViewHolder(View itemView) {
             super(itemView);
@@ -217,7 +217,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
 
         @Bind(R.id.exoplayerView)
-        PlayerView mPlayerView;
+        protected PlayerView mPlayerView;
 
         public VideoViewHolder(View itemView) {
             super(itemView);

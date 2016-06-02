@@ -107,7 +107,7 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
     public class WebsiteViewHolder extends BaseWebsiteViewHolder implements CompoundButton.OnCheckedChangeListener {
 
         @Bind(R.id.checkBox)
-        CheckBox checkBox;
+        protected CheckBox checkBox;
 
         public WebsiteViewHolder(View itemView) {
             super(itemView);

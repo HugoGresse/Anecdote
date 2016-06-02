@@ -101,7 +101,7 @@ public class TextAdapter extends AnecdoteAdapter {
     public class AnecdoteViewHolder extends BaseAnecdoteViewHolder implements View.OnLongClickListener {
 
         @Bind(R.id.contentTextView)
-        TextView mTextView;
+        protected TextView mTextView;
 
         public AnecdoteViewHolder(View itemView) {
             super(itemView);

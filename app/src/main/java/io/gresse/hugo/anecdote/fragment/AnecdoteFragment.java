@@ -121,7 +121,7 @@ public class AnecdoteFragment extends Fragment implements
 
                 // Scrolled to bottom. Do something here.
                 if (!mIsLoadingNewItems && mLastVisibleItem == mTotalItemCount - 4 && !mAllAnecdotesLoaded) {
-                    if(mAnecdoteService != null && mAnecdoteService.getWebsite().isSinglePage){
+                    if (mAnecdoteService != null && mAnecdoteService.getWebsite().isSinglePage) {
                         return;
                     }
                     mIsLoadingNewItems = true;
@@ -312,15 +312,15 @@ public class AnecdoteFragment extends Fragment implements
                     case 0:
                         FabricUtils.trackAnecdoteShare(mWebsiteName);
 
-                        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+                        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                         sharingIntent.setType("text/plain");
 
                         sharingIntent.putExtra(
-                                android.content.Intent.EXTRA_SUBJECT,
+                                Intent.EXTRA_SUBJECT,
                                 getString(R.string.app_name));
 
                         sharingIntent.putExtra(
-                                android.content.Intent.EXTRA_TEXT,
+                                Intent.EXTRA_TEXT,
                                 anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
 
                         startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.anecdote_share_title)));
