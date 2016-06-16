@@ -21,7 +21,11 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
-import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.model.MediaType;
+import io.gresse.hugo.anecdote.model.api.Content;
+import io.gresse.hugo.anecdote.model.api.ContentItem;
+import io.gresse.hugo.anecdote.model.api.Website;
+import io.gresse.hugo.anecdote.model.api.WebsitePage;
 import io.gresse.hugo.anecdote.storage.SpStorage;
 import io.gresse.hugo.anecdote.util.FabricUtils;
 
@@ -38,6 +42,10 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
     public TextInputLayout mNameTextInputLayout;
     @Bind(R.id.nameEditText)
     public EditText        mNameEditText;
+    @Bind(R.id.pageNameContainer)
+    public TextInputLayout mPageNameTextInputLayout;
+    @Bind(R.id.pageNameEditText)
+    public EditText        mPageNameEditText;
     @Bind(R.id.urlContainer)
     public TextInputLayout mUrlTextInputLayout;
     @Bind(R.id.urlEditText)
@@ -54,6 +62,7 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
     public Button          mSaveButton;
 
     protected Website mWebsite;
+    protected WebsitePage mWebsitePage;
     protected boolean mEditMode;
 
     public static WebsiteDialogFragment newInstance(@Nullable Website website) {
@@ -75,20 +84,28 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+
+        if (getDialog() != null) {
+            getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        }
+    }
+
+    @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        int width = (int) (getResources().getDisplayMetrics().widthPixels * 0.90);
-        getDialog().getWindow().setLayout(width, getDialog().getWindow().getAttributes().height);
 
         if (getArguments() != null && !TextUtils.isEmpty(getArguments().getString(ARGS_WEBSITE))) {
             mWebsite = new Gson().fromJson(
                     getArguments().getString(ARGS_WEBSITE),
                     new TypeToken<Website>() {
                     }.getType());
+            mWebsitePage = mWebsite.pages.get(0);
             initEdit();
         } else {
             mWebsite = new Website();
+            mWebsitePage = new WebsitePage();
             initAdd();
         }
 
@@ -99,10 +116,22 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
                     return;
                 }
                 mWebsite.name = mNameEditText.getText().toString();
-                mWebsite.url = mUrlEditText.getText().toString();
-                mWebsite.urlSuffix = mUrlSuffixEditText.getText().toString();
-                mWebsite.selector = mSelectorEditText.getText().toString();
-                mWebsite.isFirstPageZero = mFirstPageZeroSwitchCompat.isChecked();
+
+                mWebsitePage.name = mPageNameEditText.getText().toString();
+                mWebsitePage.url = mUrlEditText.getText().toString();
+                mWebsitePage.urlSuffix = mUrlSuffixEditText.getText().toString();
+                mWebsitePage.isFirstPageZero = mFirstPageZeroSwitchCompat.isChecked();
+                mWebsitePage.selector = mSelectorEditText.getText().toString();
+                if(mWebsitePage.content == null){
+                    mWebsitePage.content = new Content();
+                    mWebsitePage.content.items.add(new ContentItem(MediaType.TEXT, 1));
+                }
+
+                if(mWebsite.pages.size() > 0){
+                    mWebsite.pages.set(0, mWebsitePage);
+                } else {
+                    mWebsite.pages.add(mWebsitePage);
+                }
 
                 SpStorage.saveWebsite(getContext(), mWebsite);
 
@@ -133,10 +162,11 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
         mEditMode = true;
         getDialog().setTitle(R.string.dialog_website_edit_title);
         mNameEditText.setText(mWebsite.name);
-        mUrlEditText.setText(mWebsite.url);
-        mUrlSuffixEditText.setText(mWebsite.urlSuffix);
-        mSelectorEditText.setText(mWebsite.selector);
-        mFirstPageZeroSwitchCompat.setChecked(mWebsite.isFirstPageZero);
+        mPageNameEditText.setText(mWebsitePage.name);
+        mUrlEditText.setText(mWebsitePage.url);
+        mUrlSuffixEditText.setText(mWebsitePage.urlSuffix);
+        mSelectorEditText.setText(mWebsitePage.selector);
+        mFirstPageZeroSwitchCompat.setChecked(mWebsitePage.isFirstPageZero);
     }
 
     protected boolean isDataCorrect() {
@@ -148,6 +178,15 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
             return false;
         } else {
             mNameTextInputLayout.setErrorEnabled(false);
+        }
+
+        if (TextUtils.isEmpty(mPageNameEditText.getText().toString())) {
+            mPageNameTextInputLayout.setErrorEnabled(true);
+            mPageNameTextInputLayout.setError(getContext().getString(R.string.dialog_website_error_pagename));
+            mPageNameEditText.requestLayout();
+            return false;
+        } else {
+            mPageNameTextInputLayout.setErrorEnabled(false);
         }
 
         if (TextUtils.isEmpty(mUrlEditText.getText().toString())) {

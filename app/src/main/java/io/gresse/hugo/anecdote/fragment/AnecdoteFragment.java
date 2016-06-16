@@ -12,6 +12,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -31,7 +32,6 @@ import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.adapter.AnecdoteAdapter;
 import io.gresse.hugo.anecdote.adapter.AnecdoteViewHolderListener;
 import io.gresse.hugo.anecdote.adapter.MixedContentAdapter;
-import io.gresse.hugo.anecdote.adapter.TextAdapter;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.FullscreenEvent;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteEvent;
@@ -39,7 +39,7 @@ import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
-import io.gresse.hugo.anecdote.model.RichContent;
+import io.gresse.hugo.anecdote.model.MediaType;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.util.FabricUtils;
 import io.gresse.hugo.anecdote.util.Utils;
@@ -54,9 +54,10 @@ public class AnecdoteFragment extends Fragment implements
         SwipeRefreshLayout.OnRefreshListener,
         AnecdoteViewHolderListener {
 
-    private static final String TAG               = AnecdoteFragment.class.getSimpleName();
-    public static final  String ARGS_WEBSITE_ID   = "key_website_id";
-    public static final  String ARGS_WEBSITE_NAME = "key_website_name";
+    private static final String TAG                      = AnecdoteFragment.class.getSimpleName();
+    public static final  String ARGS_WEBSITE_PARENT_SLUG = "key_website_parent_slug";
+    public static final  String ARGS_WEBSITE_PAGE_SLUG   = "key_website_page_slug";
+    public static final  String ARGS_WEBSITE_NAME        = "key_website_name";
 
     @Bind(R.id.swipeRefreshLayout)
     public SwipeRefreshLayout mSwipeRefreshLayout;
@@ -64,7 +65,8 @@ public class AnecdoteFragment extends Fragment implements
     @Bind(R.id.recyclerView)
     public RecyclerView mRecyclerView;
 
-    protected int             mWebsiteId;
+    protected String          mWebsiteParentSlug;
+    protected String          mWebsiteSlug;
     protected String          mWebsiteName;
     protected AnecdoteAdapter mAdapter;
     @Nullable
@@ -121,7 +123,7 @@ public class AnecdoteFragment extends Fragment implements
 
                 // Scrolled to bottom. Do something here.
                 if (!mIsLoadingNewItems && mLastVisibleItem == mTotalItemCount - 4 && !mAllAnecdotesLoaded) {
-                    if (mAnecdoteService != null && mAnecdoteService.getWebsite().isSinglePage) {
+                    if (mAnecdoteService != null && mAnecdoteService.getWebsitePage().isSinglePage) {
                         return;
                     }
                     mIsLoadingNewItems = true;
@@ -146,7 +148,7 @@ public class AnecdoteFragment extends Fragment implements
         super.onResume();
 
         EventBus.getDefault().register(this);
-        EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteId));
+        EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteSlug));
 
         FabricUtils.trackFragmentView(this, mWebsiteName);
     }
@@ -167,7 +169,8 @@ public class AnecdoteFragment extends Fragment implements
 
     protected void init() {
         if (getArguments() != null) {
-            mWebsiteId = getArguments().getInt(ARGS_WEBSITE_ID);
+            mWebsiteParentSlug = getArguments().getString(ARGS_WEBSITE_PARENT_SLUG);
+            mWebsiteSlug = getArguments().getString(ARGS_WEBSITE_PAGE_SLUG);
             mWebsiteName = getArguments().getString(ARGS_WEBSITE_NAME);
         }
 
@@ -176,18 +179,14 @@ public class AnecdoteFragment extends Fragment implements
         int textSize = Integer.parseInt(preferences.getString(getString(R.string.pref_textsize_key), String.valueOf(getResources().getInteger(R.integer.anecdote_textsize_default))));
         boolean rowStripping = preferences.getBoolean(getString(R.string.pref_rowstriping_key), getResources().getBoolean(R.bool.pref_rowstripping_default));
 
-        mAnecdoteService = ((MainActivity) getActivity()).getAnecdoteService(mWebsiteId);
+        mAnecdoteService = ((MainActivity) getActivity()).getAnecdoteService(mWebsiteSlug);
 
         if (mAnecdoteService == null) {
             Log.e(TAG, "Unable to get an AnecdoteService");
             return;
         }
 
-        if (mAnecdoteService.getWebsite().hasAdditionalContent()) {
-            mAdapter = new MixedContentAdapter(this, mAnecdoteService.getWebsite().isSinglePage);
-        } else {
-            mAdapter = new TextAdapter(this, mAnecdoteService.getWebsite().isSinglePage);
-        }
+        mAdapter = new MixedContentAdapter(this, mAnecdoteService.getWebsitePage().isSinglePage);
 
         mRecyclerView.setAdapter(mAdapter);
 
@@ -229,7 +228,7 @@ public class AnecdoteFragment extends Fragment implements
      * @param page the page to load
      */
     protected void loadNewAnecdotes(int page) {
-        EventBus.getDefault().post(new LoadNewAnecdoteEvent(mWebsiteId, page));
+        EventBus.getDefault().post(new LoadNewAnecdoteEvent(mWebsiteSlug, page));
     }
 
 
@@ -254,7 +253,7 @@ public class AnecdoteFragment extends Fragment implements
     @Override
     public void onClick(Anecdote anecdote, View view) {
         String contentUrl;
-        if (anecdote.mixedContent == null) {
+        if (anecdote.media == null) {
             if (mChromeCustomTabsManager != null) {
                 FabricUtils.trackAnecdoteDetails(mWebsiteName);
                 mChromeCustomTabsManager.openChrome(getActivity(), anecdote);
@@ -262,10 +261,10 @@ public class AnecdoteFragment extends Fragment implements
             return;
         }
 
-        contentUrl = anecdote.mixedContent.contentUrl;
+        contentUrl = anecdote.media;
 
-        switch (anecdote.mixedContent.type) {
-            case RichContent.TYPE_IMAGE:
+        switch (anecdote.type) {
+            case MediaType.IMAGE:
                 EventBus.getDefault().post(new FullscreenEvent(
                         FullscreenEvent.TYPE_IMAGE,
                         this,
@@ -274,7 +273,7 @@ public class AnecdoteFragment extends Fragment implements
                         contentUrl
                 ));
                 break;
-            case RichContent.TYPE_VIDEO:
+            case MediaType.VIDEO:
                 EventBus.getDefault().post(new FullscreenEvent(
                         FullscreenEvent.TYPE_VIDEO,
                         this,
@@ -296,9 +295,9 @@ public class AnecdoteFragment extends Fragment implements
             return;
         }
         final Anecdote anecdote = (Anecdote) object;
-        // Open a dialog picker on item long click to choose between Open details, Share or copy the content
+        // Open a dialog picker on item long click to choose between Open details, Share or copy the text
 
-        if (mChromeCustomTabsManager != null) {
+        if (mChromeCustomTabsManager != null && !TextUtils.isEmpty(anecdote.permalink)) {
             mChromeCustomTabsManager.mayLaunch(anecdote.permalink);
         }
 
@@ -356,7 +355,7 @@ public class AnecdoteFragment extends Fragment implements
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onRequestFailedEvent(RequestFailedEvent event) {
         if (event.originalEvent instanceof LoadNewAnecdoteEvent &&
-                ((LoadNewAnecdoteEvent) event.originalEvent).websiteId != mWebsiteId) return;
+                !((LoadNewAnecdoteEvent) event.originalEvent).websitePageSlug.equals(mWebsiteSlug)) return;
 
         EventBus.getDefault().removeStickyEvent(event.getClass());
         afterRequestFinished(false);
@@ -364,7 +363,7 @@ public class AnecdoteFragment extends Fragment implements
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onAnecdoteReceived(OnAnecdoteLoadedEvent event) {
-        if (event.websiteId != mWebsiteId) return;
+        if (!event.websitePageSlug.equals(mWebsiteSlug)) return;
 
         EventBus.getDefault().removeStickyEvent(event.getClass());
         afterRequestFinished(true);
@@ -373,6 +372,6 @@ public class AnecdoteFragment extends Fragment implements
     @Subscribe
     public void onUpdateAnecdoteFragment(UpdateAnecdoteFragmentEvent event) {
         init();
-        EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteId));
+        EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteSlug));
     }
 }

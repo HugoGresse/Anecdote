@@ -5,7 +5,7 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 
 /**
- * A click on an anecdote rich content request to open the content in fullscreen
+ * A click on an anecdote rich text request to open the text in fullscreen
  * <p/>
  * Created by Hugo Gresse on 21/04/16.
  */

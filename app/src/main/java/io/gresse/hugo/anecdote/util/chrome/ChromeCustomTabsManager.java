@@ -91,7 +91,7 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
      * Prevent the Chrome client that the given url may be opened.
      */
     public void mayLaunch(String url) {
-        if (mClient == null) {
+        if (mClient == null || url == null) {
             return;
         }
         Log.i(TAG, "mayLaunch");

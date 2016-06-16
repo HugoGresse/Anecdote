@@ -13,8 +13,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.gresse.hugo.anecdote.model.Website;
-import io.gresse.hugo.anecdote.model.WebsiteItem;
+import io.gresse.hugo.anecdote.model.api.Website;
+import io.gresse.hugo.anecdote.model.api.WebsitePage;
 
 /**
  * Utility class to store stuff in sharedPreferences
@@ -108,14 +108,16 @@ public class SpStorage {
         SharedPreferences.Editor sharedPreferencesEditor = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE).edit();
         for (Website website : websites) {
             website.validateData();
+            for(WebsitePage websitePage : website.pages){
+                websitePage.content.reorderItems();
+            }
         }
         sharedPreferencesEditor.putString(SP_KEY_WEBSITES, new Gson().toJson(websites));
         sharedPreferencesEditor.apply();
     }
 
     /**
-     * Save or add a unique website. If we create a new website, we need to be sure his id is not already on another
-     * website.
+     * Save or add a unique website.
      *
      * @param context app context
      * @param website website to save
@@ -124,8 +126,10 @@ public class SpStorage {
         List<Website> websites = getWebsites(context);
 
         website.validateData();
+        for(WebsitePage websitePage : website.pages){
+            websitePage.content.reorderItems();
+        }
 
-        int maxId = 1;
         Website currentWebsite;
         for (int i = 0; i < websites.size(); i++) {
             currentWebsite = websites.get(i);
@@ -134,12 +138,8 @@ public class SpStorage {
                 saveWebsites(context, websites);
                 return;
             }
-            if (currentWebsite.id >= maxId) {
-                maxId = currentWebsite.id + 1;
-            }
         }
 
-        website.id = maxId;
         websites.add(website);
         saveWebsites(context, websites);
     }
@@ -220,12 +220,10 @@ public class SpStorage {
         if (getVersion(context) == 0) {
             if (websites != null) {
                 for (Website website : websites) {
-                    website.urlItem.type = WebsiteItem.TYPE_URL;
-                    Log.d("eee", "set urlType to URL");
+                    SpStorage.deleteWebsite(context, website);
                 }
             }
             setVersion(context, 5); // 5 = 0.4.0
-            saveWebsites(context, websites);
             Log.i(TAG, "Migrating from 0 > 5 done");
         }
     }

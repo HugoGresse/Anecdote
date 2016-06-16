@@ -5,34 +5,40 @@ import android.support.annotation.Nullable;
 import org.jsoup.Jsoup;
 
 /**
- * A single anecdote
+ * A single anecdote, composed of:
+ * - url
+ * - text
+ * - (Optional) image or video link
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
 public class Anecdote {
 
-    public String      content;
-    public String      permalink;
+    public String type;
+    public String text;
     @Nullable
-    public RichContent mixedContent;
+    public String permalink;
+    @Nullable
+    public String media;
 
-    public Anecdote(String content, String permalink) {
-        this(content, permalink, null);
+    public Anecdote(String text, String permalink) {
+        this(MediaType.TEXT, text, permalink, null);
     }
 
-    public Anecdote(String content, String permalink, @Nullable RichContent mixedContent) {
-        this.content = content;
+    public Anecdote(String type, String text, @Nullable String permalink, @Nullable String media) {
+        this.type = type;
+        this.text = text;
         this.permalink = permalink;
-        this.mixedContent = mixedContent;
+        this.media = media;
     }
 
     /**
-     * Return the content without html
+     * Return the text without html
      *
-     * @return plain text content
+     * @return plain text text
      */
     public String getPlainTextContent() {
-        return Jsoup.parse(content.replace("<br>", "#lb#")).text().replace("#lb#", System.getProperty("line.separator"));
+        return Jsoup.parse(text.replace("<br>", "#lb#")).text().replace("#lb#", System.getProperty("line.separator"));
     }
 
     @Override
@@ -42,20 +48,20 @@ public class Anecdote {
 
         Anecdote anecdote = (Anecdote) o;
 
-        return content.equals(anecdote.content) && (permalink != null ?
+        return text.equals(anecdote.text) && (permalink != null ?
                 permalink.equals(anecdote.permalink) : anecdote.permalink == null);
 
     }
 
     @Override
     public int hashCode() {
-        int result = content.hashCode();
+        int result = text.hashCode();
         result = 31 * result + (permalink != null ? permalink.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "Anecdote content='" + content + "'\', permalink='"+ permalink + '\'';
+        return "Anecdote text='" + text + "'\', permalink='" + permalink + '\'';
     }
 }
