@@ -22,12 +22,12 @@ public abstract class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapt
 
     /**
      * Set the text style options
-     *
-     * @param textSize                 size of text
+     *  @param textSize                 size of text
      * @param rowStriping              strip row every two items
-     * @param colorBackgroundStripping the color of the striping
+     * @param colorBackground          row background color
+     * @param colorBackgroundStripping row background color of the stripping
      */
-    public abstract void setTextStyle(int textSize, boolean rowStriping, int colorBackgroundStripping);
+    public abstract void setTextStyle(int textSize, boolean rowStriping, int colorBackground, int colorBackgroundStripping);
 
     abstract class BaseAnecdoteViewHolder extends RecyclerView.ViewHolder {
 
@@ -35,7 +35,7 @@ public abstract class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapt
             super(itemView);
         }
 
-        public abstract void setData(int position, Anecdote anecdote);
+        public abstract void setData(int position, Anecdote anecdote, boolean expanded);
     }
 
 }

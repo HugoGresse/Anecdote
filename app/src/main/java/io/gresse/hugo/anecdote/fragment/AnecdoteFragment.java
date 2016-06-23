@@ -193,12 +193,18 @@ public class AnecdoteFragment extends Fragment implements
         // Set default values
         mIsLoadingNewItems = false;
 
+        int colorBackground;
+        int colorBackgroundStripping;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            mAdapter.setTextStyle(textSize, rowStripping, getResources().getColor(R.color.colorBackgroundStripping, null));
+            colorBackground = getResources().getColor(R.color.rowColorBackground, null);
+            colorBackgroundStripping = getResources().getColor(R.color.rowColorBackgroundStripping, null);
         } else {
             // noinspection deprecation
-            mAdapter.setTextStyle(textSize, rowStripping, getResources().getColor(R.color.colorBackgroundStripping));
+            colorBackground = getResources().getColor(R.color.rowColorBackground);
+            // noinspection deprecation
+            colorBackgroundStripping = getResources().getColor(R.color.rowColorBackgroundStripping);
         }
+        mAdapter.setTextStyle(textSize, rowStripping, colorBackground, colorBackgroundStripping);
 
         mAdapter.setData(mAnecdoteService.getAnecdotes());
 

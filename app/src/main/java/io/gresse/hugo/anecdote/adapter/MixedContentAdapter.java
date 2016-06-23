@@ -1,6 +1,6 @@
 package io.gresse.hugo.anecdote.adapter;
 
-import android.graphics.Color;
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.text.Html;
@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -45,7 +46,9 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     private AnecdoteViewHolderListener mAnecdoteViewHolderListener;
     private int                        mTextSize;
     private boolean                    mRowStriping;
+    private int                        mRowBackground;
     private int                        mRowStripingBackground;
+    private int                        mExpandedPosition = -1;
 
     public MixedContentAdapter(@Nullable AnecdoteViewHolderListener anecdoteViewHolderListener, boolean isSinglePage) {
         mAnecdotes = new ArrayList<>();
@@ -60,9 +63,10 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     }
 
     @Override
-    public void setTextStyle(int textSize, boolean rowStriping, int colorBackgroundStripping) {
+    public void setTextStyle(int textSize, boolean rowStriping, int colorBackground, int colorBackgroundStripping) {
         mTextSize = textSize;
         mRowStriping = rowStriping;
+        mRowBackground = colorBackground;
         mRowStripingBackground = colorBackgroundStripping;
         notifyDataSetChanged();
     }
@@ -92,7 +96,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     @Override
     public void onBindViewHolder(BaseAnecdoteViewHolder holder, int position) {
         if (position < mAnecdotes.size()) {
-            holder.setData(position, mAnecdotes.get(position));
+            holder.setData(position, mAnecdotes.get(position), position == mExpandedPosition);
         }
     }
 
@@ -108,7 +112,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     public int getItemViewType(int position) {
         if (position + 1 <= mAnecdotes.size()) {
             Anecdote anecdote = mAnecdotes.get(position);
-            switch (anecdote.type){
+            switch (anecdote.type) {
                 case MediaType.TEXT:
                     return VIEW_TYPE_TEXT;
                 case MediaType.IMAGE:
@@ -129,23 +133,29 @@ public class MixedContentAdapter extends AnecdoteAdapter {
      * ViewHolder
      ***************************/
 
-    public abstract class MixedBaseViewHolder extends BaseAnecdoteViewHolder implements View.OnLongClickListener {
+    public abstract class MixedBaseViewHolder extends BaseAnecdoteViewHolder implements
+            View.OnClickListener,
+            View.OnLongClickListener {
 
-        private View mItemView;
+        protected View mItemView;
 
         @Bind(R.id.contentTextView)
         protected TextView mTextView;
+
+        @Bind(R.id.expandLayout)
+        protected LinearLayout mExpandLayout;
 
         public MixedBaseViewHolder(View itemView) {
             super(itemView);
 
             mItemView = itemView;
             ButterKnife.bind(this, itemView);
+            itemView.setOnClickListener(this);
             itemView.setOnLongClickListener(this);
         }
 
         @Override
-        public void setData(int position, Anecdote anecdote) {
+        public void setData(int position, Anecdote anecdote, boolean expanded) {
             mTextView.setText(Html.fromHtml(anecdote.text));
             mTextView.setTextSize(mTextSize);
 
@@ -153,7 +163,28 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                 if (position % 2 == 0) {
                     mItemView.setBackgroundColor(mRowStripingBackground);
                 } else {
-                    mItemView.setBackgroundColor(Color.TRANSPARENT);
+                    mItemView.setBackgroundColor(mRowBackground);
+                }
+            }
+
+
+            if(mExpandLayout == null){
+                return;
+            }
+
+            if (expanded) {
+                mExpandLayout.setVisibility(View.VISIBLE);
+                ((ViewGroup.MarginLayoutParams)itemView.getLayoutParams()).topMargin = 50;
+                ((ViewGroup.MarginLayoutParams)itemView.getLayoutParams()).bottomMargin = 50;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    itemView.setElevation(8);
+                }
+            } else {
+                mExpandLayout.setVisibility(View.GONE);
+                ((ViewGroup.MarginLayoutParams)itemView.getLayoutParams()).topMargin = 0;
+                ((ViewGroup.MarginLayoutParams)itemView.getLayoutParams()).bottomMargin = 0;
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    itemView.setElevation(0);
                 }
             }
         }
@@ -167,6 +198,19 @@ public class MixedContentAdapter extends AnecdoteAdapter {
             return false;
         }
 
+        @Override
+        public void onClick(View v) {
+            if(mExpandedPosition == getAdapterPosition()){
+                mExpandedPosition = -1;
+                notifyItemChanged(getAdapterPosition());
+                return;
+            }
+            // Notify expanded last position
+            notifyItemChanged(mExpandedPosition);
+            mExpandedPosition = getAdapterPosition();
+            // Notify new element
+            notifyItemChanged(mExpandedPosition);
+        }
     }
 
     public class TextViewHolder extends MixedBaseViewHolder {
@@ -191,8 +235,8 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         }
 
         @Override
-        public void setData(int position, Anecdote anecdote) {
-            super.setData(position, anecdote);
+        public void setData(int position, Anecdote anecdote, boolean expanded) {
+            super.setData(position, anecdote, expanded);
             String log = "setData: url:" + anecdote.media + " text:" + anecdote.text;
 
             ViewCompat.setTransitionName(mImageView, String.valueOf(position) + "_image");
@@ -215,6 +259,10 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
         @Override
         public void onClick(View v) {
+            if(!(v instanceof ImageView)){
+                super.onClick(v);
+                return;
+            }
             if (mAnecdoteViewHolderListener != null) {
                 if (mImageView != null) {
                     mAnecdoteViewHolderListener.onClick(
@@ -240,8 +288,8 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         }
 
         @Override
-        public void setData(int position, Anecdote anecdote) {
-            super.setData(position, anecdote);
+        public void setData(int position, Anecdote anecdote, boolean expanded) {
+            super.setData(position, anecdote, expanded);
             if (mPlayerView != null && anecdote.media != null) {
                 mPlayerView.setVideoUrl(anecdote.media);
             }
@@ -249,6 +297,10 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
         @Override
         public void onClick(View v) {
+            if(!(v instanceof PlayerView)){
+                super.onClick(v);
+                return;
+            }
             if (mAnecdoteViewHolderListener != null) {
                 mAnecdoteViewHolderListener.onClick(
                         mAnecdotes.get(getAdapterPosition()),
@@ -261,7 +313,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     public class UnknownViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
 
         @Bind(R.id.openLinearLayout)
-        public View mContainerLayout;
+        public LinearLayout mContainerLayout;
 
         public UnknownViewHolder(View itemView) {
             super(itemView);
@@ -270,12 +322,16 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         }
 
         @Override
-        public void setData(int position, Anecdote anecdote) {
-            super.setData(position, anecdote);
+        public void setData(int position, Anecdote anecdote, boolean expanded) {
+            super.setData(position, anecdote, expanded);
         }
 
         @Override
         public void onClick(View v) {
+            if(!(v instanceof LinearLayout)){
+                super.onClick(v);
+                return;
+            }
             if (mAnecdoteViewHolderListener != null) {
                 Log.d(TAG, "onClick");
                 mAnecdoteViewHolderListener.onClick(
@@ -294,7 +350,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         }
 
         @Override
-        public void setData(int position, Anecdote anecdote) {
+        public void setData(int position, Anecdote anecdote, boolean expanded) {
 
         }
     }

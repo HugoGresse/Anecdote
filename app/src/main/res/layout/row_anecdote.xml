@@ -10,4 +10,7 @@
         android:text="New Text"
         android:id="@+id/contentTextView"
         android:padding="@dimen/padding_anecdoterow"/>
+
+    <include layout="@layout/row_anecdote_expand"/>
+
 </LinearLayout>

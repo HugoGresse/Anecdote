@@ -7,5 +7,6 @@
     <color name="colorTextSecondary">#ff0000</color>
     <color name="colorIcons">#212121</color>
     <color name="colorDivider">#505050</color>
-    <color name="colorBackgroundStripping">#363636</color>
+    <color name="rowColorBackground">#303030</color>
+    <color name="rowColorBackgroundStripping">#363636</color>
 </resources>
