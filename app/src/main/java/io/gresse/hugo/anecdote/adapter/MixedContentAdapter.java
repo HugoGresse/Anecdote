@@ -19,6 +19,7 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.model.MediaType;
@@ -133,9 +134,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
      * ViewHolder
      ***************************/
 
-    public abstract class MixedBaseViewHolder extends BaseAnecdoteViewHolder implements
-            View.OnClickListener,
-            View.OnLongClickListener {
+    public abstract class MixedBaseViewHolder extends BaseAnecdoteViewHolder implements View.OnClickListener {
 
         protected View mItemView;
 
@@ -145,13 +144,15 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         @Bind(R.id.expandLayout)
         protected LinearLayout mExpandLayout;
 
+        @Bind(R.id.separator)
+        protected View mSeparatorView;
+
         public MixedBaseViewHolder(View itemView) {
             super(itemView);
 
             mItemView = itemView;
             ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
-            itemView.setOnLongClickListener(this);
         }
 
         @Override
@@ -173,6 +174,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
             }
 
             if (expanded) {
+                mSeparatorView.setVisibility(View.VISIBLE);
                 mExpandLayout.setVisibility(View.VISIBLE);
                 ((ViewGroup.MarginLayoutParams)itemView.getLayoutParams()).topMargin = 50;
                 ((ViewGroup.MarginLayoutParams)itemView.getLayoutParams()).bottomMargin = 50;
@@ -180,6 +182,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                     itemView.setElevation(8);
                 }
             } else {
+                mSeparatorView.setVisibility(View.GONE);
                 mExpandLayout.setVisibility(View.GONE);
                 ((ViewGroup.MarginLayoutParams)itemView.getLayoutParams()).topMargin = 0;
                 ((ViewGroup.MarginLayoutParams)itemView.getLayoutParams()).bottomMargin = 0;
@@ -187,15 +190,6 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                     itemView.setElevation(0);
                 }
             }
-        }
-
-        @Override
-        public boolean onLongClick(View v) {
-            if (mAnecdoteViewHolderListener != null) {
-                mAnecdoteViewHolderListener.onLongClick(mAnecdotes.get(getAdapterPosition()));
-                return true;
-            }
-            return false;
         }
 
         @Override
@@ -210,6 +204,42 @@ public class MixedContentAdapter extends AnecdoteAdapter {
             mExpandedPosition = getAdapterPosition();
             // Notify new element
             notifyItemChanged(mExpandedPosition);
+            if(mAnecdoteViewHolderListener != null){
+                mAnecdoteViewHolderListener.onClick(
+                        mAnecdotes.get(getAdapterPosition()),
+                        itemView,
+                        AnecdoteViewHolderListener.ACTION_OPEN_IN_BROWSER_PRELOAD);
+            }
+        }
+
+        @OnClick(R.id.shareButton)
+        public void onShareClick(){
+            if (mAnecdoteViewHolderListener != null) {
+                mAnecdoteViewHolderListener.onClick(
+                        mAnecdotes.get(getAdapterPosition()),
+                        itemView,
+                        AnecdoteViewHolderListener.ACTION_SHARE);
+            }
+        }
+
+        @OnClick(R.id.copyButton)
+        public void onCopyClick(){
+            if (mAnecdoteViewHolderListener != null) {
+                mAnecdoteViewHolderListener.onClick(
+                        mAnecdotes.get(getAdapterPosition()),
+                        itemView,
+                        AnecdoteViewHolderListener.ACTION_COPY);
+            }
+        }
+
+        @OnClick(R.id.openButton)
+        public void onOpenClick(){
+            if (mAnecdoteViewHolderListener != null) {
+                mAnecdoteViewHolderListener.onClick(
+                        mAnecdotes.get(getAdapterPosition()),
+                        itemView,
+                        AnecdoteViewHolderListener.ACTION_OPEN_IN_BROWSER);
+            }
         }
     }
 
@@ -230,7 +260,6 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
             if (mImageView != null) {
                 mImageView.setOnClickListener(this);
-                mImageView.setOnLongClickListener(this);
             }
         }
 
@@ -249,15 +278,6 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         }
 
         @Override
-        public boolean onLongClick(View v) {
-            if (mAnecdoteViewHolderListener != null) {
-                mAnecdoteViewHolderListener.onLongClick(mAnecdotes.get(getAdapterPosition()));
-                return true;
-            }
-            return false;
-        }
-
-        @Override
         public void onClick(View v) {
             if(!(v instanceof ImageView)){
                 super.onClick(v);
@@ -267,7 +287,8 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                 if (mImageView != null) {
                     mAnecdoteViewHolderListener.onClick(
                             mAnecdotes.get(getAdapterPosition()),
-                            mImageView);
+                            mImageView,
+                            AnecdoteViewHolderListener.ACTION_FULLSCREEN);
                 }
             }
         }
@@ -283,7 +304,6 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
             if (mPlayerView != null) {
                 mPlayerView.setOnClickListener(this);
-                mPlayerView.setOnLongClickListener(this);
             }
         }
 
@@ -304,7 +324,8 @@ public class MixedContentAdapter extends AnecdoteAdapter {
             if (mAnecdoteViewHolderListener != null) {
                 mAnecdoteViewHolderListener.onClick(
                         mAnecdotes.get(getAdapterPosition()),
-                        mPlayerView);
+                        mPlayerView,
+                        AnecdoteViewHolderListener.ACTION_FULLSCREEN);
             }
         }
     }
@@ -333,10 +354,9 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                 return;
             }
             if (mAnecdoteViewHolderListener != null) {
-                Log.d(TAG, "onClick");
                 mAnecdoteViewHolderListener.onClick(
                         mAnecdotes.get(getAdapterPosition()),
-                        null);
+                        null, 0);
             }
         }
     }

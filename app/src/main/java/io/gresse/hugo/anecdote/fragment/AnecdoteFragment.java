@@ -1,6 +1,5 @@
 package io.gresse.hugo.anecdote.fragment;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -8,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -160,12 +158,14 @@ public class AnecdoteFragment extends Fragment implements
     }
 
     @Override
-    public void onStop() {
+    public void onDestroy() {
         if (mChromeCustomTabsManager != null) {
             mChromeCustomTabsManager.unbindCustomTabsService(getActivity());
         }
-        super.onStop();
+        super.onDestroy();
     }
+
+
 
     protected void init() {
         if (getArguments() != null) {
@@ -237,33 +237,66 @@ public class AnecdoteFragment extends Fragment implements
         EventBus.getDefault().post(new LoadNewAnecdoteEvent(mWebsiteSlug, page));
     }
 
+    /**
+     * Open dialog to share the given anecdote
+     *
+     * @param anecdote the anecdote to share
+     */
+    private void shareAnecdote(Anecdote anecdote) {
+        FabricUtils.trackAnecdoteShare(mWebsiteName);
 
-    /***************************
-     * Implement SwipeRefreshLayout.OnRefreshListener
-     ***************************/
+        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
 
-    @Override
-    public void onRefresh() {
-        if (mAnecdoteService == null) {
-            return;
-        }
-        mAnecdoteService.cleanAnecdotes();
-        loadNewAnecdotes(mNextPageNumber = 0);
+        sharingIntent.putExtra(
+                Intent.EXTRA_SUBJECT,
+                getString(R.string.app_name));
+
+        sharingIntent.putExtra(
+                Intent.EXTRA_TEXT,
+                anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
+
+        startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.anecdote_share_title)));
     }
 
+    /**
+     * Copy the given anecdote text content in the clipboard with a link to the application at the end
+     *
+     * @param anecdote anecdote to copy
+     */
+    private void copyAnecdote(Anecdote anecdote) {
+        FabricUtils.trackAnecdoteCopy(mWebsiteName);
+        Toast.makeText(getActivity(), R.string.copied, Toast.LENGTH_SHORT).show();
+        Utils.copyToClipboard(
+                getActivity(),
+                getString(R.string.app_name),
+                anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
+    }
 
-    /***************************
-     * Implement ViewHolderListener
-     **************************/
+    /**
+     * Open given anecdote in the browser
+     *
+     * @param anecdote anecdote to open
+     * @param preload  preload the website (not opening it)
+     */
+    private void openInBrowserAnecdote(Anecdote anecdote,
+                                       boolean preload) {
+        if (preload) {
+            if (mChromeCustomTabsManager != null && !TextUtils.isEmpty(anecdote.permalink)) {
+                mChromeCustomTabsManager.mayLaunch(anecdote.permalink);
+            }
+            return;
+        }
+        if (mChromeCustomTabsManager != null) {
+            FabricUtils.trackAnecdoteDetails(mWebsiteName);
+            mChromeCustomTabsManager.openChrome(getActivity(), anecdote);
+        }
+    }
 
-    @Override
-    public void onClick(Anecdote anecdote, View view) {
+    private void fullscreenAnecdote(Anecdote anecdote, View view) {
         String contentUrl;
         if (anecdote.media == null) {
-            if (mChromeCustomTabsManager != null) {
-                FabricUtils.trackAnecdoteDetails(mWebsiteName);
-                mChromeCustomTabsManager.openChrome(getActivity(), anecdote);
-            }
+            openInBrowserAnecdote(anecdote, false);
             return;
         }
 
@@ -292,65 +325,50 @@ public class AnecdoteFragment extends Fragment implements
                 Log.w(TAG, "Not managed RichContent type");
                 break;
         }
+    }
 
+    /***************************
+     * Implement SwipeRefreshLayout.OnRefreshListener
+     ***************************/
+
+    @Override
+    public void onRefresh() {
+        if (mAnecdoteService == null) {
+            return;
+        }
+        mAnecdoteService.cleanAnecdotes();
+        loadNewAnecdotes(mNextPageNumber = 0);
+    }
+
+
+    /***************************
+     * Implement ViewHolderListener
+     **************************/
+
+    @Override
+    public void onClick(Anecdote anecdote, View view, int action) {
+        switch (action) {
+            case AnecdoteViewHolderListener.ACTION_COPY:
+                copyAnecdote(anecdote);
+                break;
+            case AnecdoteViewHolderListener.ACTION_SHARE:
+                shareAnecdote(anecdote);
+                break;
+            case AnecdoteViewHolderListener.ACTION_OPEN_IN_BROWSER_PRELOAD:
+                openInBrowserAnecdote(anecdote, true);
+                break;
+            case AnecdoteViewHolderListener.ACTION_OPEN_IN_BROWSER:
+                openInBrowserAnecdote(anecdote, false);
+                break;
+            case AnecdoteViewHolderListener.ACTION_FULLSCREEN:
+                fullscreenAnecdote(anecdote, view);
+                break;
+        }
     }
 
     @Override
     public void onLongClick(final Object object) {
-        if (!(object instanceof Anecdote)) {
-            return;
-        }
-        final Anecdote anecdote = (Anecdote) object;
-        // Open a dialog picker on item long click to choose between Open details, Share or copy the text
-
-        if (mChromeCustomTabsManager != null && !TextUtils.isEmpty(anecdote.permalink)) {
-            mChromeCustomTabsManager.mayLaunch(anecdote.permalink);
-        }
-
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setItems(R.array.anecdote_dialog, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                // The 'which' argument contains the index position
-                // of the selected item
-                switch (which) {
-                    // Share
-                    case 0:
-                        FabricUtils.trackAnecdoteShare(mWebsiteName);
-
-                        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-                        sharingIntent.setType("text/plain");
-
-                        sharingIntent.putExtra(
-                                Intent.EXTRA_SUBJECT,
-                                getString(R.string.app_name));
-
-                        sharingIntent.putExtra(
-                                Intent.EXTRA_TEXT,
-                                anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
-
-                        startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.anecdote_share_title)));
-                        break;
-                    // Open details
-                    case 1:
-                        FabricUtils.trackAnecdoteDetails(mWebsiteName);
-                        mChromeCustomTabsManager.openChrome(getActivity(), anecdote);
-                        break;
-                    // Copy
-                    case 2:
-                        FabricUtils.trackAnecdoteCopy(mWebsiteName);
-                        Toast.makeText(getActivity(), R.string.copied, Toast.LENGTH_SHORT).show();
-                        Utils.copyToClipboard(
-                                getActivity(),
-                                getString(R.string.app_name),
-                                anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
-                        break;
-                    default:
-                        Toast.makeText(getActivity(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        });
-        builder.show();
+        // Nothing here
     }
 
 

@@ -60,4 +60,7 @@
     <string name="anecdote_open_inbrowser">Ouvrir dans votre navigateur</string>
     <string name="dialog_website_page_name_hint">Nom de la page</string>
     <string name="dialog_website_error_pagename">AJoutez le nom de la page</string>
+    <string name="action_copy">Copier</string>
+    <string name="action_open">Ouvrir</string>
+    <string name="action_share">Partager</string>
 </resources>

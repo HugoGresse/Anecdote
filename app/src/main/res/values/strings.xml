@@ -26,6 +26,11 @@
         <item>Copy</item>
     </string-array>
 
+
+    <string name="action_share">Share</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_open">Open</string>
+
     <string name="open_intent_browser">Opening browser…</string>
     <string name="open_intent_browser_error">Unable to open details, check url configuration</string>
 
@@ -90,11 +95,9 @@
         <item>24</item>
     </string-array>
 
-
     <string name="anecdote_image_transition_name" translatable="false">imageTransitionName</string>
     <string name="anecdote_video_transition_name" translatable="false">videoTransitionName</string>
 
-    <string name="anecdote_nsfw_prefix" translatable="false">NSFW:</string>
     <string name="anecdote_open_inbrowser">Open in your browser</string>
 
 </resources>

@@ -56,6 +56,8 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
     public void unbindCustomTabsService(Activity activity) {
         if (mConnection == null || activity == null) return;
 
+        Log.i(TAG, "Unbinding");
+
         try {
             activity.unbindService(mConnection);
         } catch (IllegalArgumentException ignored) {
@@ -94,7 +96,7 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
         if (mClient == null || url == null) {
             return;
         }
-        Log.i(TAG, "mayLaunch");
+        Log.i(TAG, "mayLaunch " + url);
         CustomTabsSession session = getSession();
         session.mayLaunchUrl(Uri.parse(url), null, null);
     }
