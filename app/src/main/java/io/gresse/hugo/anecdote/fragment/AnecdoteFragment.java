@@ -166,7 +166,6 @@ public class AnecdoteFragment extends Fragment implements
     }
 
 
-
     protected void init() {
         if (getArguments() != null) {
             mWebsiteParentSlug = getArguments().getString(ARGS_WEBSITE_PARENT_SLUG);
@@ -293,6 +292,12 @@ public class AnecdoteFragment extends Fragment implements
         }
     }
 
+    /**
+     * Open the given anecdote content in fullscreen if it's an image or video, else in the browser.
+     *
+     * @param anecdote anecdote to open
+     * @param view     view to have nice transition if possible
+     */
     private void fullscreenAnecdote(Anecdote anecdote, View view) {
         String contentUrl;
         if (anecdote.media == null) {
