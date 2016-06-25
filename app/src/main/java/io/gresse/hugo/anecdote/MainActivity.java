@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity
         mNavigationView.setNavigationItemSelectedListener(this);
 
         // Process migration before getting anything else from shared preferences
-        SpStorage.migrate(this);
+        boolean openWebsiteChooserAddMode = SpStorage.migrate(this);
 
         mServiceProvider = new ServiceProvider();
         mWebsites = SpStorage.getWebsites(this);
@@ -128,7 +128,9 @@ public class MainActivity extends AppCompatActivity
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.startListening(this, this);
 
-        if (SpStorage.isFirstLaunch(this) || mWebsites.isEmpty()) {
+        if(openWebsiteChooserAddMode){
+            changeFragment(WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_ADD), false, false);
+        } else if (SpStorage.isFirstLaunch(this) || mWebsites.isEmpty()) {
             changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
         } else {
             changeAnecdoteFragment(mWebsites.get(0), mWebsites.get(0).pages.get(0));
