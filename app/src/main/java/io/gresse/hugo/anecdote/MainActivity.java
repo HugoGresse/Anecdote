@@ -3,6 +3,7 @@ package io.gresse.hugo.anecdote;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -96,6 +97,7 @@ public class MainActivity extends AppCompatActivity
     protected List<Website>               mWebsites;
     protected Snackbar                    mSnackbar;
     protected ToolbarSpinnerAdapter       mToolbarSpinnerAdapter;
+    protected int                         mToolbarScrollFlags;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,6 +129,9 @@ public class MainActivity extends AppCompatActivity
 
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.startListening(this, this);
+
+        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+        mToolbarScrollFlags = params.getScrollFlags();
 
         if(openWebsiteChooserAddMode){
             changeFragment(WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_ADD), false, false);
@@ -503,12 +508,17 @@ public class MainActivity extends AppCompatActivity
                     break;
                 }
             }
+
+            AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+            params.setScrollFlags(mToolbarScrollFlags);
         } else {
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayShowTitleEnabled(true);
             }
             mToolbarSpinner.setVisibility(View.GONE);
             mToolbar.setTitle(event.title);
+        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+        params.setScrollFlags(0);
         }
     }
 
