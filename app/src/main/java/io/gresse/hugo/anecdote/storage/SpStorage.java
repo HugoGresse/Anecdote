@@ -42,11 +42,11 @@ public class SpStorage {
 
     /**
      * Return the version code number
-     *
      * @param context app context
-     * @return version number, starting at 0
+     * @param defaultVersion the default value if not any already saved
+     * @return the current version
      */
-    public static int getVersion(Context context) {
+    public static int getVersion(Context context, int defaultVersion) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
         return sharedPreferences.getInt(SP_KEY_VERSION, 0);
     }
@@ -230,7 +230,7 @@ public class SpStorage {
      */
     public static boolean migrate(Context context) {
         boolean openWebsiteChooserReturn = false;
-        switch (getVersion(context)){
+        switch (getVersion(context, 12)){
             case 0:
                 List<Website> websites = getWebsites(context);
                 /**
