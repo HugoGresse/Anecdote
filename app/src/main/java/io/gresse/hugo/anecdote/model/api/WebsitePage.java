@@ -38,7 +38,7 @@ public class WebsitePage {
         if (pagination == null) {
             return url +
                     ((isFirstPageZero) ? pageNumber : pageNumber + 1) +
-                    urlSuffix;
+                    ((urlSuffix == null)? "" :  urlSuffix);
         } else if (pageNumber != 0 && paginationMap != null && paginationMap.containsKey(pageNumber)) {
             return paginationMap.get(pageNumber);
         } else {
