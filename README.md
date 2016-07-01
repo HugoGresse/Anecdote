@@ -13,7 +13,7 @@ _This application contents does not belong to the application._
 
 Features
 --------
-- display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9GAG, Se couchez moins bête, Bash.org and much more (choose on first start which websites you want to read, based on Anecdote database)
+- display 9GAG, VDM/FML (viedemerde.fr), DTC (danstonchat.com), Se couchez moins bête, Bash.org and much more (choose on first start which websites you want to read, based on Anecdote database)
 - infinit scroll
 - pull to refresh
 - manually adding websites (for expert) via HTML parsing
@@ -22,7 +22,7 @@ Features
 
 TODO
 --------
-- websitePage to manage Anecdote websites
+- website to manage Anecdote websites
 - social button below the anecdote (share, copy, open)
 - guide to add websitePage (a follow through user step)
 - filter by country

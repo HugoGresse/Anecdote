@@ -140,9 +140,8 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
 
         @Override
         public void setData(Website website) {
-
+            // Static view, nothing to set
         }
-
 
         @Override
         public void onClick(View v) {

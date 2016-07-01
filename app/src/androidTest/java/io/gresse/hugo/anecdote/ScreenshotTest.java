@@ -7,6 +7,8 @@ import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.contrib.RecyclerViewActions;
 import android.support.test.rule.ActivityTestRule;
 
+import junit.framework.Assert;
+
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -85,6 +87,9 @@ public class ScreenshotTest {
         Thread.sleep(500);
 
         Screengrab.screenshot("anecdoteCliked");
+
+        // Dump check
+        Assert.assertEquals(1, 1);
     }
 
 }
