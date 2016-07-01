@@ -187,6 +187,7 @@ public class AnecdoteFragment extends Fragment implements
 
         mAdapter = new MixedContentAdapter(this, mAnecdoteService.getWebsitePage().isSinglePage);
 
+        mAdapter.setData(mAnecdoteService.getAnecdotes());
         mRecyclerView.setAdapter(mAdapter);
 
         // Set default values
@@ -205,7 +206,6 @@ public class AnecdoteFragment extends Fragment implements
         }
         mAdapter.setTextStyle(textSize, rowStripping, colorBackground, colorBackgroundStripping);
 
-        mAdapter.setData(mAnecdoteService.getAnecdotes());
 
         if (mAnecdoteService.getAnecdotes().isEmpty()) {
             loadNewAnecdotes(mNextPageNumber);

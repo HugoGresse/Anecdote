@@ -48,15 +48,20 @@ public class Anecdote {
 
         Anecdote anecdote = (Anecdote) o;
 
-        return text.equals(anecdote.text) && (permalink != null ?
-                permalink.equals(anecdote.permalink) : anecdote.permalink == null);
+        if (type != null ? !type.equals(anecdote.type) : anecdote.type != null) return false;
+        if (text != null ? !text.equals(anecdote.text) : anecdote.text != null) return false;
+        //noinspection SimplifiableIfStatement
+        if (permalink != null ? !permalink.equals(anecdote.permalink) : anecdote.permalink != null) return false;
+        return media != null ? media.equals(anecdote.media) : anecdote.media == null;
 
     }
 
     @Override
     public int hashCode() {
-        int result = text.hashCode();
+        int result = type != null ? type.hashCode() : 0;
+        result = 31 * result + (text != null ? text.hashCode() : 0);
         result = 31 * result + (permalink != null ? permalink.hashCode() : 0);
+        result = 31 * result + (media != null ? media.hashCode() : 0);
         return result;
     }
 

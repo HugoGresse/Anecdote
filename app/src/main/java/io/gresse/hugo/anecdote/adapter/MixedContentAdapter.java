@@ -1,6 +1,8 @@
 package io.gresse.hugo.anecdote.adapter;
 
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.text.Html;
@@ -41,6 +43,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     public static final int VIEW_TYPE_VIDEO   = 3;
     public static final int VIEW_TYPE_UNKNOWN = 4;
 
+
     private List<Anecdote>             mAnecdotes;
     private boolean                    mIsSinglePage;
     @Nullable
@@ -58,9 +61,63 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     }
 
     @Override
-    public void setData(List<Anecdote> quotes) {
-        mAnecdotes = quotes;
-        notifyDataSetChanged();
+    public void setData(final List<Anecdote> quotes) {
+        if(Looper.myLooper() == Looper.getMainLooper()){
+            Log.d(TAG, "setData main thread");
+            internalUpdateOnSameThread(quotes);
+        } else {
+            Log.d(TAG, "setData diff thread");
+            // Run this on main thread
+            Handler mainHandler = new Handler(Looper.getMainLooper());
+            Runnable runnable = new Runnable() {
+                @Override
+                public void run() {
+                    internalUpdateOnSameThread(quotes);
+                }
+            };
+            mainHandler.post(runnable);
+        }
+    }
+
+    /**
+     * Notify the adapter of item change on the current thread
+     * @param quotes fresh list
+     */
+    private void internalUpdateOnSameThread(List<Anecdote> quotes){
+        if(quotes.equals(mAnecdotes) && quotes.size() == mAnecdotes.size()){
+            Log.d(TAG, "Same list");
+            // List identical, no thing
+            return;
+        } else {
+            Log.d(TAG, "Diff list");
+            // number of elements differ
+            // Two case: new item added, all item change and count didn't match
+            if(quotes.size() > mAnecdotes.size() && mAnecdotes.size() > 2 &&
+                    mAnecdotes.get(0).equals(quotes.get(0)) &&
+                    mAnecdotes.get(mAnecdotes.size() -1).equals(quotes.get(mAnecdotes.size()-1))){
+                Log.d(TAG, "Range inserted : " + mAnecdotes.size() + " to " + quotes.size());
+                // First and last item of current Anecdote list and new identical, there is new element
+                cloneAnecdoteToCurrent(quotes);
+                notifyItemRangeInserted(mAnecdotes.size(), quotes.size() + 1);
+            } else {
+                Log.d(TAG, "All change");
+                cloneAnecdoteToCurrent(quotes);
+                // Everything change
+                notifyDataSetChanged();
+            }
+        }
+    }
+
+    /**
+     * Clone given list instance (shadow, it do not clone inner element)
+     * @param quotes list to clone
+     */
+    private void cloneAnecdoteToCurrent(List<Anecdote> quotes){
+        if(quotes instanceof ArrayList){
+            mAnecdotes = new ArrayList<>(quotes);
+        } else {
+            mAnecdotes = quotes;
+        }
     }
 
     @Override
@@ -111,7 +168,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
     @Override
     public int getItemViewType(int position) {
-        if (position + 1 <= mAnecdotes.size()) {
+        if (position < mAnecdotes.size()) {
             Anecdote anecdote = mAnecdotes.get(position);
             switch (anecdote.type) {
                 case MediaType.TEXT:
