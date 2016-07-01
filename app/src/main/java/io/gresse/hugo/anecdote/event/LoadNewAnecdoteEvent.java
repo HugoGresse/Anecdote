@@ -9,8 +9,8 @@ public class LoadNewAnecdoteEvent extends AnecdoteEvent {
 
     public int page;
 
-    public LoadNewAnecdoteEvent(int websiteId, int page) {
-        super(websiteId);
+    public LoadNewAnecdoteEvent(String websitePageSlug, int page) {
+        super(websitePageSlug);
         this.page = page;
     }
 }

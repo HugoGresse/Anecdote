@@ -1,14 +1,13 @@
 package io.gresse.hugo.anecdote.service;
 
-import android.content.Context;
-
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.model.api.Website;
+import io.gresse.hugo.anecdote.model.api.WebsitePage;
 
 /**
  * Provide different services (that explain a lot)
@@ -17,9 +16,9 @@ import io.gresse.hugo.anecdote.model.Website;
  */
 public class ServiceProvider {
 
-    protected List<Website>                 mWebsites;
-    protected Map<Integer, AnecdoteService> mAnecdoteServices;
-    protected WebsiteApiService             mWebsiteApiService;
+    protected List<Website>                mWebsites;
+    protected Map<String, AnecdoteService> mAnecdoteServices;
+    protected WebsiteApiService            mWebsiteApiService;
 
     public ServiceProvider() {
         mAnecdoteServices = new HashMap<>();
@@ -30,27 +29,29 @@ public class ServiceProvider {
         mWebsites = websites;
 
         for (Website website : mWebsites) {
-            mAnecdoteServices.put(website.id, new AnecdoteService(website));
+            for (WebsitePage websitePage : website.pages) {
+                mAnecdoteServices.put(websitePage.slug, new AnecdoteService(website, websitePage));
+            }
         }
     }
 
-    public void register(Context context, EventBus eventBus) {
-        for (Map.Entry<Integer, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
+    public void register(EventBus eventBus) {
+        for (Map.Entry<String, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
             eventBus.register(entry.getValue());
         }
         eventBus.register(mWebsiteApiService);
     }
 
     public void unregister(EventBus eventBus) {
-        for (Map.Entry<Integer, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
+        for (Map.Entry<String, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
             eventBus.unregister(entry.getValue());
         }
         mAnecdoteServices.clear();
         eventBus.unregister(mWebsiteApiService);
     }
 
-    public AnecdoteService getAnecdoteService(int websiteId) {
-        return mAnecdoteServices.get(websiteId);
+    public AnecdoteService getAnecdoteService(String websitePageSlug) {
+        return mAnecdoteServices.get(websitePageSlug);
     }
 
     public WebsiteApiService getWebsiteApiService() {

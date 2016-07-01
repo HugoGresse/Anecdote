@@ -24,7 +24,7 @@ import io.gresse.hugo.anecdote.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.event.OnRemoteWebsiteResponseEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
-import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.model.api.Website;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import okhttp3.Call;
 import okhttp3.Callback;

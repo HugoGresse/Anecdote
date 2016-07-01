@@ -20,4 +20,6 @@
         android:layout_height="300dp"
         android:paddingBottom="@dimen/padding_anecdoterow_half"/>
 
+    <include layout="@layout/row_anecdote_expand"/>
+
 </LinearLayout>

@@ -2,7 +2,7 @@ package io.gresse.hugo.anecdote.event;
 
 import java.util.List;
 
-import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.model.api.Website;
 
 /**
  * When remote websites has been downloaded. This should be fired after {@link LoadRemoteWebsiteEvent}.

@@ -10,8 +10,8 @@ public class OnAnecdoteLoadedEvent extends AnecdoteEvent {
     public int numberOfItemLoaded;
     public int page;
 
-    public OnAnecdoteLoadedEvent(int websiteId, int numberOfItemLoaded, int page) {
-        super(websiteId);
+    public OnAnecdoteLoadedEvent(String websitePageSlug, int numberOfItemLoaded, int page) {
+        super(websitePageSlug);
         this.numberOfItemLoaded = numberOfItemLoaded;
         this.page = page;
     }

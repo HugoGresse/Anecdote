@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <View
+          android:layout_width="match_parent"
+          android:layout_height="1dp"
+          android:id="@+id/separator"
+          android:background="@color/colorDivider"
+          android:layout_gravity="center_horizontal"/>
+
+    <!--icon padding : 35%; button size : 32dp + 16dp padding-->
+
+    <LinearLayout
+                  android:id="@+id/expandLayout"
+                  android:orientation="horizontal"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent">
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/ic_social_share2"
+            android:id="@+id/shareButton"
+            android:contentDescription="@string/action_share"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/ic_content_content_copy"
+            android:contentDescription="@string/action_copy"
+            android:id="@+id/copyButton"/>
+
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:src="@drawable/ic_action_open_in_browser"
+            android:contentDescription="@string/action_open"
+            android:id="@+id/openButton"/>
+
+    </LinearLayout>
+
+</merge>

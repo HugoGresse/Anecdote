@@ -22,9 +22,9 @@ Features
 
 TODO
 --------
-- website to manage Anecdote websites
+- websitePage to manage Anecdote websites
 - social button below the anecdote (share, copy, open)
-- guide to add website (a follow through user step)
+- guide to add websitePage (a follow through user step)
 - filter by country
 - offline management by task to download data at a given time
 

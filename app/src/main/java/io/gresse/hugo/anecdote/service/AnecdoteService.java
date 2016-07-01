@@ -26,8 +26,8 @@ import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
-import io.gresse.hugo.anecdote.model.RichContent;
-import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.model.api.Website;
+import io.gresse.hugo.anecdote.model.api.WebsitePage;
 import io.gresse.hugo.anecdote.util.FabricUtils;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.util.Utils;
@@ -44,17 +44,19 @@ import okhttp3.Response;
  */
 public class AnecdoteService {
 
+    protected Website              mWebsite;
+    protected WebsitePage          mWebsitePage;
     protected OkHttpClient         mOkHttpClient;
     protected String               mServiceName;
-    protected Website              mWebsite;
     protected List<Anecdote>       mAnecdotes;
     protected List<Event>          mFailEvents;
     protected Map<Integer, String> mPaginationMap;
     protected boolean mEnd = false;
 
-    public AnecdoteService(Website website) {
+    public AnecdoteService(Website website, WebsitePage websitePage) {
         mWebsite = website;
-        mServiceName = mWebsite.name.replaceAll("\\s", "") + AnecdoteService.class.getSimpleName();
+        mWebsitePage = websitePage;
+        mServiceName = mWebsite.name.replaceAll("\\s", "") + websitePage.name + AnecdoteService.class.getSimpleName();
 
         mOkHttpClient = new OkHttpClient();
         mAnecdotes = new ArrayList<>();
@@ -69,6 +71,15 @@ public class AnecdoteService {
      */
     public Website getWebsite() {
         return mWebsite;
+    }
+
+    /**
+     * Get the Website page object
+     *
+     * @return website page object
+     */
+    public WebsitePage getWebsitePage() {
+        return mWebsitePage;
     }
 
     /**
@@ -109,8 +120,10 @@ public class AnecdoteService {
         Log.d(mServiceName, "Downloading page " + pageNumber);
         Request request;
         try {
+            String url = mWebsitePage.getPageUrl(pageNumber, mPaginationMap);
+            Log.d(mServiceName, "Will download " + url);
             request = new Request.Builder()
-                    .url(mWebsite.getPageUrl(pageNumber, mPaginationMap))
+                    .url(url)
                     .header("User-Agent", Utils.getUserAgent(mWebsite))
                     .header("Cache-Control", " no-transform")
                     .build();
@@ -118,7 +131,7 @@ public class AnecdoteService {
             mFailEvents.add(event);
             postOnUiThread(new RequestFailedEvent(
                     event,
-                    "Website configuration is wrong: " + mWebsite.name,
+                    "Website configuration is wrong: " + mWebsitePage.name,
                     exception));
             return;
         }
@@ -130,7 +143,7 @@ public class AnecdoteService {
                 mFailEvents.add(event);
                 postOnUiThread(new RequestFailedEvent(
                         event,
-                        "Unable to load " + mWebsite.name,
+                        "Unable to load " + mWebsitePage.name,
                         e));
             }
 
@@ -150,7 +163,7 @@ public class AnecdoteService {
                     mFailEvents.add(event);
                     postOnUiThread(new RequestFailedEvent(
                             event,
-                            "Unable to load website",
+                            "Unable to load website: error " + response.code(),
                             null));
                 }
 
@@ -166,20 +179,17 @@ public class AnecdoteService {
             response.body().close();
             postOnUiThread(new RequestFailedEvent(
                     event,
-                    "Unable to parse " + mWebsite.name + " website",
+                    "Unable to parse " + mWebsitePage.name + " website",
                     null));
             return;
         } finally {
             response.body().close();
         }
 
-        final Elements elements = document.select(mWebsite.selector);
+        final Elements elements = document.select(mWebsitePage.selector);
 
         if (elements != null && !elements.isEmpty()) {
             Element tempElement = null;
-            String content;
-            String url;
-            RichContent richContent = null;
 
             /**
              * We get each item to select the correct data and apply the WebsiteItem options (replace, prefix, etc).
@@ -187,31 +197,22 @@ public class AnecdoteService {
              */
             for (Element element : elements) {
                 //noinspection ConstantConditions
-                content = mWebsite.contentItem.getData(element, tempElement);
-                //noinspection ConstantConditions
-                url = mWebsite.urlItem.getData(element, tempElement);
-
-                if (mWebsite.hasAdditionalContent()) {
-                    //noinspection ConstantConditions
-                    richContent = mWebsite.additionalMixedContentItem.getRichData(element, tempElement);
-                }
-
-                mAnecdotes.add(new Anecdote(content, url, richContent));
+                mAnecdotes.add(mWebsitePage.content.getAnecdote(element, tempElement));
             }
 
-            if (mWebsite.paginationItem != null) {
-                mPaginationMap.put(pageNumber + 1, mWebsite.paginationItem.getData(document));
+            if (mWebsitePage.pagination != null) {
+                mPaginationMap.put(pageNumber + 1, mWebsitePage.pagination.getData(document));
             }
 
-            postOnUiThread(new OnAnecdoteLoadedEvent(mWebsite.id, elements.size(), pageNumber));
+            postOnUiThread(new OnAnecdoteLoadedEvent(mWebsitePage.slug, elements.size(), pageNumber));
         } else {
             Log.w(mServiceName, "No elements :/");
             postOnUiThread(new RequestFailedEvent(
                     event,
-                    "Unable to parse " + mWebsite.name + " website",
+                    "Unable to parse " + mWebsitePage.name + " website",
                     null));
             if (mWebsite.source.equals(Website.SOURCE_REMOTE)) {
-                FabricUtils.trackWebsiteWrongConfiguration(mWebsite.name);
+                FabricUtils.trackWebsiteWrongConfiguration(mWebsitePage.name);
             }
             mEnd = true;
         }
@@ -241,7 +242,7 @@ public class AnecdoteService {
 
     @Subscribe
     public void loadNextAnecdoteEvent(LoadNewAnecdoteEvent event) {
-        if (event.websiteId != mWebsite.id) return;
+        if (!event.websitePageSlug.equals(mWebsitePage.slug)) return;
         int pageNumber = event.page;
         downloadLatest(event, pageNumber);
     }

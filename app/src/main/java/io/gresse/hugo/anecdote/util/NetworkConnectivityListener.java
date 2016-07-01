@@ -8,7 +8,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 /**
  * From http://www.netmite.com/android/mydroid/frameworks/base/core/java/android/net/NetworkConnectivityListener.java

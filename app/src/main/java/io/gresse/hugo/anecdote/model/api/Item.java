@@ -1,4 +1,4 @@
-package io.gresse.hugo.anecdote.model;
+package io.gresse.hugo.anecdote.model.api;
 
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -9,27 +9,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Represent an iterative item from a Website, like a content or url.
+ * Represent a parsing configuration for a given text type of a {@link ContentItem}
  * <p/>
  * Created by Hugo Gresse on 28/02/16.
  */
-public class WebsiteItem {
-
-    public static final int TYPE_STRING     = 0;
-    public static final int TYPE_URL        = 1;
-    public static final int TYPE_PAGINATION = 2;
-    public static final int TYPE_IMAGE      = 3;
-    public static final int TYPE_VIDEO      = 4;
-
-    /**
-     * The type of data among:
-     * - {@link #TYPE_STRING}
-     * - {@link #TYPE_URL}
-     * - {@link #TYPE_PAGINATION}
-     * - {@link #TYPE_IMAGE}
-     * - {@link #TYPE_VIDEO}
-     */
-    public int type;
+public class Item {
 
     /**
      * The DOM selector to fetch the item
@@ -38,7 +22,7 @@ public class WebsiteItem {
     public String selector;
 
     /**
-     * The special attribute to get, default is the html content
+     * The special attribute to get, default is the html text
      */
     @Nullable
     public String attribute;
@@ -61,13 +45,7 @@ public class WebsiteItem {
      */
     public Map<String, String> replaceMap;
 
-    /**
-     * If the current websiteItem fail to be geted from given data, try to fallback to this
-     */
-    @Nullable
-    public WebsiteItem fallbackItem;
-
-    public WebsiteItem() {
+    public Item() {
         suffix = null;
         prefix = null;
         attribute = null;
@@ -92,6 +70,7 @@ public class WebsiteItem {
      * @param tempElement a tempElement to storage the wanted data
      */
     @SuppressWarnings("ParameterCanBeLocal")
+    @Nullable
     public String getData(Element element, @Nullable Element tempElement) {
         String data;
         if (!TextUtils.isEmpty(prefix)) {
@@ -105,11 +84,8 @@ public class WebsiteItem {
         } else try {
             tempElement = element.select(selector).get(0);
         } catch (IndexOutOfBoundsException exception) {
-            // No item, we try the fallback if any
-            if(fallbackItem != null){
-                return fallbackItem.getData(element, tempElement);
-            }
-            return data;
+            // No item
+            return null;
         }
 
         if (tempElement != null) {
@@ -131,21 +107,13 @@ public class WebsiteItem {
         return data;
     }
 
-    @Nullable
-    public RichContent getRichData(Element element, Element tempElement){
-        String data = getData(element, tempElement);
-        if(TextUtils.isEmpty(data)){
-            return null;
+    /**
+     * Fill required fill to prevent any usae when using it
+     */
+    public void validate() {
+        if (TextUtils.isEmpty(selector)) {
+            selector = "";
         }
-
-        if(data.endsWith(".jpg") || data.endsWith(".jpeg") ||
-                data.endsWith(".gif") ||
-                data.endsWith(".png") || data.endsWith(".tiff")){
-            return new RichContent(RichContent.TYPE_IMAGE, data);
-        } else if(data.endsWith(".mp4")){
-            return new RichContent(RichContent.TYPE_VIDEO, data);
-        }
-        return null;
     }
 
     @Override

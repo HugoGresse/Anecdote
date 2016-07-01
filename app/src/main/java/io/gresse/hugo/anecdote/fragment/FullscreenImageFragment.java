@@ -34,7 +34,6 @@ public class FullscreenImageFragment extends Fragment {
     public static final String BUNDLE_IMAGEURL = "contentUrl";
 
     private String mImageUrl;
-    PhotoViewAttacher mAttacher;
 
     @Bind(R.id.imageView)
     public ImageView mImageView;

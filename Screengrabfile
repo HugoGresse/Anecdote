@@ -1,0 +1,17 @@
+# remove the leading '#' to uncomment lines
+
+app_package_name 'io.gresse.hugo.anecdote'
+# use_tests_in_packages ['your.screenshot.tests.package']
+
+app_apk_path 'app/build/outputs/apk/Anecdote-debug.apk'
+tests_apk_path 'app/build/outputs/apk/Anecdote-debug-androidTest-unaligned.apk'
+
+locales ['en-US', 'fr-FR']
+
+# clear all previously generated screenshots in your local output directory before creating new ones
+clear_previous_screenshots true
+
+output_directory 'screenshots'
+
+# For more information about all available options run
+#   screengrab --help
