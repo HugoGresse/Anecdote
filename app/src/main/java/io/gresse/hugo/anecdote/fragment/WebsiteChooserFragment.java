@@ -8,6 +8,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,7 @@ import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.event.OnRemoteWebsiteResponseEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
-import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.model.api.Website;
 import io.gresse.hugo.anecdote.storage.SpStorage;
 import io.gresse.hugo.anecdote.util.FabricUtils;
 
@@ -197,6 +198,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
 
     @Subscribe
     public void onRemoteWebsiteLoaded(OnRemoteWebsiteResponseEvent event) {
+        Log.d(TAG, "onRemoteWebsiteLoaded, count? " + event.websiteList.size());
         if (event.isSuccessful) {
             setAdapterData(event.websiteList);
         } else {

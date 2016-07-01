@@ -3,6 +3,7 @@ package io.gresse.hugo.anecdote;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
@@ -15,6 +16,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -25,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
@@ -37,7 +40,9 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnItemSelected;
 import io.fabric.sdk.android.Fabric;
+import io.gresse.hugo.anecdote.adapter.ToolbarSpinnerAdapter;
 import io.gresse.hugo.anecdote.event.ChangeFullscreenEvent;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.FullscreenEvent;
@@ -54,7 +59,8 @@ import io.gresse.hugo.anecdote.fragment.FullscreenVideoFragment;
 import io.gresse.hugo.anecdote.fragment.SettingsFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteChooserFragment;
 import io.gresse.hugo.anecdote.fragment.WebsiteDialogFragment;
-import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.model.api.Website;
+import io.gresse.hugo.anecdote.model.api.WebsitePage;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.service.WebsiteApiService;
@@ -83,10 +89,15 @@ public class MainActivity extends AppCompatActivity
     @Bind(R.id.nav_view)
     public NavigationView mNavigationView;
 
+    @Bind(R.id.toolbarSpinner)
+    public Spinner mToolbarSpinner;
+
     protected ServiceProvider             mServiceProvider;
     protected NetworkConnectivityListener mNetworkConnectivityListener;
     protected List<Website>               mWebsites;
     protected Snackbar                    mSnackbar;
+    protected ToolbarSpinnerAdapter       mToolbarSpinnerAdapter;
+    protected int                         mToolbarScrollFlags;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,23 +118,31 @@ public class MainActivity extends AppCompatActivity
         mNavigationView.setNavigationItemSelectedListener(this);
 
         // Process migration before getting anything else from shared preferences
-        SpStorage.migrate(this);
+        boolean openWebsiteChooserAddMode = SpStorage.migrate(this);
 
         mServiceProvider = new ServiceProvider();
         mWebsites = SpStorage.getWebsites(this);
         mServiceProvider.createAnecdoteService(mWebsites);
-        mServiceProvider.register(this, EventBus.getDefault());
+        mServiceProvider.register(EventBus.getDefault());
 
         populateNavigationView(false);
 
         mNetworkConnectivityListener = new NetworkConnectivityListener();
         mNetworkConnectivityListener.startListening(this, this);
 
-        if (SpStorage.isFirstLaunch(this) || mWebsites.isEmpty()) {
+        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+        mToolbarScrollFlags = params.getScrollFlags();
+
+        if(openWebsiteChooserAddMode){
+            changeFragment(WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_ADD), false, false);
+        } else if (SpStorage.isFirstLaunch(this) || mWebsites.isEmpty()) {
             changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
         } else {
-            changeAnecdoteFragment(mWebsites.get(0));
+            changeAnecdoteFragment(mWebsites.get(0), mWebsites.get(0).pages.get(0));
         }
+
+        mToolbarSpinnerAdapter = new ToolbarSpinnerAdapter(getApplicationContext(), "test", new ArrayList<String>());
+        mToolbarSpinner.setAdapter(mToolbarSpinnerAdapter);
     }
 
     @Override
@@ -197,7 +216,7 @@ public class MainActivity extends AppCompatActivity
             case R.id.drawer_group_content:
                 for (Website website : mWebsites) {
                     if (website.name.equals(item.getTitle())) {
-                        changeAnecdoteFragment(website);
+                        changeAnecdoteFragment(website, website.pages.get(0));
                         break;
                     }
                 }
@@ -215,6 +234,13 @@ public class MainActivity extends AppCompatActivity
 
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
+    }
+
+    @OnItemSelected(R.id.toolbarSpinner)
+    public void onSpinnerSelected(AppCompatSpinner adapter, View v, int i, long lng){
+        if(mToolbarSpinnerAdapter.getWebsite() != null){
+            changeAnecdoteFragment(mToolbarSpinnerAdapter.getWebsite(), mToolbarSpinnerAdapter.getWebsite().pages.get(i));
+        }
     }
 
     /***************************
@@ -253,7 +279,7 @@ public class MainActivity extends AppCompatActivity
         String backStateName = ((Object) frag).getClass().getName();
 
         if (frag instanceof AnecdoteFragment) {
-            backStateName += frag.getArguments().getInt(AnecdoteFragment.ARGS_WEBSITE_ID);
+            backStateName += frag.getArguments().getString(AnecdoteFragment.ARGS_WEBSITE_PAGE_SLUG);
         }
 
         try {
@@ -305,11 +331,12 @@ public class MainActivity extends AppCompatActivity
      *
      * @param website the website specification to be displayed in the fragment
      */
-    private void changeAnecdoteFragment(Website website) {
+    private void changeAnecdoteFragment(Website website, WebsitePage websitePage) {
         Fragment fragment = Fragment.instantiate(this, AnecdoteFragment.class.getName());
         Bundle bundle = new Bundle();
-        bundle.putInt(AnecdoteFragment.ARGS_WEBSITE_ID, website.id);
-        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, website.name);
+        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_PARENT_SLUG, website.slug);
+        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_PAGE_SLUG, websitePage.slug);
+        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, websitePage.name);
         fragment.setArguments(bundle);
         changeFragment(fragment, true, false);
     }
@@ -319,10 +346,10 @@ public class MainActivity extends AppCompatActivity
 
         mServiceProvider.unregister(EventBus.getDefault());
         mServiceProvider.createAnecdoteService(mWebsites);
-        mServiceProvider.register(this, EventBus.getDefault());
+        mServiceProvider.register(EventBus.getDefault());
 
         if (!mWebsites.isEmpty()) {
-            changeAnecdoteFragment(mWebsites.get(0));
+            changeAnecdoteFragment(mWebsites.get(0), mWebsites.get(0).pages.get(0));
         } else {
             changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
         }
@@ -355,7 +382,11 @@ public class MainActivity extends AppCompatActivity
                                 case R.id.action_edit:
                                     // Remove edit button for remote website
                                     if (!website.isEditable()) {
-                                        Toast.makeText(MainActivity.this, R.string.action_website_noteditable_toast, Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(
+                                                MainActivity.this,
+                                                R.string.action_website_noteditable_toast,
+                                                Toast.LENGTH_SHORT)
+                                                .show();
                                         return false;
                                     }
 
@@ -371,7 +402,13 @@ public class MainActivity extends AppCompatActivity
                                     EventBus.getDefault().post(new WebsitesChangeEvent());
                                     FabricUtils.trackWebsiteDefault(website.name);
                                     break;
-
+                                default:
+                                    Toast.makeText(
+                                            MainActivity.this,
+                                            R.string.not_implemented,
+                                            Toast.LENGTH_SHORT)
+                                            .show();
+                                    break;
                             }
                             return true;
                         }
@@ -386,7 +423,8 @@ public class MainActivity extends AppCompatActivity
                 .setIcon(R.drawable.ic_action_content_add);
 
         if (addNewNotification) {
-            navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_newwebsite)
+            navigationViewMenu
+                    .add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_newwebsite)
                     .setIcon(R.drawable.ic_action_info_outline);
         }
 
@@ -413,12 +451,12 @@ public class MainActivity extends AppCompatActivity
     /**
      * Get the anecdote Service corresponding to the given name
      *
-     * @param websiteId the website id to get the service from
+     * @param websitePageSlug the website page slug to get the service from
      * @return an anecdote Service, if one is find
      */
     @Nullable
-    public AnecdoteService getAnecdoteService(int websiteId) {
-        return mServiceProvider.getAnecdoteService(websiteId);
+    public AnecdoteService getAnecdoteService(String websitePageSlug) {
+        return mServiceProvider.getAnecdoteService(websitePageSlug);
     }
 
     public WebsiteApiService getWebsiteApiService() {
@@ -431,7 +469,6 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void onRequestFailed(final RequestFailedEvent event) {
-        Log.d(TAG, "requestFailed:  " + event.getClass().getCanonicalName());
         if (Configuration.DEBUG) {
             Log.d(TAG, "RequestFailed: " + event.toString());
         }
@@ -452,16 +489,36 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeTitle(ChangeTitleEvent event) {
-        if (event.websiteId != null) {
+        if (event.websiteSlug != null) {
+
+            AnecdoteService anecdoteService = getAnecdoteService(event.websiteSlug);
+            if(anecdoteService != null){
+                int selectedItem = mToolbarSpinnerAdapter.populate(anecdoteService.getWebsite(), event.websiteSlug);
+                mToolbarSpinnerAdapter.notifyDataSetChanged();
+                mToolbarSpinner.setSelection(selectedItem);
+            }
+
+            mToolbar.setTitle("");
+            mToolbarSpinner.setVisibility(View.VISIBLE);
+
             for (int i = 0; i < mWebsites.size(); i++) {
-                if (mWebsites.get(i).id == event.websiteId) {
-                    mToolbar.setTitle(mWebsites.get(i).name);
+                if (mWebsites.get(i).slug.equals(event.websiteSlug)) {
+                    //mToolbar.setTitle(mWebsites.get(i).name);
                     mNavigationView.getMenu().getItem(i).setChecked(true);
                     break;
                 }
             }
+
+            AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+            params.setScrollFlags(mToolbarScrollFlags);
         } else {
+            if (getSupportActionBar() != null) {
+                getSupportActionBar().setDisplayShowTitleEnabled(true);
+            }
+            mToolbarSpinner.setVisibility(View.GONE);
             mToolbar.setTitle(event.title);
+        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+        params.setScrollFlags(0);
         }
     }
 
@@ -534,7 +591,8 @@ public class MainActivity extends AppCompatActivity
                 changeFragment(fragment, true, false, event.transitionView, event.transitionName);
                 break;
             default:
-                Log.d(TAG, "Not managed content type");
+                Log.d(TAG, "Not managed text type");
+                break;
         }
     }
 
@@ -613,7 +671,7 @@ public class MainActivity extends AppCompatActivity
     public void onConnectivityChange(NetworkConnectivityListener.State state) {
         Log.d(TAG, "onConnectivityChange: " + state);
         EventBus.getDefault().post(new NetworkConnectivityChangeEvent(state));
-        if(state == NetworkConnectivityListener.State.CONNECTED && mSnackbar != null && mSnackbar.isShownOrQueued()){
+        if (state == NetworkConnectivityListener.State.CONNECTED && mSnackbar != null && mSnackbar.isShownOrQueued()) {
             mSnackbar.dismiss();
         }
     }

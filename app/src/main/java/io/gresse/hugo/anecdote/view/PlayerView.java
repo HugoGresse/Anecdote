@@ -130,7 +130,8 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
                 mSimpleExoPlayer.start();
             }
 
-            state = bundle.getParcelable("instanceState");
+            super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
+            return;
         }
 
         super.onRestoreInstanceState(state);

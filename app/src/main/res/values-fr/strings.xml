@@ -58,4 +58,10 @@
     <string name="action_website_noteditable_toast">Vous ne pouvez pas modifier un site distant</string>
     <string name="action_website_newwebsite">Nouveaux sites disponible</string>
     <string name="anecdote_open_inbrowser">Ouvrir dans votre navigateur</string>
+    <string name="dialog_website_page_name_hint">Nom de la page</string>
+    <string name="dialog_website_error_pagename">AJoutez le nom de la page</string>
+    <string name="action_copy">Copier</string>
+    <string name="action_open">Ouvrir</string>
+    <string name="action_share">Partager</string>
+    <string name="app_migration_1_0_0">Migré vers la nouvelle version d\'Anecdote</string>
 </resources>

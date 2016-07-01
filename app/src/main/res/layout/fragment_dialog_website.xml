@@ -1,94 +1,114 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
-              android:paddingLeft="@dimen/activity_horizontal_margin"
-              android:paddingRight="@dimen/activity_horizontal_margin"
-              android:paddingTop="@dimen/activity_vertical_margin"
-              android:paddingBottom="@dimen/activity_vertical_margin"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
 
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
+    <LinearLayout
+                  android:orientation="vertical"
+                  android:paddingLeft="@dimen/activity_horizontal_margin"
+                  android:paddingRight="@dimen/activity_horizontal_margin"
+                  android:paddingTop="@dimen/activity_vertical_margin"
+                  android:paddingBottom="@dimen/activity_vertical_margin"
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/nameContainer">
-
-        <EditText
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/nameEditText"
-            android:inputType="textAutoCorrect"
-            android:hint="@string/dialog_website_name_hint"/>
+            android:id="@+id/nameContainer">
 
-    </android.support.design.widget.TextInputLayout>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/nameEditText"
+                android:inputType="textAutoCorrect"
+                android:hint="@string/dialog_website_name_hint"/>
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/urlContainer">
+        </android.support.design.widget.TextInputLayout>
 
-        <EditText
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/urlEditText"
-            android:inputType="textUri"
-            android:hint="@string/dialog_website_url_hint"/>
+            android:id="@+id/pageNameContainer">
 
-    </android.support.design.widget.TextInputLayout>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/pageNameEditText"
+                android:inputType="textAutoCorrect"
+                android:hint="@string/dialog_website_page_name_hint"/>
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/urlSuffixContainer">
+        </android.support.design.widget.TextInputLayout>
 
-        <EditText
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/urlSuffixEditText"
-            android:inputType="textNoSuggestions"
-            android:hint="@string/dialog_website_urlsuffix_hint"/>
+            android:id="@+id/urlContainer">
 
-    </android.support.design.widget.TextInputLayout>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/urlEditText"
+                android:inputType="textUri"
+                android:hint="@string/dialog_website_url_hint"/>
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/selectorContainer">
+        </android.support.design.widget.TextInputLayout>
 
-        <EditText
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/selectorEditText"
-            android:inputType="textNoSuggestions"
-            android:hint="@string/dialog_website_selector_hint"/>
+            android:id="@+id/urlSuffixContainer">
 
-    </android.support.design.widget.TextInputLayout>
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/urlSuffixEditText"
+                android:inputType="textNoSuggestions"
+                android:hint="@string/dialog_website_urlsuffix_hint"/>
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/firstPageZeroContainer">
+        </android.support.design.widget.TextInputLayout>
 
-        <android.support.v7.widget.SwitchCompat
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/firstPageZeroSwitchCompat"
-            android:inputType="textNoSuggestions"
+            android:id="@+id/selectorContainer">
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/selectorEditText"
+                android:inputType="textNoSuggestions"
+                android:hint="@string/dialog_website_selector_hint"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/firstPageZeroContainer">
+
+            <android.support.v7.widget.SwitchCompat
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/firstPageZeroSwitchCompat"
+                android:inputType="textNoSuggestions"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:hint="@string/dialog_website_firstpagezero_hint"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/saveButton"
+            android:text="@string/dialog_website_save"
             android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:hint="@string/dialog_website_firstpagezero_hint"/>
-
-    </android.support.design.widget.TextInputLayout>
-
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/saveButton"
-        android:text="@string/dialog_website_save"
-        android:layout_marginTop="@dimen/activity_vertical_margin"
-        android:layout_gravity="right"
-        style="?attr/borderlessButtonStyle"/>
+            android:layout_gravity="right"
+            style="?attr/borderlessButtonStyle"/>
 
 
-</LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

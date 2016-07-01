@@ -9,5 +9,9 @@
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/contentTextView"
+        android:background="?attr/selectableItemBackground"
         android:padding="@dimen/padding_anecdoterow"/>
+
+    <include layout="@layout/row_anecdote_expand"/>
+
 </LinearLayout>

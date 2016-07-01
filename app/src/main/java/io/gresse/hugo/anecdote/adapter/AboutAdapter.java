@@ -96,15 +96,14 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
 
         @Override
         public void setData(String text) {
-            text = authorTextView.getText().toString();
+            String urlString = authorTextView.getText().toString();
 
-            int lastUrl = text.lastIndexOf("http://");
+            int lastUrl = urlString.lastIndexOf("http://");
             if (lastUrl == -1) {
-                authorTextView.setText(text);
+                authorTextView.setText(urlString);
             } else try {
-                authorTextView.setText(text.substring(0, lastUrl));
-
-                URL url = new URL(text.substring(lastUrl));
+                authorTextView.setText(urlString.substring(0, lastUrl));
+                URL url = new URL(urlString.substring(lastUrl));
                 mAuthorIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url.toString()));
             } catch (MalformedURLException e) {
                 // Do nothing
