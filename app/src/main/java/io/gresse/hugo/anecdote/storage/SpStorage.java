@@ -269,7 +269,7 @@ public class SpStorage {
                             JSONObject object = jsonObj.getJSONObject(i);
 
                             String source = object.getString("source");
-                            if(TextUtils.isEmpty(source) || source.equals("remote")){
+                            if(TextUtils.isEmpty(source) || "remote".equals(source)){
                                 // Skip remote websites. The user will need to reselect it
                                 continue;
                             }

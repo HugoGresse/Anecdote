@@ -53,7 +53,7 @@ public class ImageTransitionSet extends TransitionSet implements Transition.Tran
 
     @Override
     public void onTransitionStart(Transition transition) {
-
+        // Nothing special here
     }
 
     @Override
@@ -63,16 +63,16 @@ public class ImageTransitionSet extends TransitionSet implements Transition.Tran
 
     @Override
     public void onTransitionCancel(Transition transition) {
-
+        // Nothing special here
     }
 
     @Override
     public void onTransitionPause(Transition transition) {
-
+        // Nothing special here
     }
 
     @Override
     public void onTransitionResume(Transition transition) {
-
+        // Nothing special here
     }
 }

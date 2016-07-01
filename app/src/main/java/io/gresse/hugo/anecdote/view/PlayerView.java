@@ -220,32 +220,32 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
 
     @Override
     public void playerIsLoaded() {
-
+        // No need to listen this listener
     }
 
     @Override
     public void playerViewAttached() {
-
+        // No need to listen this listener
     }
 
     @Override
     public void playerError(Exception e) {
-
+        // No need to listen this listener
     }
 
     @Override
     public void playerWillStartPlaying() {
-
+        // No need to listen this listener
     }
 
     @Override
     public void playerStartPlaying() {
-
+        // No need to listen this listener
     }
 
     @Override
     public void playerSurfaceDestroyedShouldPause() {
-
+        // No need to listen this listener
     }
 
     @Override
@@ -255,6 +255,6 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
 
     @Override
     public void playerPublishProgress(long milliSecond) {
-
+        // No need to listen this listener
     }
 }

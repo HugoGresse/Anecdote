@@ -353,6 +353,7 @@ public class AnecdoteFragment extends Fragment implements
     @Override
     public void onClick(Anecdote anecdote, View view, int action) {
         switch (action) {
+            default:
             case AnecdoteViewHolderListener.ACTION_COPY:
                 copyAnecdote(anecdote);
                 break;

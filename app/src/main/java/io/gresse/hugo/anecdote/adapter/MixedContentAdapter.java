@@ -62,7 +62,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
     @Override
     public void setData(final List<Anecdote> quotes) {
-        if(Looper.myLooper() == Looper.getMainLooper()){
+        if (Looper.myLooper() == Looper.getMainLooper()) {
             Log.d(TAG, "setData main thread");
             internalUpdateOnSameThread(quotes);
         } else {
@@ -81,10 +81,11 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
     /**
      * Notify the adapter of item change on the current thread
+     *
      * @param quotes fresh list
      */
-    private void internalUpdateOnSameThread(List<Anecdote> quotes){
-        if(quotes.equals(mAnecdotes) && quotes.size() == mAnecdotes.size()){
+    private void internalUpdateOnSameThread(List<Anecdote> quotes) {
+        if (quotes.equals(mAnecdotes) && quotes.size() == mAnecdotes.size()) {
             Log.d(TAG, "Same list");
             // List identical, no thing
             return;
@@ -92,9 +93,9 @@ public class MixedContentAdapter extends AnecdoteAdapter {
             Log.d(TAG, "Diff list");
             // number of elements differ
             // Two case: new item added, all item change and count didn't match
-            if(quotes.size() > mAnecdotes.size() && mAnecdotes.size() > 2 &&
+            if (quotes.size() > mAnecdotes.size() && mAnecdotes.size() > 2 &&
                     mAnecdotes.get(0).equals(quotes.get(0)) &&
-                    mAnecdotes.get(mAnecdotes.size() -1).equals(quotes.get(mAnecdotes.size()-1))){
+                    mAnecdotes.get(mAnecdotes.size() - 1).equals(quotes.get(mAnecdotes.size() - 1))) {
                 Log.d(TAG, "Range inserted : " + mAnecdotes.size() + " to " + quotes.size());
                 // First and last item of current Anecdote list and new identical, there is new element
                 cloneAnecdoteToCurrent(quotes);
@@ -110,10 +111,11 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
     /**
      * Clone given list instance (shadow, it do not clone inner element)
+     *
      * @param quotes list to clone
      */
-    private void cloneAnecdoteToCurrent(List<Anecdote> quotes){
-        if(quotes instanceof ArrayList){
+    private void cloneAnecdoteToCurrent(List<Anecdote> quotes) {
+        if (quotes instanceof ArrayList) {
             mAnecdotes = new ArrayList<>(quotes);
         } else {
             mAnecdotes = quotes;
@@ -214,7 +216,12 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
         @Override
         public void setData(int position, Anecdote anecdote, boolean expanded) {
-            mTextView.setText(Html.fromHtml(anecdote.text));
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mTextView.setText(Html.fromHtml(anecdote.text, Html.FROM_HTML_MODE_LEGACY));
+            } else {
+                //noinspection deprecation
+                mTextView.setText(Html.fromHtml(anecdote.text));
+            }
             mTextView.setTextSize(mTextSize);
 
             if (mRowStriping) {
@@ -340,13 +347,11 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                 super.onClick(v);
                 return;
             }
-            if (mAnecdoteViewHolderListener != null) {
-                if (mImageView != null) {
-                    mAnecdoteViewHolderListener.onClick(
-                            mAnecdotes.get(getAdapterPosition()),
-                            mImageView,
-                            AnecdoteViewHolderListener.ACTION_FULLSCREEN);
-                }
+            if (mAnecdoteViewHolderListener != null && mImageView != null) {
+                mAnecdoteViewHolderListener.onClick(
+                        mAnecdotes.get(getAdapterPosition()),
+                        mImageView,
+                        AnecdoteViewHolderListener.ACTION_FULLSCREEN);
             }
         }
     }
@@ -400,11 +405,6 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         }
 
         @Override
-        public void setData(int position, Anecdote anecdote, boolean expanded) {
-            super.setData(position, anecdote, expanded);
-        }
-
-        @Override
         public void onClick(View v) {
             if (!(v instanceof LinearLayout)) {
                 super.onClick(v);
@@ -428,7 +428,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
 
         @Override
         public void setData(int position, Anecdote anecdote, boolean expanded) {
-
+            // This view is static, no need to change it's data
         }
     }
 
