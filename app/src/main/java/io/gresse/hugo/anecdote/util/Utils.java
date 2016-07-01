@@ -5,7 +5,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.model.api.Website;
 
 /**
  * Generals utils
@@ -45,7 +45,7 @@ public class Utils {
      *
      * @param context app context
      * @param title   title/label of this clipboard
-     * @param content content to be copied
+     * @param content text to be copied
      */
     public static void copyToClipboard(@NonNull Context context, String title, String content){
         if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.HONEYCOMB) {

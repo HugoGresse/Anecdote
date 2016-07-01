@@ -14,7 +14,7 @@ public class ChangeTitleEvent implements Event {
     @Nullable
     public String  className;
     @Nullable
-    public Integer websiteId;
+    public String websiteSlug;
 
     public ChangeTitleEvent(@Nullable String title, @Nullable String className) {
         this.title = title;
@@ -22,11 +22,11 @@ public class ChangeTitleEvent implements Event {
     }
 
     /**
-     * If it's a website related event
+     * If it's a website (parent) related event
      *
-     * @param websiteId the website displayed
+     * @param websiteSlug the website (parent) displayed
      */
-    public ChangeTitleEvent(@Nullable Integer websiteId) {
-        this.websiteId = websiteId;
+    public ChangeTitleEvent(@Nullable String websiteSlug) {
+        this.websiteSlug = websiteSlug;
     }
 }

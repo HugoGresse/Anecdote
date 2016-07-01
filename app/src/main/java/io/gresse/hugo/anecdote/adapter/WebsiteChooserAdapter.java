@@ -13,7 +13,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.model.Website;
+import io.gresse.hugo.anecdote.model.api.Website;
 
 /**
  * Display a list of website
@@ -107,7 +107,7 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
     public class WebsiteViewHolder extends BaseWebsiteViewHolder implements CompoundButton.OnCheckedChangeListener {
 
         @Bind(R.id.checkBox)
-        CheckBox checkBox;
+        protected CheckBox checkBox;
 
         public WebsiteViewHolder(View itemView) {
             super(itemView);
@@ -140,9 +140,8 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
 
         @Override
         public void setData(Website website) {
-
+            // Static view, nothing to set
         }
-
 
         @Override
         public void onClick(View v) {

@@ -56,6 +56,8 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
     public void unbindCustomTabsService(Activity activity) {
         if (mConnection == null || activity == null) return;
 
+        Log.i(TAG, "Unbinding");
+
         try {
             activity.unbindService(mConnection);
         } catch (IllegalArgumentException ignored) {
@@ -91,10 +93,10 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
      * Prevent the Chrome client that the given url may be opened.
      */
     public void mayLaunch(String url) {
-        if (mClient == null) {
+        if (mClient == null || url == null) {
             return;
         }
-        Log.i(TAG, "mayLaunch");
+        Log.i(TAG, "mayLaunch " + url);
         CustomTabsSession session = getSession();
         session.mayLaunchUrl(Uri.parse(url), null, null);
     }
@@ -124,7 +126,8 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
         builder.setShowTitle(true);
         builder.enableUrlBarHiding();
         builder.setToolbarColor(mToolbarBackgroundColor);
-        builder.setSecondaryToolbarColor(activity.getResources().getColor(android.R.color.white));
+
+        builder.setSecondaryToolbarColor(ContextCompat.getColor(activity, android.R.color.white));
         builder.setStartAnimations(activity, R.anim.slide_in_right, R.anim.hold);
         builder.setExitAnimations(activity, R.anim.hold, R.anim.slide_out_left);
         builder.setCloseButtonIcon(
@@ -136,13 +139,13 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
     }
 
     private void setIntentAction(Activity activity, CustomTabsIntent.Builder builder, Anecdote anecdote){
-        Intent sharingIntent = new Intent(android.content.Intent.ACTION_SEND);
+        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
 
-        sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, activity.getString(R.string.app_name));
+        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, activity.getString(R.string.app_name));
 
         sharingIntent.putExtra(
-                android.content.Intent.EXTRA_TEXT,
+                Intent.EXTRA_TEXT,
                 anecdote.getPlainTextContent() + " " + activity.getString(R.string.app_share_credits));
 
         builder.setActionButton(

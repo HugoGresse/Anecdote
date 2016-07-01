@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <string name="app_name">Quote</string>
 
+    <string name="app_migration_1_0_0">Migrated to new Quote version</string>
+
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
@@ -26,6 +28,11 @@
         <item>Copy</item>
     </string-array>
 
+
+    <string name="action_share">Share</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_open">Open</string>
+
     <string name="open_intent_browser">Opening browser…</string>
     <string name="open_intent_browser_error">Unable to open details, check url configuration</string>
 
@@ -36,10 +43,12 @@
     <string name="dialog_website_add">Add</string>
     <string name="dialog_website_error_itemperpage">The item per page must be more than 0</string>
     <string name="dialog_website_error_name">Don\'t you want to add a name?</string>
-    <string name="dialog_website_error_url">Missing website url :(</string>
-    <string name="dialog_website_error_selector">Missing content selector</string>
+    <string name="dialog_website_error_pagename">Add a page name</string>
+    <string name="dialog_website_error_url">Missing website page url :(</string>
+    <string name="dialog_website_error_selector">Missing text selector</string>
     <string name="dialog_website_save">Save</string>
     <string name="dialog_website_name_hint">Website name</string>
+    <string name="dialog_website_page_name_hint">Page name</string>
     <string name="dialog_website_url_hint">Website url</string>
     <string name="dialog_website_urlsuffix_hint">(optional) Page number suffix</string>
     <string name="dialog_website_selector_hint">DOM selector</string>
@@ -88,11 +97,9 @@
         <item>24</item>
     </string-array>
 
-
     <string name="anecdote_image_transition_name" translatable="false">imageTransitionName</string>
     <string name="anecdote_video_transition_name" translatable="false">videoTransitionName</string>
 
-    <string name="anecdote_nsfw_prefix" translatable="false">NSFW:</string>
     <string name="anecdote_open_inbrowser">Open in your browser</string>
 
 </resources>

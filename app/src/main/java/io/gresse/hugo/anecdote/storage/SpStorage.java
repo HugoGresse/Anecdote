@@ -4,17 +4,26 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.gresse.hugo.anecdote.model.Website;
-import io.gresse.hugo.anecdote.model.WebsiteItem;
+import io.gresse.hugo.anecdote.R;
+import io.gresse.hugo.anecdote.model.MediaType;
+import io.gresse.hugo.anecdote.model.api.Content;
+import io.gresse.hugo.anecdote.model.api.ContentItem;
+import io.gresse.hugo.anecdote.model.api.Website;
+import io.gresse.hugo.anecdote.model.api.WebsitePage;
 
 /**
  * Utility class to store stuff in sharedPreferences
@@ -33,11 +42,11 @@ public class SpStorage {
 
     /**
      * Return the version code number
-     *
      * @param context app context
-     * @return version number, starting at 0
+     * @param defaultVersion the default value if not any already saved
+     * @return the current version
      */
-    public static int getVersion(Context context) {
+    public static int getVersion(Context context, int defaultVersion) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
         return sharedPreferences.getInt(SP_KEY_VERSION, 0);
     }
@@ -78,6 +87,16 @@ public class SpStorage {
     }
 
     /**
+     * Get the raw json string for the websites key
+     * @param context app context
+     * @return websites json
+     */
+    public static String getWebsitesString(Context context){
+        SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
+        return sharedPreferences.getString(SP_KEY_WEBSITES, "");
+    }
+
+    /**
      * Get the list of user Website to be displayed in the app
      *
      * @param context app context
@@ -108,14 +127,16 @@ public class SpStorage {
         SharedPreferences.Editor sharedPreferencesEditor = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE).edit();
         for (Website website : websites) {
             website.validateData();
+            for(WebsitePage websitePage : website.pages){
+                websitePage.content.reorderItems();
+            }
         }
         sharedPreferencesEditor.putString(SP_KEY_WEBSITES, new Gson().toJson(websites));
         sharedPreferencesEditor.apply();
     }
 
     /**
-     * Save or add a unique website. If we create a new website, we need to be sure his id is not already on another
-     * website.
+     * Save or add a unique website.
      *
      * @param context app context
      * @param website website to save
@@ -124,8 +145,10 @@ public class SpStorage {
         List<Website> websites = getWebsites(context);
 
         website.validateData();
+        for(WebsitePage websitePage : website.pages){
+            websitePage.content.reorderItems();
+        }
 
-        int maxId = 1;
         Website currentWebsite;
         for (int i = 0; i < websites.size(); i++) {
             currentWebsite = websites.get(i);
@@ -134,12 +157,8 @@ public class SpStorage {
                 saveWebsites(context, websites);
                 return;
             }
-            if (currentWebsite.id >= maxId) {
-                maxId = currentWebsite.id + 1;
-            }
         }
 
-        website.id = maxId;
         websites.add(website);
         saveWebsites(context, websites);
     }
@@ -209,25 +228,95 @@ public class SpStorage {
      *
      * @param context app context
      */
-    public static void migrate(Context context) {
-        List<Website> websites = getWebsites(context);
-
-        /**
-         * v0.4.0 migration (type in WebsiteItem)
-         *
-         * the first/previous version is considered as 0 as version was implemented starting app v0.4.0
-         */
-        if (getVersion(context) == 0) {
-            if (websites != null) {
-                for (Website website : websites) {
-                    website.urlItem.type = WebsiteItem.TYPE_URL;
-                    Log.d("eee", "set urlType to URL");
+    public static boolean migrate(Context context) {
+        boolean openWebsiteChooserReturn = false;
+        switch (getVersion(context, 12)){
+            case 0:
+                List<Website> websites = getWebsites(context);
+                /**
+                 * v0.4.0 migration (type in WebsiteItem)
+                 *
+                 * the first/previous version is considered as 0 as version was implemented starting app v0.4.0
+                 */
+                if (websites != null) {
+                    for (Website website : websites) {
+                        SpStorage.deleteWebsite(context, website);
+                    }
                 }
-            }
-            setVersion(context, 5); // 5 = 0.4.0
-            saveWebsites(context, websites);
-            Log.i(TAG, "Migrating from 0 > 5 done");
+                setVersion(context, 5); // 5 = 0.4.0
+                Log.i(TAG, "Migrating from 0 > 5 done");
+                break;
+            case 5:
+                /**
+                 * v1.0.0 migration : major model change
+                 */
+                List<Website> migratedLocalWebsites = new ArrayList<>();
+
+                // 1. Load all stored websites
+                String websitesString = SpStorage.getWebsitesString(context);
+
+                // 2. Clear all stored websites
+                SharedPreferences.Editor sharedPreferencesEditor = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE).edit();
+                sharedPreferencesEditor.putString(SP_KEY_WEBSITES, "[]");
+                sharedPreferencesEditor.apply();
+
+                // 3. Migrate local websites ONLY
+                if(!TextUtils.isEmpty(websitesString)){
+                    try {
+                        JSONArray jsonObj = new JSONArray(websitesString);
+                        
+                        for (int i = 0; i < jsonObj.length(); i++) {
+                            JSONObject object = jsonObj.getJSONObject(i);
+
+                            String source = object.getString("source");
+                            if(TextUtils.isEmpty(source) || "remote".equals(source)){
+                                // Skip remote websites. The user will need to reselect it
+                                continue;
+                            }
+
+                            Website website = new Website();
+                            WebsitePage websitePage = new WebsitePage();
+                            websitePage.content = new Content();
+                            websitePage.content.items.add(new ContentItem(MediaType.TEXT, 1));
+
+                            website.color = object.getInt("color");
+                            websitePage.isFirstPageZero = object.getBoolean("isFirstPageZero");
+                            websitePage.isSinglePage = object.getBoolean("isSinglePage");
+                            website.like = object.getInt("like");
+                            website.name = object.getString("name");
+                            websitePage.selector = object.getString("selector");
+                            websitePage.name = website.name;
+                            website.source = "local";
+                            websitePage.url = object.getString("url");
+                            websitePage.urlSuffix = object.getString("urlSuffix");
+
+                            website.pages.add(websitePage);
+                            website.validateData();
+
+                            migratedLocalWebsites.add(website);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                // 4. Save back local websites
+                SpStorage.saveWebsites(context, migratedLocalWebsites);
+
+                // 5. Change return value to help user reselect websites
+                openWebsiteChooserReturn = true;
+
+                // 6. Done, set new version
+                setVersion(context, 12);
+                // As the user will need to reselect websites, say to him why
+                Toast.makeText(context, context.getString(R.string.app_migration_1_0_0), Toast.LENGTH_SHORT).show();
+                Log.i(TAG, "Migrating from 5 > 12 done");
+                break;
+            default:
+                // Nothing
+                break;
         }
+        return openWebsiteChooserReturn;
     }
 
 }

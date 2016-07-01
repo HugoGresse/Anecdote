@@ -29,4 +29,6 @@
 
     </FrameLayout>
 
+    <include layout="@layout/row_anecdote_expand"/>
+
 </LinearLayout>

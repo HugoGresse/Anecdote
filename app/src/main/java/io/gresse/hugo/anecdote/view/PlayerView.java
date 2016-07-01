@@ -39,26 +39,26 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
 
     public PlayerView(Context context) {
         super(context);
-        init(null, 0, 0);
+        init(null, 0);
     }
 
     public PlayerView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(attrs, 0, 0);
+        init(attrs, 0);
     }
 
     public PlayerView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(attrs, defStyleAttr, 0);
+        init(attrs, defStyleAttr);
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public PlayerView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
-        init(attrs, defStyleAttr, defStyleRes);
+        init(attrs, defStyleAttr);
     }
 
-    private void init(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    private void init(AttributeSet attrs, int defStyleAttr) {
 
         final TypedArray a = getContext().obtainStyledAttributes(attrs, io.gresse.hugo.simpleexoplayer.R.styleable.ExoplayerView, defStyleAttr, 0);
         mAutoPlay = a.getBoolean(io.gresse.hugo.simpleexoplayer.R.styleable.ExoplayerView_autoPlay, true);
@@ -130,7 +130,8 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
                 mSimpleExoPlayer.start();
             }
 
-            state = bundle.getParcelable("instanceState");
+            super.onRestoreInstanceState(bundle.getParcelable("instanceState"));
+            return;
         }
 
         super.onRestoreInstanceState(state);
@@ -219,32 +220,32 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
 
     @Override
     public void playerIsLoaded() {
-
+        // No need to listen this listener
     }
 
     @Override
     public void playerViewAttached() {
-
+        // No need to listen this listener
     }
 
     @Override
     public void playerError(Exception e) {
-
+        // No need to listen this listener
     }
 
     @Override
     public void playerWillStartPlaying() {
-
+        // No need to listen this listener
     }
 
     @Override
     public void playerStartPlaying() {
-
+        // No need to listen this listener
     }
 
     @Override
     public void playerSurfaceDestroyedShouldPause() {
-
+        // No need to listen this listener
     }
 
     @Override
@@ -254,6 +255,6 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
 
     @Override
     public void playerPublishProgress(long milliSecond) {
-
+        // No need to listen this listener
     }
 }
