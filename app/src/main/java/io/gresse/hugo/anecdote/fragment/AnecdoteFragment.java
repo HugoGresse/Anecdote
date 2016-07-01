@@ -39,7 +39,7 @@ import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.model.MediaType;
 import io.gresse.hugo.anecdote.service.AnecdoteService;
-import io.gresse.hugo.anecdote.util.FabricUtils;
+import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.util.Utils;
 import io.gresse.hugo.anecdote.util.chrome.ChromeCustomTabsManager;
 
@@ -148,7 +148,7 @@ public class AnecdoteFragment extends Fragment implements
         EventBus.getDefault().register(this);
         EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteSlug));
 
-        FabricUtils.trackFragmentView(this, mWebsiteName);
+        EventUtils.trackFragmentView(this, mWebsiteName);
     }
 
     @Override
@@ -242,7 +242,7 @@ public class AnecdoteFragment extends Fragment implements
      * @param anecdote the anecdote to share
      */
     private void shareAnecdote(Anecdote anecdote) {
-        FabricUtils.trackAnecdoteShare(mWebsiteName);
+        EventUtils.trackAnecdoteShare(mWebsiteName);
 
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
@@ -264,7 +264,7 @@ public class AnecdoteFragment extends Fragment implements
      * @param anecdote anecdote to copy
      */
     private void copyAnecdote(Anecdote anecdote) {
-        FabricUtils.trackAnecdoteCopy(mWebsiteName);
+        EventUtils.trackAnecdoteCopy(mWebsiteName);
         Toast.makeText(getActivity(), R.string.copied, Toast.LENGTH_SHORT).show();
         Utils.copyToClipboard(
                 getActivity(),
@@ -287,7 +287,7 @@ public class AnecdoteFragment extends Fragment implements
             return;
         }
         if (mChromeCustomTabsManager != null) {
-            FabricUtils.trackAnecdoteDetails(mWebsiteName);
+            EventUtils.trackAnecdoteDetails(mWebsiteName);
             mChromeCustomTabsManager.openChrome(getActivity(), anecdote);
         }
     }

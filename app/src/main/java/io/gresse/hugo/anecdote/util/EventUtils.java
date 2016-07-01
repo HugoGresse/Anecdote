@@ -11,18 +11,18 @@ import com.crashlytics.android.answers.CustomEvent;
 import io.gresse.hugo.anecdote.Configuration;
 
 /**
- * Fabric related utils
+ * Event related utils
  * <p/>
  * Created by Hugo Gresse on 25/04/16.
  */
-public class FabricUtils {
+public class EventUtils {
 
     /**
-     * Return true if fabric is enable, checking the BuildConfig
+     * Return true if event reporting is enable, checking the BuildConfig
      *
      * @return true if enable, false otherweise
      */
-    public static boolean isFabricEnable() {
+    public static boolean isEventEnable() {
         return !Configuration.DEBUG;
     }
 
@@ -33,7 +33,7 @@ public class FabricUtils {
      * @param screenName the additional name if any
      */
     public static void trackFragmentView(Fragment fragment, @Nullable String screenName) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         String name;
 
@@ -55,7 +55,7 @@ public class FabricUtils {
      * @param value the error detail
      */
     public static void trackError(String key, String value) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         CustomEvent event = new CustomEvent("Error");
         event.putCustomAttribute(key, value);
@@ -70,7 +70,7 @@ public class FabricUtils {
      * @param isSave      if the edit is saved or not
      */
     public static void trackWebsiteEdit(String websiteName, boolean isSave) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         CustomEvent event = new CustomEvent("Website edit");
 
@@ -91,7 +91,7 @@ public class FabricUtils {
      * @param websiteName website name
      */
     public static void trackWebsiteDelete(String websiteName) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(
                 new CustomEvent("Website delete")
@@ -104,7 +104,7 @@ public class FabricUtils {
      * @param websiteName website name
      */
     public static void trackWebsiteDefault(String websiteName) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(
                 new CustomEvent("Website set default")
@@ -115,7 +115,7 @@ public class FabricUtils {
      * Track when all websites are restored for new ones
      */
     public static void trackWebsitesRestored() {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(new CustomEvent("Websites restored"));
     }
@@ -124,7 +124,7 @@ public class FabricUtils {
      * Track when a custom website is added
      */
     public static void trackCustomWebsiteAdded() {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(new CustomEvent("Websites custom added"));
     }
@@ -135,7 +135,7 @@ public class FabricUtils {
      * @param websiteName the website name
      */
     public static void trackAnecdoteCopy(String websiteName) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(
                 new CustomEvent("Anecdote copied")
@@ -148,7 +148,7 @@ public class FabricUtils {
      * @param websiteName the website name
      */
     public static void trackAnecdoteShare(String websiteName) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(
                 new CustomEvent("Anecdote shared")
@@ -161,7 +161,7 @@ public class FabricUtils {
      * @param websiteName the website name
      */
     public static void trackAnecdoteDetails(String websiteName) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(
                 new CustomEvent("Anecdote details")
@@ -174,7 +174,7 @@ public class FabricUtils {
      * @param websiteName the website name
      */
     public static void trackAnecdoteReadMore(String websiteName) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(
                 new CustomEvent("Anecdote read more")
@@ -187,7 +187,7 @@ public class FabricUtils {
      * @param thirdPartiesName the name of the third parties
      */
     public static void trackThirdPartiesClick(String thirdPartiesName) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(
                 new CustomEvent("Third-parties click")
@@ -201,7 +201,7 @@ public class FabricUtils {
      * @param value the setting new value
      */
     public static void trackSettingChange(String name, String value) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(
                 new CustomEvent("Setting " + name + " changed")
@@ -214,7 +214,7 @@ public class FabricUtils {
      * @param websiteName the website name
      */
     public static void trackWebsiteWrongConfiguration(String websiteName) {
-        if (!isFabricEnable()) return;
+        if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(
                 new CustomEvent("Website wrong configuration")

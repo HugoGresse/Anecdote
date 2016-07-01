@@ -9,7 +9,7 @@ import org.greenrobot.eventbus.EventBus;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
-import io.gresse.hugo.anecdote.util.FabricUtils;
+import io.gresse.hugo.anecdote.util.EventUtils;
 
 /**
  * Anecdote preferences fragment
@@ -27,7 +27,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onResume() {
         super.onResume();
         EventBus.getDefault().post(new ChangeTitleEvent(getString(R.string.action_settings), null));
-        FabricUtils.trackFragmentView(this, null);
+        EventUtils.trackFragmentView(this, null);
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -51,7 +51,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             value = String.valueOf(sharedPreferences.getString(key, null));
         }
 
-        FabricUtils.trackSettingChange(key, value);
+        EventUtils.trackSettingChange(key, value);
     }
 
 }

@@ -25,7 +25,7 @@ import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.model.MediaType;
-import io.gresse.hugo.anecdote.util.FabricUtils;
+import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.view.PlayerView;
 
 /**
@@ -180,7 +180,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                 case MediaType.VIDEO:
                     return VIEW_TYPE_VIDEO;
                 default:
-                    FabricUtils.trackError("MixedContentAdapter", "Unknow type: " + anecdote.type);
+                    EventUtils.trackError("MixedContentAdapter", "Unknow type: " + anecdote.type);
                     Log.e(TAG, "Unknow type: " + anecdote.type);
                     return VIEW_TYPE_UNKNOWN;
             }

@@ -27,7 +27,7 @@ import io.gresse.hugo.anecdote.model.api.ContentItem;
 import io.gresse.hugo.anecdote.model.api.Website;
 import io.gresse.hugo.anecdote.model.api.WebsitePage;
 import io.gresse.hugo.anecdote.storage.SpStorage;
-import io.gresse.hugo.anecdote.util.FabricUtils;
+import io.gresse.hugo.anecdote.util.EventUtils;
 
 /**
  * FialogFragment to edit or add wesites
@@ -136,9 +136,9 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
                 SpStorage.saveWebsite(getContext(), mWebsite);
 
                 if (mEditMode) {
-                    FabricUtils.trackWebsiteEdit(mWebsite.name, true);
+                    EventUtils.trackWebsiteEdit(mWebsite.name, true);
                 } else {
-                    FabricUtils.trackCustomWebsiteAdded();
+                    EventUtils.trackCustomWebsiteAdded();
                 }
 
                 EventBus.getDefault().post(new WebsitesChangeEvent());

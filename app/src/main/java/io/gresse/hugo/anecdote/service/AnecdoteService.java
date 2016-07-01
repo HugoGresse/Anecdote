@@ -28,7 +28,7 @@ import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.model.api.Website;
 import io.gresse.hugo.anecdote.model.api.WebsitePage;
-import io.gresse.hugo.anecdote.util.FabricUtils;
+import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.util.Utils;
 import okhttp3.Call;
@@ -212,7 +212,7 @@ public class AnecdoteService {
                     "Unable to parse " + mWebsitePage.name + " website",
                     null));
             if (mWebsite.source.equals(Website.SOURCE_REMOTE)) {
-                FabricUtils.trackWebsiteWrongConfiguration(mWebsitePage.name);
+                EventUtils.trackWebsiteWrongConfiguration(mWebsitePage.name);
             }
             mEnd = true;
         }

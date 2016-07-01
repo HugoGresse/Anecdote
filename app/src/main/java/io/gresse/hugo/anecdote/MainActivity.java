@@ -65,7 +65,7 @@ import io.gresse.hugo.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.service.ServiceProvider;
 import io.gresse.hugo.anecdote.service.WebsiteApiService;
 import io.gresse.hugo.anecdote.storage.SpStorage;
-import io.gresse.hugo.anecdote.util.FabricUtils;
+import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (FabricUtils.isFabricEnable()) {
+        if (EventUtils.isEventEnable()) {
             Fabric.with(this, new Crashlytics());
         }
         setContentView(R.layout.activity_main);
@@ -395,12 +395,12 @@ public class MainActivity extends AppCompatActivity
                                 case R.id.action_delete:
                                     SpStorage.deleteWebsite(MainActivity.this, website);
                                     EventBus.getDefault().post(new WebsitesChangeEvent());
-                                    FabricUtils.trackWebsiteDelete(website.name);
+                                    EventUtils.trackWebsiteDelete(website.name);
                                     break;
                                 case R.id.action_default:
                                     SpStorage.setDefaultWebsite(MainActivity.this, website);
                                     EventBus.getDefault().post(new WebsitesChangeEvent());
-                                    FabricUtils.trackWebsiteDefault(website.name);
+                                    EventUtils.trackWebsiteDefault(website.name);
                                     break;
                                 default:
                                     Toast.makeText(
@@ -439,9 +439,9 @@ public class MainActivity extends AppCompatActivity
      */
     private void openWebsiteDialog(@Nullable Website website) {
         if (website == null) {
-            FabricUtils.trackWebsiteEdit("", false);
+            EventUtils.trackWebsiteEdit("", false);
         } else {
-            FabricUtils.trackWebsiteEdit(website.name, false);
+            EventUtils.trackWebsiteEdit(website.name, false);
         }
         FragmentManager fm = getSupportFragmentManager();
         DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(website);

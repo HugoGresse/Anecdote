@@ -16,7 +16,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.event.ChangeFullscreenEvent;
-import io.gresse.hugo.anecdote.util.FabricUtils;
+import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.view.PlayerView;
 
 /**
@@ -81,7 +81,7 @@ public class FullscreenVideoFragment extends Fragment {
     public void onResume() {
         super.onResume();
 
-        FabricUtils.trackFragmentView(this, null);
+        EventUtils.trackFragmentView(this, null);
     }
 
     @Override

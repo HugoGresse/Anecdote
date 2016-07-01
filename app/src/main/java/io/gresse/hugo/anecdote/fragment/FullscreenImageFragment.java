@@ -19,7 +19,7 @@ import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.event.ChangeFullscreenEvent;
 import io.gresse.hugo.anecdote.event.EnterTransitionEndEvent;
-import io.gresse.hugo.anecdote.util.FabricUtils;
+import io.gresse.hugo.anecdote.util.EventUtils;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
@@ -91,7 +91,7 @@ public class FullscreenImageFragment extends Fragment {
         super.onResume();
 
         EventBus.getDefault().register(this);
-        FabricUtils.trackFragmentView(this, null);
+        EventUtils.trackFragmentView(this, null);
     }
 
     @Override

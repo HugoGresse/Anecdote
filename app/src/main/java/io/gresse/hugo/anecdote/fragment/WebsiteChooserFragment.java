@@ -36,7 +36,7 @@ import io.gresse.hugo.anecdote.event.OnRemoteWebsiteResponseEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.model.api.Website;
 import io.gresse.hugo.anecdote.storage.SpStorage;
-import io.gresse.hugo.anecdote.util.FabricUtils;
+import io.gresse.hugo.anecdote.util.EventUtils;
 
 /**
  * Display a list of website from Firebase so the user can choose which website he want to load after initial
@@ -125,7 +125,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
             EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
         }
 
-        FabricUtils.trackFragmentView(this, null);
+        EventUtils.trackFragmentView(this, null);
     }
 
     @Override
@@ -144,7 +144,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
             EventBus.getDefault().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_RESTORE)) {
             SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
-            FabricUtils.trackWebsitesRestored();
+            EventUtils.trackWebsitesRestored();
             EventBus.getDefault().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_ADD)) {
             for (Website website : mSelectedWebsites) {
