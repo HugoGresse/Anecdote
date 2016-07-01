@@ -2,8 +2,10 @@ sudo: false
 language: android
 android:
   components:
+    - platform-tool
+    - tool
     - build-tools-24.0.0
-    - android-23
+    - android-24
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
