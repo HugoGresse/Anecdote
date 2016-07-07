@@ -2,6 +2,7 @@ package io.gresse.hugo.anecdote;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -79,6 +80,9 @@ public class MainActivity extends AppCompatActivity
 
     @Bind(R.id.coordinatorLayout)
     public CoordinatorLayout mCoordinatorLayout;
+
+    @Bind(R.id.app_bar_layout)
+    public AppBarLayout mAppBarLayout;
 
     @Bind(R.id.toolbar)
     public Toolbar mToolbar;
@@ -598,12 +602,20 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeFullscreenVisibilityEvent(ChangeFullscreenEvent event) {
-        // TODO: hide appBar when displaying FullscreenFragments, this is not working
-//        if(event.toFullscreen){
-//            mAppBarLayout.animate().translationY(-mAppBarLayout.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
-//        } else {
-//            mAppBarLayout.animate().translationY(0).setInterpolator(new AccelerateInterpolator()).start();
-//        }
+        if(event.toFullscreen && getSupportActionBar() != null){
+            getSupportActionBar().hide();
+            // mAppBarLayout.animate().translationY(-mAppBarLayout.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+        } else if(getSupportActionBar() != null){
+            getSupportActionBar().show();
+            // mAppBarLayout.animate().translationY(0).setInterpolator(new AccelerateInterpolator()).start();
+        }
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mAppBarLayout.getParent().requestLayout();
+            }
+        }, 600);
 
         if (event.toFullscreen) {
             // Hide status bar
