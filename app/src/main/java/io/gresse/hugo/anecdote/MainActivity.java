@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity
         AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
         mToolbarScrollFlags = params.getScrollFlags();
 
-        if(openWebsiteChooserAddMode){
+        if (openWebsiteChooserAddMode) {
             changeFragment(WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_ADD), false, false);
         } else if (SpStorage.isFirstLaunch(this) || mWebsites.isEmpty()) {
             changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
@@ -221,6 +221,20 @@ public class MainActivity extends AppCompatActivity
                 for (Website website : mWebsites) {
                     if (website.name.equals(item.getTitle())) {
                         changeAnecdoteFragment(website, website.pages.get(0));
+
+                        // We redisplay the toolbar if it was scrollUp by removing the scrollFlags,
+                        // wait a litle and reset the last scrollFlags on it (doing it right after was not working
+                        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+                        final int scrollFlags = layoutParams.getScrollFlags();
+                        layoutParams.setScrollFlags(0);
+
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                layoutParams.setScrollFlags(scrollFlags);
+                                mToolbar.setLayoutParams(layoutParams);
+                            }
+                        }, 100);
                         break;
                     }
                 }
@@ -241,8 +255,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @OnItemSelected(R.id.toolbarSpinner)
-    public void onSpinnerSelected(AppCompatSpinner adapter, View v, int i, long lng){
-        if(mToolbarSpinnerAdapter.getWebsite() != null){
+    public void onSpinnerSelected(AppCompatSpinner adapter, View v, int i, long lng) {
+        if (mToolbarSpinnerAdapter.getWebsite() != null) {
             changeAnecdoteFragment(mToolbarSpinnerAdapter.getWebsite(), mToolbarSpinnerAdapter.getWebsite().pages.get(i));
         }
     }
@@ -496,10 +510,19 @@ public class MainActivity extends AppCompatActivity
         if (event.websiteSlug != null) {
 
             AnecdoteService anecdoteService = getAnecdoteService(event.websiteSlug);
-            if(anecdoteService != null){
+            if (anecdoteService != null) {
                 int selectedItem = mToolbarSpinnerAdapter.populate(anecdoteService.getWebsite(), event.websiteSlug);
                 mToolbarSpinnerAdapter.notifyDataSetChanged();
                 mToolbarSpinner.setSelection(selectedItem);
+            }
+
+            /**
+             * When the current toolbar is not displaying an AnecdoteFragment and that we want to display an
+             * AnecdoteFragment now, we need to set back the scrollflags.
+             */
+            if(mToolbarSpinner.getVisibility() != View.VISIBLE){
+                AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+                params.setScrollFlags(mToolbarScrollFlags);
             }
 
             mToolbar.setTitle("");
@@ -512,17 +535,14 @@ public class MainActivity extends AppCompatActivity
                     break;
                 }
             }
-
-            AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
-            params.setScrollFlags(mToolbarScrollFlags);
         } else {
             if (getSupportActionBar() != null) {
                 getSupportActionBar().setDisplayShowTitleEnabled(true);
             }
             mToolbarSpinner.setVisibility(View.GONE);
             mToolbar.setTitle(event.title);
-        AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
-        params.setScrollFlags(0);
+            AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+            params.setScrollFlags(0);
         }
     }
 
@@ -602,20 +622,13 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeFullscreenVisibilityEvent(ChangeFullscreenEvent event) {
-        if(event.toFullscreen && getSupportActionBar() != null){
+        if (event.toFullscreen && getSupportActionBar() != null) {
             getSupportActionBar().hide();
             // mAppBarLayout.animate().translationY(-mAppBarLayout.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
-        } else if(getSupportActionBar() != null){
+        } else if (getSupportActionBar() != null) {
             getSupportActionBar().show();
             // mAppBarLayout.animate().translationY(0).setInterpolator(new AccelerateInterpolator()).start();
         }
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mAppBarLayout.getParent().requestLayout();
-            }
-        }, 600);
 
         if (event.toFullscreen) {
             // Hide status bar

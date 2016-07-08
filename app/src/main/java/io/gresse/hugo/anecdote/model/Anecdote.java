@@ -14,6 +14,7 @@ import org.jsoup.Jsoup;
  */
 public class Anecdote {
 
+    @Nullable
     public String type;
     public String text;
     @Nullable
@@ -25,7 +26,7 @@ public class Anecdote {
         this(MediaType.TEXT, text, permalink, null);
     }
 
-    public Anecdote(String type, String text, @Nullable String permalink, @Nullable String media) {
+    public Anecdote(@Nullable String type, String text, @Nullable String permalink, @Nullable String media) {
         this.type = type;
         this.text = text;
         this.permalink = permalink;
