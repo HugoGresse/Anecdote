@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.text.Html;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -172,6 +173,11 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     public int getItemViewType(int position) {
         if (position < mAnecdotes.size()) {
             Anecdote anecdote = mAnecdotes.get(position);
+            if(TextUtils.isEmpty(anecdote.type)){
+                FabricUtils.trackError("MixedContentAdapter", "Unknow type, using TEXT: " + anecdote.type);
+                Log.e(TAG, "Unknow type, using TEXT: " + anecdote.type);
+                return VIEW_TYPE_TEXT;
+            }
             switch (anecdote.type) {
                 case MediaType.TEXT:
                     return VIEW_TYPE_TEXT;
