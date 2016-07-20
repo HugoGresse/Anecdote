@@ -174,7 +174,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         if (position < mAnecdotes.size()) {
             Anecdote anecdote = mAnecdotes.get(position);
             if(TextUtils.isEmpty(anecdote.type)){
-                FabricUtils.trackError("MixedContentAdapter", "Unknow type, using TEXT: " + anecdote.type);
+                EventUtils.trackError("MixedContentAdapter", "Unknow type, using TEXT: " + anecdote.type);
                 Log.e(TAG, "Unknow type, using TEXT: " + anecdote.type);
                 return VIEW_TYPE_TEXT;
             }

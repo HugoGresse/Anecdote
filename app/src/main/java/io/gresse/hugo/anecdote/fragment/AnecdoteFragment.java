@@ -1,6 +1,5 @@
 package io.gresse.hugo.anecdote.fragment;
 
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -10,14 +9,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -31,10 +28,13 @@ import io.gresse.hugo.anecdote.adapter.AnecdoteAdapter;
 import io.gresse.hugo.anecdote.adapter.AnecdoteViewHolderListener;
 import io.gresse.hugo.anecdote.adapter.MixedContentAdapter;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.event.CopyAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.FullscreenEvent;
 import io.gresse.hugo.anecdote.event.LoadNewAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.OnAnecdoteLoadedEvent;
+import io.gresse.hugo.anecdote.event.OpenAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.event.ShareAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.model.MediaType;
@@ -78,15 +78,11 @@ public class AnecdoteFragment extends Fragment implements
     // TODO: check all loaded
     private boolean             mAllAnecdotesLoaded;
 
-    @Nullable
-    private ChromeCustomTabsManager mChromeCustomTabsManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        mChromeCustomTabsManager = new ChromeCustomTabsManager(getActivity());
-        mChromeCustomTabsManager.bindCustomTabsService(getActivity());
     }
 
     // Inflate the view for the fragment based on layout XML
@@ -156,15 +152,6 @@ public class AnecdoteFragment extends Fragment implements
         super.onPause();
         EventBus.getDefault().unregister(this);
     }
-
-    @Override
-    public void onDestroy() {
-        if (mChromeCustomTabsManager != null) {
-            mChromeCustomTabsManager.unbindCustomTabsService(getActivity());
-        }
-        super.onDestroy();
-    }
-
 
     protected void init() {
         if (getArguments() != null) {
@@ -237,75 +224,21 @@ public class AnecdoteFragment extends Fragment implements
     }
 
     /**
-     * Open dialog to share the given anecdote
-     *
-     * @param anecdote the anecdote to share
-     */
-    private void shareAnecdote(Anecdote anecdote) {
-        EventUtils.trackAnecdoteShare(mWebsiteName);
-
-        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-        sharingIntent.setType("text/plain");
-
-        sharingIntent.putExtra(
-                Intent.EXTRA_SUBJECT,
-                getString(R.string.app_name));
-
-        sharingIntent.putExtra(
-                Intent.EXTRA_TEXT,
-                anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
-
-        startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.anecdote_share_title)));
-    }
-
-    /**
-     * Copy the given anecdote text content in the clipboard with a link to the application at the end
-     *
-     * @param anecdote anecdote to copy
-     */
-    private void copyAnecdote(Anecdote anecdote) {
-        EventUtils.trackAnecdoteCopy(mWebsiteName);
-        Toast.makeText(getActivity(), R.string.copied, Toast.LENGTH_SHORT).show();
-        Utils.copyToClipboard(
-                getActivity(),
-                getString(R.string.app_name),
-                anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
-    }
-
-    /**
-     * Open given anecdote in the browser
-     *
-     * @param anecdote anecdote to open
-     * @param preload  preload the website (not opening it)
-     */
-    private void openInBrowserAnecdote(Anecdote anecdote,
-                                       boolean preload) {
-        if (preload) {
-            if (mChromeCustomTabsManager != null && !TextUtils.isEmpty(anecdote.permalink)) {
-                mChromeCustomTabsManager.mayLaunch(anecdote.permalink);
-            }
-            return;
-        }
-        if (mChromeCustomTabsManager != null) {
-            EventUtils.trackAnecdoteDetails(mWebsiteName);
-            mChromeCustomTabsManager.openChrome(getActivity(), anecdote);
-        }
-    }
-
-    /**
      * Open the given anecdote content in fullscreen if it's an image or video, else in the browser.
      *
      * @param anecdote anecdote to open
      * @param view     view to have nice transition if possible
      */
     private void fullscreenAnecdote(Anecdote anecdote, View view) {
-        String contentUrl;
         if (anecdote.media == null) {
-            openInBrowserAnecdote(anecdote, false);
+            EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteName, anecdote, false));
             return;
         }
 
-        contentUrl = anecdote.media;
+        if (anecdote.type == null) {
+            Log.w(TAG, "fullscreenAnecdote null Anecdote");
+            return;
+        }
 
         switch (anecdote.type) {
             case MediaType.IMAGE:
@@ -314,7 +247,7 @@ public class AnecdoteFragment extends Fragment implements
                         this,
                         view,
                         getString(R.string.anecdote_image_transition_name),
-                        contentUrl
+                        anecdote
                 ));
                 break;
             case MediaType.VIDEO:
@@ -323,7 +256,7 @@ public class AnecdoteFragment extends Fragment implements
                         this,
                         view,
                         getString(R.string.anecdote_image_transition_name),
-                        contentUrl
+                        anecdote
                 ));
                 break;
             default:
@@ -355,16 +288,16 @@ public class AnecdoteFragment extends Fragment implements
         switch (action) {
             default:
             case AnecdoteViewHolderListener.ACTION_COPY:
-                copyAnecdote(anecdote);
+                EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, anecdote));
                 break;
             case AnecdoteViewHolderListener.ACTION_SHARE:
-                shareAnecdote(anecdote);
+                EventBus.getDefault().post(new ShareAnecdoteEvent(mWebsiteName, anecdote));
                 break;
             case AnecdoteViewHolderListener.ACTION_OPEN_IN_BROWSER_PRELOAD:
-                openInBrowserAnecdote(anecdote, true);
+                EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteName, anecdote, true));
                 break;
             case AnecdoteViewHolderListener.ACTION_OPEN_IN_BROWSER:
-                openInBrowserAnecdote(anecdote, false);
+                EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteName, anecdote, false));
                 break;
             case AnecdoteViewHolderListener.ACTION_FULLSCREEN:
                 fullscreenAnecdote(anecdote, view);

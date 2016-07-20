@@ -1,5 +1,6 @@
 package io.gresse.hugo.anecdote;
 
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,6 +33,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.crashlytics.android.Crashlytics;
+import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -46,15 +48,19 @@ import io.fabric.sdk.android.Fabric;
 import io.gresse.hugo.anecdote.adapter.ToolbarSpinnerAdapter;
 import io.gresse.hugo.anecdote.event.ChangeFullscreenEvent;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.event.CopyAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.FullscreenEvent;
 import io.gresse.hugo.anecdote.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.event.OnRemoteWebsiteResponseEvent;
+import io.gresse.hugo.anecdote.event.OpenAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.event.ShareAnecdoteEvent;
 import io.gresse.hugo.anecdote.event.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.event.network.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.fragment.AboutFragment;
 import io.gresse.hugo.anecdote.fragment.AnecdoteFragment;
+import io.gresse.hugo.anecdote.fragment.FullscreenFragment;
 import io.gresse.hugo.anecdote.fragment.FullscreenImageFragment;
 import io.gresse.hugo.anecdote.fragment.FullscreenVideoFragment;
 import io.gresse.hugo.anecdote.fragment.SettingsFragment;
@@ -68,6 +74,8 @@ import io.gresse.hugo.anecdote.service.WebsiteApiService;
 import io.gresse.hugo.anecdote.storage.SpStorage;
 import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
+import io.gresse.hugo.anecdote.util.Utils;
+import io.gresse.hugo.anecdote.util.chrome.ChromeCustomTabsManager;
 import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
 /**
@@ -102,6 +110,9 @@ public class MainActivity extends AppCompatActivity
     protected Snackbar                    mSnackbar;
     protected ToolbarSpinnerAdapter       mToolbarSpinnerAdapter;
     protected int                         mToolbarScrollFlags;
+
+    @Nullable
+    private ChromeCustomTabsManager mChromeCustomTabsManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -147,6 +158,9 @@ public class MainActivity extends AppCompatActivity
 
         mToolbarSpinnerAdapter = new ToolbarSpinnerAdapter(getApplicationContext(), "test", new ArrayList<String>());
         mToolbarSpinner.setAdapter(mToolbarSpinnerAdapter);
+
+        mChromeCustomTabsManager = new ChromeCustomTabsManager(this);
+        mChromeCustomTabsManager.bindCustomTabsService(this);
     }
 
     @Override
@@ -171,6 +185,10 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         mServiceProvider.unregister(EventBus.getDefault());
         mNetworkConnectivityListener.stopListening();
+
+        if (mChromeCustomTabsManager != null) {
+            mChromeCustomTabsManager.unbindCustomTabsService(this);
+        }
     }
 
     @Override
@@ -354,7 +372,7 @@ public class MainActivity extends AppCompatActivity
         Bundle bundle = new Bundle();
         bundle.putString(AnecdoteFragment.ARGS_WEBSITE_PARENT_SLUG, website.slug);
         bundle.putString(AnecdoteFragment.ARGS_WEBSITE_PAGE_SLUG, websitePage.slug);
-        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, websitePage.name);
+        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, website.name + " " + websitePage.name);
         fragment.setArguments(bundle);
         changeFragment(fragment, true, false);
     }
@@ -520,7 +538,7 @@ public class MainActivity extends AppCompatActivity
              * When the current toolbar is not displaying an AnecdoteFragment and that we want to display an
              * AnecdoteFragment now, we need to set back the scrollflags.
              */
-            if(mToolbarSpinner.getVisibility() != View.VISIBLE){
+            if (mToolbarSpinner.getVisibility() != View.VISIBLE) {
                 AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
                 params.setScrollFlags(mToolbarScrollFlags);
             }
@@ -573,7 +591,9 @@ public class MainActivity extends AppCompatActivity
     @Subscribe
     public void onFullscreenEvent(FullscreenEvent event) {
         Fragment fragment;
-        Bundle bundle;
+        Bundle bundle = new Bundle();
+
+        bundle.putString(FullscreenFragment.BUNDLE_ANECDOTE, new Gson().toJson(event.anecdote));
 
         switch (event.type) {
             case FullscreenEvent.TYPE_IMAGE:
@@ -589,8 +609,7 @@ public class MainActivity extends AppCompatActivity
                     fragment.setSharedElementReturnTransition(new ImageTransitionSet());
                 }
 
-                bundle = new Bundle();
-                bundle.putString(FullscreenImageFragment.BUNDLE_IMAGEURL, event.contentUrl);
+                bundle.putString(FullscreenImageFragment.BUNDLE_IMAGEURL, event.anecdote.media);
                 fragment.setArguments(bundle);
 
                 changeFragment(fragment, true, false, event.transitionView, event.transitionName);
@@ -608,8 +627,7 @@ public class MainActivity extends AppCompatActivity
                     fragment.setSharedElementReturnTransition(new ImageTransitionSet());
                 }
 
-                bundle = new Bundle();
-                bundle.putString(FullscreenVideoFragment.BUNDLE_VIDEOURL, event.contentUrl);
+                bundle.putString(FullscreenVideoFragment.BUNDLE_VIDEOURL, event.anecdote.media);
                 fragment.setArguments(bundle);
 
                 changeFragment(fragment, true, false, event.transitionView, event.transitionName);
@@ -630,9 +648,17 @@ public class MainActivity extends AppCompatActivity
             // mAppBarLayout.animate().translationY(0).setInterpolator(new AccelerateInterpolator()).start();
         }
 
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mAppBarLayout.getParent().requestLayout();
+            }
+        }, 600);
+
         if (event.toFullscreen) {
             // Hide status bar
-            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            // TODO : fix fullscreen and finish button on fullscreen fragment
+            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         } else {
             // Show status bar
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -685,6 +711,48 @@ public class MainActivity extends AppCompatActivity
             EventBus.getDefault().post(new UpdateAnecdoteFragmentEvent());
         } else if (newNotification) {
             populateNavigationView(true);
+        }
+    }
+
+    @Subscribe
+    public void onShareAnecdote(ShareAnecdoteEvent event){
+        EventUtils.trackAnecdoteShare(event.websiteName);
+
+        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
+        sharingIntent.setType("text/plain");
+
+        sharingIntent.putExtra(
+                Intent.EXTRA_SUBJECT,
+                getString(R.string.app_name));
+
+        sharingIntent.putExtra(
+                Intent.EXTRA_TEXT,
+                event.anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
+
+        startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.anecdote_share_title)));
+    }
+
+    @Subscribe
+    public void onCopyAnecdote(CopyAnecdoteEvent event){
+        EventUtils.trackAnecdoteCopy(event.websiteName);
+        Toast.makeText(this, R.string.copied, Toast.LENGTH_SHORT).show();
+        Utils.copyToClipboard(
+                this,
+                getString(R.string.app_name),
+                event.anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
+    }
+
+    @Subscribe
+    public void onOpenAnecdote(OpenAnecdoteEvent event){
+        if (event.preloadOnly) {
+            if (mChromeCustomTabsManager != null && !TextUtils.isEmpty(event.anecdote.permalink)) {
+                mChromeCustomTabsManager.mayLaunch(event.anecdote.permalink);
+            }
+            return;
+        }
+        if (mChromeCustomTabsManager != null) {
+            EventUtils.trackAnecdoteDetails(event.websiteName);
+            mChromeCustomTabsManager.openChrome(this, event.anecdote);
         }
     }
 
