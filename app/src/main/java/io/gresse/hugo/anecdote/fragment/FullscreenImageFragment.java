@@ -3,7 +3,6 @@ package io.gresse.hugo.anecdote.fragment;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,11 +15,11 @@ import org.greenrobot.eventbus.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.event.ChangeFullscreenEvent;
 import io.gresse.hugo.anecdote.event.EnterTransitionEndEvent;
-import io.gresse.hugo.anecdote.util.FabricUtils;
 import uk.co.senab.photoview.PhotoViewAttacher;
+
 
 /**
  * Display an image in fullscreen. It listen for the end of the fragment shared element transition to intialise the
@@ -28,7 +27,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  * <p/>
  * Created by Hugo Gresse on 20/04/16.
  */
-public class FullscreenImageFragment extends Fragment {
+public class FullscreenImageFragment extends FullscreenFragment implements PhotoViewAttacher.OnPhotoTapListener {
 
     public static final String TAG             = FullscreenImageFragment.class.getSimpleName();
     public static final String BUNDLE_IMAGEURL = "contentUrl";
@@ -38,11 +37,10 @@ public class FullscreenImageFragment extends Fragment {
     @Bind(R.id.imageView)
     public ImageView mImageView;
 
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        EventBus.getDefault().post(new ChangeFullscreenEvent(true));
 
         if (getArguments() != null) {
             mImageUrl = getArguments().getString(BUNDLE_IMAGEURL);
@@ -50,9 +48,7 @@ public class FullscreenImageFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_fullscreen_image, container, false);
         ButterKnife.bind(this, view);
         return view;
@@ -64,34 +60,18 @@ public class FullscreenImageFragment extends Fragment {
 
         Glide.with(getContext())
                 .load(mImageUrl)
-                .fitCenter()
                 .into(mImageView);
 
         // No transition compatible
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            new PhotoViewAttacher(mImageView);
+            createPhotoView();
         }
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.unbind(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-        EventBus.getDefault().post(new ChangeFullscreenEvent(false));
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
         EventBus.getDefault().register(this);
-        FabricUtils.trackFragmentView(this, null);
     }
 
     @Override
@@ -100,6 +80,17 @@ public class FullscreenImageFragment extends Fragment {
         EventBus.getDefault().unregister(this);
     }
 
+    @OnClick(R.id.imageView)
+    public void onImageViewClick(){
+    }
+
+    /***************************
+     * Private methods
+     ***************************/
+
+    private void createPhotoView(){
+        new PhotoViewAttacher(mImageView).setOnPhotoTapListener(this);
+    }
 
     /***************************
      * Event
@@ -107,7 +98,15 @@ public class FullscreenImageFragment extends Fragment {
 
     @Subscribe
     public void onTransitionEnd(EnterTransitionEndEvent event) {
-        new PhotoViewAttacher(mImageView);
+        createPhotoView();
     }
 
+    /***************************
+     * implements PhotoViewAttacher.OnPhotoTapListener
+     ***************************/
+
+    @Override
+    public void onPhotoTap(View view, float x, float y) {
+        super.toggleOverlayVisibility();
+    }
 }
