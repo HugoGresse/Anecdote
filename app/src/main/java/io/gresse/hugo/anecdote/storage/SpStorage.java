@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.gresse.hugo.anecdote.BuildConfig;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.MediaType;
 import io.gresse.hugo.anecdote.api.model.Content;
@@ -49,7 +50,7 @@ public class SpStorage {
      */
     public static int getVersion(Context context, int defaultVersion) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
-        return sharedPreferences.getInt(SP_KEY_VERSION, 0);
+        return sharedPreferences.getInt(SP_KEY_VERSION, defaultVersion);
     }
 
     /**
@@ -233,7 +234,8 @@ public class SpStorage {
      */
     public static boolean migrate(Context context) {
         boolean openWebsiteChooserReturn = false;
-        switch (getVersion(context, 12)) {
+        int latestVersion = BuildConfig.VERSION_CODE;
+        switch (getVersion(context, latestVersion)){
             case 0:
                 List<Website> websites = getWebsites(context);
                 /**
@@ -316,6 +318,7 @@ public class SpStorage {
                 Log.i(TAG, "Migrating from 5 > 12 done");
                 break;
             default:
+                setVersion(context, latestVersion);
                 // Nothing
                 break;
         }
