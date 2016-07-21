@@ -12,7 +12,7 @@ import android.util.AttributeSet;
 
 import org.greenrobot.eventbus.EventBus;
 
-import io.gresse.hugo.anecdote.event.EnterTransitionEndEvent;
+import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenEnterTransitionEndEvent;
 
 /**
  * Transition that performs almost exactly like {@link android.transition.AutoTransition}, but has an
@@ -58,7 +58,7 @@ public class ImageTransitionSet extends TransitionSet implements Transition.Tran
 
     @Override
     public void onTransitionEnd(Transition transition) {
-        EventBus.getDefault().post(new EnterTransitionEndEvent());
+        EventBus.getDefault().post(new FullscreenEnterTransitionEndEvent());
     }
 
     @Override

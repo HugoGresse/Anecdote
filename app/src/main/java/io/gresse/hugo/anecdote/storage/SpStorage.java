@@ -19,11 +19,11 @@ import java.util.Collections;
 import java.util.List;
 
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.model.MediaType;
-import io.gresse.hugo.anecdote.model.api.Content;
-import io.gresse.hugo.anecdote.model.api.ContentItem;
-import io.gresse.hugo.anecdote.model.api.Website;
-import io.gresse.hugo.anecdote.model.api.WebsitePage;
+import io.gresse.hugo.anecdote.anecdote.model.MediaType;
+import io.gresse.hugo.anecdote.api.model.Content;
+import io.gresse.hugo.anecdote.api.model.ContentItem;
+import io.gresse.hugo.anecdote.api.model.Website;
+import io.gresse.hugo.anecdote.api.model.WebsitePage;
 
 /**
  * Utility class to store stuff in sharedPreferences

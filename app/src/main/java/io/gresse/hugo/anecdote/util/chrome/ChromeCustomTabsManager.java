@@ -17,7 +17,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 
 /**
  * Manage Chrome custom tabs binding and launching
