@@ -1,5 +1,7 @@
 package io.gresse.hugo.anecdote.anecdote;
 
+import io.gresse.hugo.anecdote.api.chooser.WebsiteChooserAdapter;
+
 /**
  * Listener for {@link WebsiteChooserAdapter}
  * <p/>

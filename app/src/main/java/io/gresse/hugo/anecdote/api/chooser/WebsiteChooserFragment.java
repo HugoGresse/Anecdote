@@ -1,4 +1,4 @@
-package io.gresse.hugo.anecdote.anecdote.fragment;
+package io.gresse.hugo.anecdote.api.chooser;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,8 +28,8 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.anecdote.WebsiteChooserAdapter;
 import io.gresse.hugo.anecdote.anecdote.WebsiteViewHolderListener;
+import io.gresse.hugo.anecdote.anecdote.fragment.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.api.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.api.event.OnRemoteWebsiteResponseEvent;
@@ -61,7 +61,6 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
 
     @Nullable
     protected String                mMode;
-    private   List<Website>         mWebsites;
     private   WebsiteChooserAdapter mAdapter;
     private   List<Website>         mSelectedWebsites;
 
@@ -161,22 +160,22 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
      * @param websites data to display
      */
     private void setAdapterData(List<Website> websites) {
-        mWebsites = new ArrayList<>();
-        mWebsites.addAll(websites);
-        if (mWebsites != null && !mWebsites.isEmpty()) {
+        List<Website> websites1 = new ArrayList<>();
+        websites1.addAll(websites);
+        if (websites1 != null && !websites1.isEmpty()) {
             if (!TextUtils.isEmpty(mMode) && !mMode.equals(BUNDLE_MODE_RESTORE)) {
                 // We want to add some websites : remove duplicates or already added ones
                 List<Website> savedWebsites = SpStorage.getWebsites(getActivity());
 
                 // We cannot iterate on a list and remove item at the same time, need an array
-                for (Website website : mWebsites.toArray(new Website[mWebsites.size()])) {
+                for (Website website : websites1.toArray(new Website[websites1.size()])) {
                     if (savedWebsites.contains(website)) {
-                        mWebsites.remove(website);
+                        websites1.remove(website);
                     }
                 }
             }
 
-            Collections.sort(mWebsites, new Comparator<Website>() {
+            Collections.sort(websites1, new Comparator<Website>() {
                 @Override
                 public int compare(Website website, Website website2) {
                     if (website.like > website2.like) {
@@ -188,7 +187,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
                 }
             });
 
-            mAdapter.setData(mWebsites);
+            mAdapter.setData(websites1);
         }
     }
 

@@ -17,9 +17,9 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.anecdote.socialEvent.CopyAnecdoteEvent;
-import io.gresse.hugo.anecdote.anecdote.socialEvent.OpenAnecdoteEvent;
-import io.gresse.hugo.anecdote.anecdote.socialEvent.ShareAnecdoteEvent;
+import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
+import io.gresse.hugo.anecdote.anecdote.social.OpenAnecdoteEvent;
+import io.gresse.hugo.anecdote.anecdote.social.ShareAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.util.FabricUtils;
 

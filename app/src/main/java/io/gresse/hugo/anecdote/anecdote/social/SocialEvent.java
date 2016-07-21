@@ -1,4 +1,4 @@
-package io.gresse.hugo.anecdote.anecdote.socialEvent;
+package io.gresse.hugo.anecdote.anecdote.social;
 
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.event.Event;
