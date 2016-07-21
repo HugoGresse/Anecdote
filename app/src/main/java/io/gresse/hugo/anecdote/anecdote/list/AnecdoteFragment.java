@@ -25,18 +25,18 @@ import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
+import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenEvent;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.anecdote.model.MediaType;
 import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.anecdote.service.event.LoadNewAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.service.event.OnAnecdoteLoadedEvent;
-import io.gresse.hugo.anecdote.anecdote.socialEvent.CopyAnecdoteEvent;
-import io.gresse.hugo.anecdote.anecdote.socialEvent.OpenAnecdoteEvent;
-import io.gresse.hugo.anecdote.anecdote.socialEvent.ShareAnecdoteEvent;
-import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.util.EventUtils;
+import io.gresse.hugo.anecdote.anecdote.social.OpenAnecdoteEvent;
+import io.gresse.hugo.anecdote.anecdote.social.ShareAnecdoteEvent;
 
 /**
  * A generic anecdote fragment

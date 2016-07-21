@@ -1,4 +1,4 @@
-package io.gresse.hugo.anecdote.anecdote;
+package io.gresse.hugo.anecdote.api.chooser;
 
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +13,7 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
+import io.gresse.hugo.anecdote.anecdote.WebsiteViewHolderListener;
 import io.gresse.hugo.anecdote.api.model.Website;
 
 /**

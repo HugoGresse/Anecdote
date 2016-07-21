@@ -15,7 +15,6 @@ import org.greenrobot.eventbus.Subscribe;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.util.EventUtils;
 import uk.co.senab.photoview.PhotoViewAttacher;
@@ -79,10 +78,6 @@ public class FullscreenImageFragment extends FullscreenFragment implements Photo
     public void onPause() {
         super.onPause();
         EventBus.getDefault().unregister(this);
-    }
-
-    @OnClick(R.id.imageView)
-    public void onImageViewClick(){
     }
 
     /***************************

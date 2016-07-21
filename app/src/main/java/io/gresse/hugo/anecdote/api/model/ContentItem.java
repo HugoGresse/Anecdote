@@ -4,7 +4,7 @@ import io.gresse.hugo.anecdote.anecdote.model.MediaType;
 
 /**
  * Represent the parsing configuration for a given item in a {@link WebsitePage}
- *
+ * <p/>
  * Created by Hugo Gresse on 08/06/16.
  */
 public class ContentItem extends Item {
