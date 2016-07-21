@@ -18,12 +18,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import io.gresse.hugo.anecdote.BuildConfig;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.model.MediaType;
-import io.gresse.hugo.anecdote.model.api.Content;
-import io.gresse.hugo.anecdote.model.api.ContentItem;
-import io.gresse.hugo.anecdote.model.api.Website;
-import io.gresse.hugo.anecdote.model.api.WebsitePage;
+import io.gresse.hugo.anecdote.anecdote.model.MediaType;
+import io.gresse.hugo.anecdote.api.model.Content;
+import io.gresse.hugo.anecdote.api.model.ContentItem;
+import io.gresse.hugo.anecdote.api.model.Website;
+import io.gresse.hugo.anecdote.api.model.WebsitePage;
 
 /**
  * Utility class to store stuff in sharedPreferences
@@ -42,13 +43,14 @@ public class SpStorage {
 
     /**
      * Return the version code number
-     * @param context app context
+     *
+     * @param context        app context
      * @param defaultVersion the default value if not any already saved
      * @return the current version
      */
     public static int getVersion(Context context, int defaultVersion) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
-        return sharedPreferences.getInt(SP_KEY_VERSION, 0);
+        return sharedPreferences.getInt(SP_KEY_VERSION, defaultVersion);
     }
 
     /**
@@ -88,10 +90,11 @@ public class SpStorage {
 
     /**
      * Get the raw json string for the websites key
+     *
      * @param context app context
      * @return websites json
      */
-    public static String getWebsitesString(Context context){
+    public static String getWebsitesString(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
         return sharedPreferences.getString(SP_KEY_WEBSITES, "");
     }
@@ -127,7 +130,7 @@ public class SpStorage {
         SharedPreferences.Editor sharedPreferencesEditor = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE).edit();
         for (Website website : websites) {
             website.validateData();
-            for(WebsitePage websitePage : website.pages){
+            for (WebsitePage websitePage : website.pages) {
                 websitePage.content.reorderItems();
             }
         }
@@ -145,7 +148,7 @@ public class SpStorage {
         List<Website> websites = getWebsites(context);
 
         website.validateData();
-        for(WebsitePage websitePage : website.pages){
+        for (WebsitePage websitePage : website.pages) {
             websitePage.content.reorderItems();
         }
 
@@ -203,10 +206,11 @@ public class SpStorage {
 
     /**
      * Get the number of websites last time checked
+     *
      * @param context app context
      * @return number of websites
      */
-    public static int getSavedRemoteWebsiteNumber(Context context){
+    public static int getSavedRemoteWebsiteNumber(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE);
         return sharedPreferences.getInt(SP_KEY_WEBSITE_REMOTE_NB, 0);
     }
@@ -215,9 +219,9 @@ public class SpStorage {
      * Set saved remite website number
      *
      * @param context app context
-     * @param number the number of remote website last time checked
+     * @param number  the number of remote website last time checked
      */
-    public static void setSavedRemoteWebsiteNumber(Context context, int number){
+    public static void setSavedRemoteWebsiteNumber(Context context, int number) {
         SharedPreferences.Editor sharedPreferencesEditor = context.getSharedPreferences(SP_KEY, Context.MODE_PRIVATE).edit();
         sharedPreferencesEditor.putInt(SP_KEY_WEBSITE_REMOTE_NB, number);
         sharedPreferencesEditor.apply();
@@ -230,7 +234,8 @@ public class SpStorage {
      */
     public static boolean migrate(Context context) {
         boolean openWebsiteChooserReturn = false;
-        switch (getVersion(context, 12)){
+        int latestVersion = BuildConfig.VERSION_CODE;
+        switch (getVersion(context, latestVersion)){
             case 0:
                 List<Website> websites = getWebsites(context);
                 /**
@@ -261,15 +266,15 @@ public class SpStorage {
                 sharedPreferencesEditor.apply();
 
                 // 3. Migrate local websites ONLY
-                if(!TextUtils.isEmpty(websitesString)){
+                if (!TextUtils.isEmpty(websitesString)) {
                     try {
                         JSONArray jsonObj = new JSONArray(websitesString);
-                        
+
                         for (int i = 0; i < jsonObj.length(); i++) {
                             JSONObject object = jsonObj.getJSONObject(i);
 
                             String source = object.getString("source");
-                            if(TextUtils.isEmpty(source) || "remote".equals(source)){
+                            if (TextUtils.isEmpty(source) || "remote".equals(source)) {
                                 // Skip remote websites. The user will need to reselect it
                                 continue;
                             }
@@ -313,6 +318,7 @@ public class SpStorage {
                 Log.i(TAG, "Migrating from 5 > 12 done");
                 break;
             default:
+                setVersion(context, latestVersion);
                 // Nothing
                 break;
         }

@@ -1,7 +1,7 @@
 ############
 # Keep correct stacktrace :
 -keepattributes SourceFile,LineNumberTable
--keepnames class tv.teads.sdk.**
+-keepnames class io.gresse.hugo.anecdote.**
 
 
 ############
@@ -10,7 +10,6 @@
 -dontwarn java.nio.file.*
 -dontwarn org.codehaus.mojo.animal_sniffer.IgnoreJRERequirement
 -dontwarn okio.**
-
 
 ############
 # EventBus
@@ -44,7 +43,8 @@
 -keep class sun.misc.Unsafe { *; }
 #-keep class com.google.gson.stream.** { *; }
 # Application classes that will be serialized/deserialized over Gson
--keep class io.gresse.hugo.anecdote.model.** { *; }
+-keep class io.gresse.hugo.anecdote.anecdote.model.** { *; }
+-keep class io.gresse.hugo.anecdote.api.model.** { *; }
 
 ############
 # Jsoup

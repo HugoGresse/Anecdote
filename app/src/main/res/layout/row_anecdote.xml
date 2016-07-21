@@ -12,6 +12,13 @@
         android:background="?attr/selectableItemBackground"
         android:padding="@dimen/padding_anecdoterow"/>
 
+    <View
+        android:id="@+id/separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/colorDivider"/>
+
     <include layout="@layout/row_anecdote_expand"/>
 
 </LinearLayout>

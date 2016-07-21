@@ -3,6 +3,7 @@ package io.gresse.hugo.anecdote.view;
 import android.content.Context;
 import android.support.v4.widget.DrawerLayout;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 /**
@@ -29,7 +30,7 @@ public class HackyDrawerLayout extends DrawerLayout {
         try {
             return super.onInterceptTouchEvent(ev);
         } catch (ArrayIndexOutOfBoundsException e) {
-            e.printStackTrace();
+            Log.d("HackyDrawerLayout", "onInterceptTouchEvent exception received");
             return false;
         }
     }
