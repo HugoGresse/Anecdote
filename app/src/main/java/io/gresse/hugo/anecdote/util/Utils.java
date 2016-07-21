@@ -5,7 +5,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import io.gresse.hugo.anecdote.model.api.Website;
+import io.gresse.hugo.anecdote.api.model.Website;
 
 /**
  * Generals utils
