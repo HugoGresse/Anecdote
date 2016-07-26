@@ -19,7 +19,7 @@
     <string name="not_implemented" translatable="false">Not implemented</string>
     <string name="action_website_noteditable_toast">You can\'t edit a remote website</string>
 
-    <string name="app_share_credits"> - via Anecdote http://bit.ly/anecdoteapp </string>
+    <string name="app_share_credits"> - via Quote http://bit.ly/anecdoteapp </string>
 
     <string name="anecdote_share_title">Share using</string>
     <string-array name="anecdote_dialog">

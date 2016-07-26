@@ -726,7 +726,7 @@ public class MainActivity extends AppCompatActivity
 
         sharingIntent.putExtra(
                 Intent.EXTRA_TEXT,
-                event.anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
+                event.anecdote.getShareString(this));
 
         startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.anecdote_share_title)));
     }
@@ -738,7 +738,7 @@ public class MainActivity extends AppCompatActivity
         Utils.copyToClipboard(
                 this,
                 getString(R.string.app_name),
-                event.anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
+                event.anecdote.getShareString(this));
     }
 
     @Subscribe

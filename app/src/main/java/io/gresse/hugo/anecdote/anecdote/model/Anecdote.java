@@ -1,8 +1,12 @@
 package io.gresse.hugo.anecdote.anecdote.model;
 
+import android.content.Context;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import org.jsoup.Jsoup;
+
+import io.gresse.hugo.anecdote.R;
 
 /**
  * A single anecdote, composed of:
@@ -40,6 +44,23 @@ public class Anecdote {
      */
     public String getPlainTextContent() {
         return Jsoup.parse(text.replace("<br>", "#lb#")).text().replace("#lb#", System.getProperty("line.separator"));
+    }
+
+    /**
+     * Get the share string of the
+     * @param context app context
+     * @return the shareable string description of this anecdote
+     */
+    public String getShareString(Context context){
+        String copyString = getPlainTextContent();
+
+        if(!TextUtils.isEmpty(permalink)){
+            copyString += " " + permalink;
+        }
+
+        copyString += context.getString(R.string.app_share_credits);
+
+        return copyString;
     }
 
     @Override
