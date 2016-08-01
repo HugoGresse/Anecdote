@@ -103,12 +103,16 @@ public class MainActivity extends AppCompatActivity
     @Bind(R.id.toolbarSpinner)
     public Spinner mToolbarSpinner;
 
+    @Bind(R.id.fragment_container)
+    public View mFragmentContainer;
+
     protected ServiceProvider             mServiceProvider;
     protected NetworkConnectivityListener mNetworkConnectivityListener;
     protected List<Website>               mWebsites;
     protected Snackbar                    mSnackbar;
     protected ToolbarSpinnerAdapter       mToolbarSpinnerAdapter;
     protected int                         mToolbarScrollFlags;
+    protected CoordinatorLayout.Behavior  mFragmentLayoutBehavior;
 
     @Nullable
     private ChromeCustomTabsManager mChromeCustomTabsManager;
@@ -656,11 +660,20 @@ public class MainActivity extends AppCompatActivity
 
         if (event.toFullscreen) {
             // Hide status bar
-            // TODO : fix fullscreen and finish button on fullscreen fragment
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+            // Remove the layout behavior on fragment container to prevent issue with the fullscreen
+            CoordinatorLayout.LayoutParams fragmentContainerLayoutParams =
+                    (CoordinatorLayout.LayoutParams) mFragmentContainer.getLayoutParams();
+            mFragmentLayoutBehavior = fragmentContainerLayoutParams.getBehavior();
+            fragmentContainerLayoutParams.setBehavior(null);
         } else {
             // Show status bar
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+            // Set back the layout behavior on fragment container
+            ((CoordinatorLayout.LayoutParams) mFragmentContainer.getLayoutParams())
+                    .setBehavior(new AppBarLayout.ScrollingViewBehavior());
         }
     }
 
@@ -714,7 +727,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Subscribe
-    public void onShareAnecdote(ShareAnecdoteEvent event){
+    public void onShareAnecdote(ShareAnecdoteEvent event) {
         EventUtils.trackAnecdoteShare(event.websiteName);
 
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
@@ -732,7 +745,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Subscribe
-    public void onCopyAnecdote(CopyAnecdoteEvent event){
+    public void onCopyAnecdote(CopyAnecdoteEvent event) {
         EventUtils.trackAnecdoteCopy(event.websiteName);
         Toast.makeText(this, R.string.copied, Toast.LENGTH_SHORT).show();
         Utils.copyToClipboard(
@@ -742,7 +755,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Subscribe
-    public void onOpenAnecdote(OpenAnecdoteEvent event){
+    public void onOpenAnecdote(OpenAnecdoteEvent event) {
         if (event.preloadOnly) {
             if (mChromeCustomTabsManager != null && !TextUtils.isEmpty(event.anecdote.permalink)) {
                 mChromeCustomTabsManager.mayLaunch(event.anecdote.permalink);
