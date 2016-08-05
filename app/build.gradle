@@ -86,9 +86,7 @@ dependencies {
     compile 'com.android.support:design:24.1.1'
     compile 'com.android.support:recyclerview-v7:24.1.1'
     compile 'com.android.support:customtabs:24.1.1'
-    //noinspection GradleDynamicVersion
-    compile 'com.android.support:multidex:1.0.+'
-    compile 'com.squareup.okhttp3:okhttp:3.1.2'
+    compile 'com.squareup.okhttp3:okhttp:3.4.1'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.code.gson:gson:2.6.2'
     compile 'org.jsoup:jsoup:1.8.3'
