@@ -22,10 +22,8 @@
     <string name="app_share_credits"> - via Quote http://bit.ly/anecdoteapp </string>
 
     <string name="anecdote_share_title">Share using</string>
-    <string-array name="anecdote_dialog">
-        <item>Share</item>
-        <item>Open details</item>
-        <item>Copy</item>
+    <string-array name="anecdote_content_dialog">
+        <item>Copy link</item>
     </string-array>
 
 

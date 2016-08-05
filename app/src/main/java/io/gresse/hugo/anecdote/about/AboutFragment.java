@@ -57,7 +57,7 @@ public class AboutFragment extends Fragment implements AboutAdapter.OnClickListe
         super.onResume();
         EventBus.getDefault().post(new ChangeTitleEvent(getString(R.string.action_about), this.getClass().getName()));
 
-        EventUtils.trackFragmentView(this, null);
+        EventUtils.trackFragmentView(this, null, null);
     }
 
     @Override

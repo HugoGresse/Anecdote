@@ -16,6 +16,7 @@ import org.greenrobot.eventbus.Subscribe;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
+import io.gresse.hugo.anecdote.util.EventUtils;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 
@@ -25,7 +26,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  * <p/>
  * Created by Hugo Gresse on 20/04/16.
  */
-public class FullscreenImageFragment extends FullscreenFragment implements PhotoViewAttacher.OnPhotoTapListener {
+public class FullscreenImageFragment extends FullscreenFragment implements PhotoViewAttacher.OnPhotoTapListener, View.OnLongClickListener {
 
     public static final String TAG             = FullscreenImageFragment.class.getSimpleName();
     public static final String BUNDLE_IMAGEURL = "contentUrl";
@@ -70,6 +71,7 @@ public class FullscreenImageFragment extends FullscreenFragment implements Photo
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
+        EventUtils.trackFragmentView(this, null, "Fullscreen image");
     }
 
     @Override
@@ -83,7 +85,9 @@ public class FullscreenImageFragment extends FullscreenFragment implements Photo
      ***************************/
 
     private void createPhotoView(){
-        new PhotoViewAttacher(mImageView).setOnPhotoTapListener(this);
+        PhotoViewAttacher photoViewAttacher = new PhotoViewAttacher(mImageView);
+        photoViewAttacher.setOnPhotoTapListener(this);
+        photoViewAttacher.setOnLongClickListener(this);
     }
 
     /***************************
@@ -102,5 +106,11 @@ public class FullscreenImageFragment extends FullscreenFragment implements Photo
     @Override
     public void onPhotoTap(View view, float x, float y) {
         super.toggleOverlayVisibility();
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
+        super.onContentLongTouch(mImageUrl);
+        return true;
     }
 }
