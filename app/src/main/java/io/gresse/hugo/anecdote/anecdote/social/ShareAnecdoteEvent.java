@@ -1,7 +1,5 @@
 package io.gresse.hugo.anecdote.anecdote.social;
 
-import android.content.Context;
-
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 
 /**

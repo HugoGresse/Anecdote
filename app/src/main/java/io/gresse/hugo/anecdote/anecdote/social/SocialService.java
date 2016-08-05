@@ -20,6 +20,7 @@ import io.gresse.hugo.anecdote.util.chrome.ChromeCustomTabsManager;
  */
 public class SocialService {
 
+    @SuppressWarnings("unused")
     private static final String TAG = SocialService.class.getSimpleName();
 
     @Nullable
