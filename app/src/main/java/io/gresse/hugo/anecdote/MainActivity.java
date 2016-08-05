@@ -1,6 +1,5 @@
 package io.gresse.hugo.anecdote;
 
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -45,36 +44,31 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnItemSelected;
 import io.fabric.sdk.android.Fabric;
-import io.gresse.hugo.anecdote.anecdote.ToolbarSpinnerAdapter;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.ChangeFullscreenEvent;
-import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
-import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenEvent;
-import io.gresse.hugo.anecdote.api.event.LoadRemoteWebsiteEvent;
-import io.gresse.hugo.anecdote.api.event.OnRemoteWebsiteResponseEvent;
-import io.gresse.hugo.anecdote.anecdote.social.OpenAnecdoteEvent;
-import io.gresse.hugo.anecdote.event.RequestFailedEvent;
-import io.gresse.hugo.anecdote.anecdote.social.ShareAnecdoteEvent;
-import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
-import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
-import io.gresse.hugo.anecdote.event.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.about.AboutFragment;
-import io.gresse.hugo.anecdote.anecdote.list.AnecdoteFragment;
+import io.gresse.hugo.anecdote.anecdote.ToolbarSpinnerAdapter;
+import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
+import io.gresse.hugo.anecdote.anecdote.fragment.WebsiteDialogFragment;
+import io.gresse.hugo.anecdote.anecdote.fullscreen.ChangeFullscreenEvent;
+import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenEvent;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenFragment;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenImageFragment;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenVideoFragment;
-import io.gresse.hugo.anecdote.setting.SettingsFragment;
-import io.gresse.hugo.anecdote.api.chooser.WebsiteChooserFragment;
-import io.gresse.hugo.anecdote.anecdote.fragment.WebsiteDialogFragment;
-import io.gresse.hugo.anecdote.api.model.Website;
-import io.gresse.hugo.anecdote.api.model.WebsitePage;
+import io.gresse.hugo.anecdote.anecdote.list.AnecdoteFragment;
 import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.api.WebsiteApiService;
+import io.gresse.hugo.anecdote.api.chooser.WebsiteChooserFragment;
+import io.gresse.hugo.anecdote.api.event.LoadRemoteWebsiteEvent;
+import io.gresse.hugo.anecdote.api.event.OnRemoteWebsiteResponseEvent;
+import io.gresse.hugo.anecdote.api.model.Website;
+import io.gresse.hugo.anecdote.api.model.WebsitePage;
+import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.event.NetworkConnectivityChangeEvent;
+import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
+import io.gresse.hugo.anecdote.setting.SettingsFragment;
 import io.gresse.hugo.anecdote.storage.SpStorage;
 import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
-import io.gresse.hugo.anecdote.util.Utils;
-import io.gresse.hugo.anecdote.util.chrome.ChromeCustomTabsManager;
 import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
 /**
@@ -103,15 +97,16 @@ public class MainActivity extends AppCompatActivity
     @Bind(R.id.toolbarSpinner)
     public Spinner mToolbarSpinner;
 
+    @Bind(R.id.fragment_container)
+    public View mFragmentContainer;
+
     protected ServiceProvider             mServiceProvider;
     protected NetworkConnectivityListener mNetworkConnectivityListener;
     protected List<Website>               mWebsites;
     protected Snackbar                    mSnackbar;
     protected ToolbarSpinnerAdapter       mToolbarSpinnerAdapter;
     protected int                         mToolbarScrollFlags;
-
-    @Nullable
-    private ChromeCustomTabsManager mChromeCustomTabsManager;
+    protected CoordinatorLayout.Behavior  mFragmentLayoutBehavior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,7 +129,7 @@ public class MainActivity extends AppCompatActivity
         // Process migration before getting anything else from shared preferences
         boolean openWebsiteChooserAddMode = SpStorage.migrate(this);
 
-        mServiceProvider = new ServiceProvider();
+        mServiceProvider = new ServiceProvider(this);
         mWebsites = SpStorage.getWebsites(this);
         mServiceProvider.createAnecdoteService(mWebsites);
         mServiceProvider.register(EventBus.getDefault());
@@ -157,9 +152,6 @@ public class MainActivity extends AppCompatActivity
 
         mToolbarSpinnerAdapter = new ToolbarSpinnerAdapter(getApplicationContext(), "test", new ArrayList<String>());
         mToolbarSpinner.setAdapter(mToolbarSpinnerAdapter);
-
-        mChromeCustomTabsManager = new ChromeCustomTabsManager(this);
-        mChromeCustomTabsManager.bindCustomTabsService(this);
     }
 
     @Override
@@ -181,13 +173,9 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         mServiceProvider.unregister(EventBus.getDefault());
         mNetworkConnectivityListener.stopListening();
-
-        if (mChromeCustomTabsManager != null) {
-            mChromeCustomTabsManager.unbindCustomTabsService(this);
-        }
+        super.onDestroy();
     }
 
     @Override
@@ -656,11 +644,20 @@ public class MainActivity extends AppCompatActivity
 
         if (event.toFullscreen) {
             // Hide status bar
-            // TODO : fix fullscreen and finish button on fullscreen fragment
             this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+            // Remove the layout behavior on fragment container to prevent issue with the fullscreen
+            CoordinatorLayout.LayoutParams fragmentContainerLayoutParams =
+                    (CoordinatorLayout.LayoutParams) mFragmentContainer.getLayoutParams();
+            mFragmentLayoutBehavior = fragmentContainerLayoutParams.getBehavior();
+            fragmentContainerLayoutParams.setBehavior(null);
         } else {
             // Show status bar
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+            // Set back the layout behavior on fragment container
+            ((CoordinatorLayout.LayoutParams) mFragmentContainer.getLayoutParams())
+                    .setBehavior(new AppBarLayout.ScrollingViewBehavior());
         }
     }
 
@@ -713,47 +710,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Subscribe
-    public void onShareAnecdote(ShareAnecdoteEvent event){
-        EventUtils.trackAnecdoteShare(event.websiteName);
-
-        Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-        sharingIntent.setType("text/plain");
-
-        sharingIntent.putExtra(
-                Intent.EXTRA_SUBJECT,
-                getString(R.string.app_name));
-
-        sharingIntent.putExtra(
-                Intent.EXTRA_TEXT,
-                event.anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
-
-        startActivity(Intent.createChooser(sharingIntent, getResources().getString(R.string.anecdote_share_title)));
-    }
-
-    @Subscribe
-    public void onCopyAnecdote(CopyAnecdoteEvent event){
-        EventUtils.trackAnecdoteCopy(event.websiteName);
-        Toast.makeText(this, R.string.copied, Toast.LENGTH_SHORT).show();
-        Utils.copyToClipboard(
-                this,
-                getString(R.string.app_name),
-                event.anecdote.getPlainTextContent() + " " + getString(R.string.app_share_credits));
-    }
-
-    @Subscribe
-    public void onOpenAnecdote(OpenAnecdoteEvent event){
-        if (event.preloadOnly) {
-            if (mChromeCustomTabsManager != null && !TextUtils.isEmpty(event.anecdote.permalink)) {
-                mChromeCustomTabsManager.mayLaunch(event.anecdote.permalink);
-            }
-            return;
-        }
-        if (mChromeCustomTabsManager != null) {
-            EventUtils.trackAnecdoteDetails(event.websiteName);
-            mChromeCustomTabsManager.openChrome(this, event.anecdote);
-        }
-    }
 
     /***************************
      * Implements NetworkConnectivityListener.ConnectivityListener

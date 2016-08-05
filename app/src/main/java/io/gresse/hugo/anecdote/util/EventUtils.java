@@ -9,6 +9,7 @@ import com.crashlytics.android.answers.ContentViewEvent;
 import com.crashlytics.android.answers.CustomEvent;
 
 import io.gresse.hugo.anecdote.Configuration;
+import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
 
 /**
  * Event related utils
@@ -31,8 +32,9 @@ public class EventUtils {
      *
      * @param fragment   the fragment name to track
      * @param screenName the additional name if any
+     * @param subName    sub view name
      */
-    public static void trackFragmentView(Fragment fragment, @Nullable String screenName) {
+    public static void trackFragmentView(Fragment fragment, @Nullable String screenName, @Nullable String subName) {
         if (!isEventEnable()) return;
 
         String name;
@@ -43,9 +45,18 @@ public class EventUtils {
             name = screenName;
         }
 
-        Answers.getInstance().logContentView(new ContentViewEvent()
-                .putContentName(name)
-                .putContentType("Fragment"));
+        ContentViewEvent contentViewEvent = new ContentViewEvent();
+
+        contentViewEvent.putContentName(name);
+
+        if (TextUtils.isEmpty(subName)) {
+            contentViewEvent.putContentType("Fragment");
+        } else {
+            contentViewEvent.putContentType(subName);
+        }
+
+
+        Answers.getInstance().logContentView(new ContentViewEvent());
     }
 
     /**
@@ -132,14 +143,15 @@ public class EventUtils {
     /**
      * Track the copy action on an anecdote
      *
-     * @param websiteName the website name
+     * @param event the copy event
      */
-    public static void trackAnecdoteCopy(String websiteName) {
+    public static void trackAnecdoteCopy(CopyAnecdoteEvent event) {
         if (!isEventEnable()) return;
 
         Answers.getInstance().logCustom(
                 new CustomEvent("Anecdote copied")
-                        .putCustomAttribute("Website name", websiteName));
+                        .putCustomAttribute("Website name", event.websiteName)
+                        .putCustomAttribute("Type", event.type));
     }
 
     /**

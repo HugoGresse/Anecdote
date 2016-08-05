@@ -12,7 +12,9 @@ import android.view.ViewGroup;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnLongClick;
 import io.gresse.hugo.anecdote.R;
+import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.view.PlayerView;
 
 /**
@@ -56,8 +58,21 @@ public class FullscreenVideoFragment extends FullscreenFragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        EventUtils.trackFragmentView(this, null, "Fullscreen video");
+    }
+
     @OnClick(R.id.playerView)
-    public void onImageViewClick(){
+    public void onClick(){
         super.toggleOverlayVisibility();
+    }
+
+    @OnLongClick(R.id.playerView)
+    public boolean onLongClick(){
+        super.onContentLongTouch(mVideoUrl);
+        return true;
     }
 }

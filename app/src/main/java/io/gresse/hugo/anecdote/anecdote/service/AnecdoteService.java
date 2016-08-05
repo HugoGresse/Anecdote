@@ -212,7 +212,7 @@ public class AnecdoteService {
                     "Unable to parse " + mWebsitePage.name + " website",
                     null));
             if (mWebsite.source.equals(Website.SOURCE_REMOTE)) {
-                EventUtils.trackWebsiteWrongConfiguration(mWebsitePage.name);
+                EventUtils.trackWebsiteWrongConfiguration(mWebsite.name + " " + mWebsitePage.name);
             }
             mEnd = true;
         }

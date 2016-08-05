@@ -1,14 +1,17 @@
 package io.gresse.hugo.anecdote;
 
+import android.app.Activity;
+
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.gresse.hugo.anecdote.anecdote.social.SocialService;
 import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
-import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.WebsiteApiService;
+import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.model.WebsitePage;
 
 /**
@@ -21,10 +24,12 @@ public class ServiceProvider {
     protected List<Website>                mWebsites;
     protected Map<String, AnecdoteService> mAnecdoteServices;
     protected WebsiteApiService            mWebsiteApiService;
+    protected SocialService                mSocialService;
 
-    public ServiceProvider() {
+    public ServiceProvider(Activity activity) {
         mAnecdoteServices = new HashMap<>();
         mWebsiteApiService = new WebsiteApiService();
+        mSocialService = new SocialService(activity);
     }
 
     public void createAnecdoteService(List<Website> websites) {
@@ -42,6 +47,7 @@ public class ServiceProvider {
             eventBus.register(entry.getValue());
         }
         eventBus.register(mWebsiteApiService);
+        eventBus.register(mSocialService);
     }
 
     public void unregister(EventBus eventBus) {
@@ -50,6 +56,8 @@ public class ServiceProvider {
         }
         mAnecdoteServices.clear();
         eventBus.unregister(mWebsiteApiService);
+        mSocialService.unregister();
+        eventBus.unregister(mSocialService);
     }
 
     public AnecdoteService getAnecdoteService(String websitePageSlug) {
@@ -58,5 +66,9 @@ public class ServiceProvider {
 
     public WebsiteApiService getWebsiteApiService() {
         return mWebsiteApiService;
+    }
+
+    public SocialService getSocialService() {
+        return mSocialService;
     }
 }

@@ -139,7 +139,7 @@ public class AnecdoteFragment extends Fragment implements
         EventBus.getDefault().register(this);
         EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteSlug));
 
-        EventUtils.trackFragmentView(this, mWebsiteName);
+        EventUtils.trackFragmentView(this, mWebsiteName, null);
     }
 
     @Override
@@ -283,10 +283,10 @@ public class AnecdoteFragment extends Fragment implements
         switch (action) {
             default:
             case AnecdoteViewHolderListener.ACTION_COPY:
-                EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, anecdote));
+                EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, anecdote, anecdote.getShareString(getContext()), CopyAnecdoteEvent.TYPE_ANECDOTE));
                 break;
             case AnecdoteViewHolderListener.ACTION_SHARE:
-                EventBus.getDefault().post(new ShareAnecdoteEvent(mWebsiteName, anecdote));
+                EventBus.getDefault().post(new ShareAnecdoteEvent(mWebsiteName, anecdote, anecdote.getShareString(getContext())));
                 break;
             case AnecdoteViewHolderListener.ACTION_OPEN_IN_BROWSER_PRELOAD:
                 EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteName, anecdote, true));

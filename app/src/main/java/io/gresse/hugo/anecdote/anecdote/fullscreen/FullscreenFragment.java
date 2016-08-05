@@ -1,12 +1,15 @@
 package io.gresse.hugo.anecdote.anecdote.fullscreen;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -18,7 +21,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
-import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.social.OpenAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.social.ShareAnecdoteEvent;
@@ -81,16 +83,13 @@ public abstract class FullscreenFragment extends Fragment {
         EventBus.getDefault().post(new ChangeFullscreenEvent(false));
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        EventUtils.trackFragmentView(this, null);
-    }
-
     /***************************
      * Private methods
      ***************************/
 
+    /**
+     * Toggle the  Overlay/UI above the fullscreen content. This should be called by child fragment
+     */
     protected void toggleOverlayVisibility() {
         if (mContentTextView.isShown()) {
             Log.d(TAG, "toggleOverlayVisibility to GONE");
@@ -103,18 +102,41 @@ public abstract class FullscreenFragment extends Fragment {
         }
     }
 
+    /**
+     * Display a dialog to have some option
+     */
+    protected void onContentLongTouch(final String contentUrl) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setItems(R.array.anecdote_content_dialog, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface dialog, int which) {
+                // The 'which' argument contains the index position
+                // of the selected item
+                switch (which) {
+                    // Copy
+                    case 0:
+                        EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, mAnecdote, contentUrl, CopyAnecdoteEvent.TYPE_MEDIA));
+                        break;
+                    default:
+                        Toast.makeText(getActivity(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
+        builder.show();
+    }
+
     /***************************
      * onClick
      ***************************/
 
     @OnClick(R.id.shareButton)
     public void onShareClick() {
-        EventBus.getDefault().post(new ShareAnecdoteEvent(mWebsiteName, mAnecdote));
+        EventBus.getDefault().post(new ShareAnecdoteEvent(mWebsiteName, mAnecdote, mAnecdote.getShareString(getContext())));
     }
 
     @OnClick(R.id.copyButton)
     public void onCopyClick() {
-        EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, mAnecdote));
+        EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, mAnecdote, mAnecdote.getShareString(getContext()), CopyAnecdoteEvent.TYPE_ANECDOTE));
     }
 
     @OnClick(R.id.openButton)

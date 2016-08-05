@@ -9,8 +9,11 @@ import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
  */
 public class ShareAnecdoteEvent extends SocialEvent {
 
-    public ShareAnecdoteEvent(String websiteName, Anecdote anecdote) {
+    public String shareString;
+
+    public ShareAnecdoteEvent(String websiteName, Anecdote anecdote, String shareString) {
         super(websiteName, anecdote);
+        this.shareString = shareString;
     }
 
 }
