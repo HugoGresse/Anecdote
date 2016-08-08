@@ -114,7 +114,7 @@ public abstract class FullscreenFragment extends Fragment {
                 switch (which) {
                     // Copy
                     case 0:
-                        EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, mAnecdote, contentUrl, CopyAnecdoteEvent.TYPE_MEDIA));
+                        EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, mAnecdote, CopyAnecdoteEvent.TYPE_MEDIA, contentUrl));
                         break;
                     default:
                         Toast.makeText(getActivity(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
@@ -136,7 +136,7 @@ public abstract class FullscreenFragment extends Fragment {
 
     @OnClick(R.id.copyButton)
     public void onCopyClick() {
-        EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, mAnecdote, mAnecdote.getShareString(getContext()), CopyAnecdoteEvent.TYPE_ANECDOTE));
+        EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, mAnecdote, CopyAnecdoteEvent.TYPE_ANECDOTE, mAnecdote.getShareString(getContext())));
     }
 
     @OnClick(R.id.openButton)

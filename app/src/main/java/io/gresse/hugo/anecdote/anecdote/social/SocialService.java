@@ -34,7 +34,16 @@ public class SocialService {
             return;
         }
         mChromeCustomTabsManager = new ChromeCustomTabsManager(mActivity);
-        mChromeCustomTabsManager.bindCustomTabsService(mActivity);
+    }
+
+    /**
+     * Register service
+     */
+    public void register(Activity activity) {
+        mActivity = activity;
+        if (mChromeCustomTabsManager != null) {
+            mChromeCustomTabsManager.bindCustomTabsService(mActivity);
+        }
     }
 
     /**
