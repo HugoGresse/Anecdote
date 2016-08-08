@@ -132,7 +132,7 @@ public class MainActivity extends AppCompatActivity
         mServiceProvider = new ServiceProvider(this);
         mWebsites = SpStorage.getWebsites(this);
         mServiceProvider.createAnecdoteService(mWebsites);
-        mServiceProvider.register(EventBus.getDefault());
+        mServiceProvider.register(EventBus.getDefault(), this);
 
         populateNavigationView(false);
 
@@ -369,7 +369,7 @@ public class MainActivity extends AppCompatActivity
 
         mServiceProvider.unregister(EventBus.getDefault());
         mServiceProvider.createAnecdoteService(mWebsites);
-        mServiceProvider.register(EventBus.getDefault());
+        mServiceProvider.register(EventBus.getDefault(), this);
 
         if (!mWebsites.isEmpty()) {
             changeAnecdoteFragment(mWebsites.get(0), mWebsites.get(0).pages.get(0));

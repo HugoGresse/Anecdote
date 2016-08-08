@@ -42,12 +42,13 @@ public class ServiceProvider {
         }
     }
 
-    public void register(EventBus eventBus) {
+    public void register(EventBus eventBus, Activity activity) {
         for (Map.Entry<String, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
             eventBus.register(entry.getValue());
         }
         eventBus.register(mWebsiteApiService);
         eventBus.register(mSocialService);
+        mSocialService.register(activity);
     }
 
     public void unregister(EventBus eventBus) {

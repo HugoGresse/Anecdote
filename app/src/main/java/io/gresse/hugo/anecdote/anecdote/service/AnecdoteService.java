@@ -139,7 +139,7 @@ public class AnecdoteService {
         mOkHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+                Log.d(mServiceName, "Fail Download", e);
                 mFailEvents.add(event);
                 postOnUiThread(new RequestFailedEvent(
                         event,
