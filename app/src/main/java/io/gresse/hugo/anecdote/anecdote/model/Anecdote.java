@@ -58,7 +58,7 @@ public class Anecdote {
             copyString += " " + permalink;
         }
 
-        copyString += context.getString(R.string.app_share_credits);
+        copyString += " " + context.getString(R.string.app_share_credits);
 
         return copyString;
     }
