@@ -18,6 +18,10 @@ import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
  */
 public class EventUtils {
 
+    public static final String CONTENT_TYPE_ANECDOTE = "Anecdote";
+    public static final String CONTENT_TYPE_APP = "App";
+
+
     /**
      * Return true if event reporting is enable, checking the BuildConfig
      *
@@ -43,6 +47,10 @@ public class EventUtils {
             name = fragment.getClass().getSimpleName();
         } else {
             name = screenName;
+        }
+
+        if (TextUtils.isEmpty(name)) {
+            name = "ERROR";
         }
 
         ContentViewEvent contentViewEvent = new ContentViewEvent();

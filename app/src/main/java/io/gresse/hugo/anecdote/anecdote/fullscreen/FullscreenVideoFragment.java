@@ -62,7 +62,7 @@ public class FullscreenVideoFragment extends FullscreenFragment {
     public void onResume() {
         super.onResume();
 
-        EventUtils.trackFragmentView(this, null, "Fullscreen video");
+        EventUtils.trackFragmentView(this, null, EventUtils.CONTENT_TYPE_ANECDOTE);
     }
 
     @OnClick(R.id.playerView)

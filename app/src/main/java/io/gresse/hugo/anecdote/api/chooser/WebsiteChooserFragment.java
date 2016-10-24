@@ -124,7 +124,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
             EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
         }
 
-        EventUtils.trackFragmentView(this, null, null);
+        EventUtils.trackFragmentView(this, null, EventUtils.CONTENT_TYPE_APP);
     }
 
     @Override
