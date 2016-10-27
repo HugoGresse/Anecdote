@@ -1,5 +1,7 @@
 package io.gresse.hugo.anecdote;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -213,6 +215,12 @@ public class MainActivity extends AppCompatActivity
                         Fragment.instantiate(this, SettingsFragment.class.getName()),
                         true,
                         true);
+                return true;
+            case R.id.action_feedback:
+                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                        "mailto","hugo.gresse@gmail.com", null));
+                emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " feedback");
+                startActivity(Intent.createChooser(emailIntent, "Send email..."));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -225,8 +225,12 @@ public class MixedContentAdapter extends AnecdoteAdapter {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
                 mTextView.setText(Html.fromHtml(anecdote.text, Html.FROM_HTML_MODE_LEGACY));
             } else {
-                //noinspection deprecation
-                mTextView.setText(Html.fromHtml(anecdote.text));
+                try {
+                    //noinspection deprecation
+                    mTextView.setText(Html.fromHtml(anecdote.text));
+                } catch (Error error){
+                    mTextView.setText(anecdote.text);
+                }
             }
             mTextView.setTextSize(mTextSize);
 
@@ -237,7 +241,6 @@ public class MixedContentAdapter extends AnecdoteAdapter {
                     mItemView.setBackgroundColor(mRowBackground);
                 }
             }
-
 
             if (mExpandLayout == null) {
                 return;

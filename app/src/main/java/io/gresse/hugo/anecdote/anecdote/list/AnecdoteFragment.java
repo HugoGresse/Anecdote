@@ -139,7 +139,7 @@ public class AnecdoteFragment extends Fragment implements
         EventBus.getDefault().register(this);
         EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteSlug));
 
-        EventUtils.trackFragmentView(this, mWebsiteName, null);
+        EventUtils.trackFragmentView(this, mWebsiteName, EventUtils.CONTENT_TYPE_ANECDOTE);
     }
 
     @Override

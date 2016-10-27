@@ -45,7 +45,7 @@ public abstract class FullscreenFragment extends Fragment {
     @Bind(R.id.overlayLinearLayout)
     public LinearLayout mOverlayLinearLayout;
 
-    @Bind(R.id.textView)
+    @Bind(R.id.contentTextView)
     public TextView mContentTextView;
 
     @Override

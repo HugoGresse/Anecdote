@@ -71,7 +71,7 @@ public class FullscreenImageFragment extends FullscreenFragment implements Photo
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
-        EventUtils.trackFragmentView(this, null, "Fullscreen image");
+        EventUtils.trackFragmentView(this, null, EventUtils.CONTENT_TYPE_ANECDOTE);
     }
 
     @Override
