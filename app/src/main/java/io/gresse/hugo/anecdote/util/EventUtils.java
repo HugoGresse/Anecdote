@@ -63,8 +63,7 @@ public class EventUtils {
             contentViewEvent.putContentType(subName);
         }
 
-
-        Answers.getInstance().logContentView(new ContentViewEvent());
+        Answers.getInstance().logContentView(contentViewEvent);
     }
 
     /**
