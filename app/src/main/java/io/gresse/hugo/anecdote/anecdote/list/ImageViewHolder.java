@@ -32,7 +32,7 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
     private String mImageUrl;
 
     @Bind(R.id.imageView)
-    private ImageView mImageView;
+    ImageView mImageView;
 
 
 
