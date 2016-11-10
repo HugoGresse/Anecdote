@@ -51,7 +51,7 @@ public interface AnecdoteAdapter {
          * When the viewHolder is detached from the window = it's not visible anymore and will maybe be recycled
          */
         public void onViewDetached(){
-
+            // not needed to be implemented in child
         }
     }
 

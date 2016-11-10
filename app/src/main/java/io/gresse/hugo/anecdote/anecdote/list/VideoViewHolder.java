@@ -14,8 +14,9 @@ import io.gresse.hugo.anecdote.view.PlayerView;
  */
 public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
 
+    @SuppressWarnings("WeakerAccess")
     @Bind(R.id.exoplayerView)
-    PlayerView mPlayerView;
+    public PlayerView mPlayerView;
 
     public VideoViewHolder(View itemView,
                            AdapterListener adapterListener,

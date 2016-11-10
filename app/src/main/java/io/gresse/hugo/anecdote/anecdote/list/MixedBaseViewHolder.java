@@ -31,14 +31,17 @@ public class MixedBaseViewHolder
 
     private View mItemView;
 
+    @SuppressWarnings("WeakerAccess")
     @Bind(R.id.contentTextView)
-    TextView mTextView;
+    public TextView mTextView;
 
+    @SuppressWarnings("WeakerAccess")
     @Bind(R.id.expandLayout)
-    LinearLayout mExpandLayout;
+    public LinearLayout mExpandLayout;
 
+    @SuppressWarnings("WeakerAccess")
     @Bind(R.id.separator)
-    View mSeparatorView;
+    public View mSeparatorView;
 
     public MixedBaseViewHolder(View itemView,
                                AdapterListener adapterListener,
