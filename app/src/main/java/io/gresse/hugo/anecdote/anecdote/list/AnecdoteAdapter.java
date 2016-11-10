@@ -12,22 +12,32 @@ import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
  * <p/>
  * Created by Hugo Gresse on 27/03/16.
  */
-public abstract class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapter.BaseAnecdoteViewHolder> {
+public interface AnecdoteAdapter {
+
+    /**
+     * Get an item for the specified position
+     *
+     * @param position the position of the item
+     * @return an anecdote
+     */
+    Anecdote getItem(int position);
 
     /**
      * Set the adapter data to use
+     *
      * @param anecdotes the data to display
      */
-    public abstract void setData(List<Anecdote> anecdotes);
+    void setData(List<Anecdote> anecdotes);
 
     /**
      * Set the text style options
-     *  @param textSize                 size of text
+     *
+     * @param textSize                 size of text
      * @param rowStriping              strip row every two items
      * @param colorBackground          row background color
      * @param colorBackgroundStripping row background color of the stripping
      */
-    public abstract void setTextStyle(int textSize, boolean rowStriping, int colorBackground, int colorBackgroundStripping);
+    void setTextStyle(int textSize, boolean rowStriping, int colorBackground, int colorBackgroundStripping);
 
     abstract class BaseAnecdoteViewHolder extends RecyclerView.ViewHolder {
 
@@ -35,7 +45,14 @@ public abstract class AnecdoteAdapter extends RecyclerView.Adapter<AnecdoteAdapt
             super(itemView);
         }
 
-        public abstract void setData(int position, Anecdote anecdote, boolean expanded);
+        public abstract void setData(int position, Anecdote anecdote);
+
+        /**
+         * When the viewHolder is detached from the window = it's not visible anymore and will maybe be recycled
+         */
+        public void onViewDetached(){
+            // not needed to be implemented in child
+        }
     }
 
 }

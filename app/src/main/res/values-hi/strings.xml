@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?><resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">उद्धरण</string>
+
+    <string name="app_migration_1_0_0">नवीन उद्धरण संस्करण पर चले गए</string>
+
+    <string name="navigation_drawer_open">नेविगेशन दराज खोंले</string>
+    <string name="navigation_drawer_close">नेविगेशन दराज बंद करें</string>
+
+    <string name="action_settings">सेटिंग</string>
+    <string name="action_about">बारे में</string>
+    <string name="action_restore">वेबसाइटों को पुनर्स्थापित करें</string>
+    <string name="action_edit">संपादित करें</string>
+    <string name="action_delete">मिटाए</string>
+    <string name="action_default">डिफॉल्ट</string>
+    <string name="action_website_add">वेबसाइट जोड़े</string>
+    <string name="action_website_newwebsite">नयी वेबसाइटे उपलब्ध हैं!</string>
+    <string name="action_website_add_custom">कस्टम वेबसाइट जोड़े</string>
+    <string name="copied">क्लिपबोर्ड पर कॉपी किया गया</string>
+    <string name="action_website_noteditable_toast">आप रिमोट वेबसाइट को संपादित नहीं कर सकते हैं</string>
+
+    <string name="app_share_credits"> - उद्धरण http://bit.ly/anecdoteapp के माध्यम से</string>
+
+    <string name="anecdote_share_title">का उपयोग कर साझा करें</string>
+    <string-array name="anecdote_content_dialog">
+    <item>कड़ी की प्रतिलिप करें</item>
+  </string-array>
+
+
+    <string name="action_share">साझा करें</string>
+    <string name="action_copy">कॉपी करें</string>
+    <string name="action_open">खोलें</string>
+
+    <string name="open_intent_browser">ब्राउजर खोल रहे हैं…</string>
+    <string name="open_intent_browser_error">विवरण खोलने में असमर्थ, यूआरएल विन्यास की जाँच करें</string>
+
+    <string name="action_website">वेबसाइट कार्यवाही</string>
+
+    <string name="dialog_website_new_title">नयी वेबसाइट</string>
+    <string name="dialog_website_edit_title">संपादित करें</string>
+    <string name="dialog_website_add">जोड़े</string>
+    <string name="dialog_website_error_itemperpage">प्रति पृष्ठ चीजें 0 से अधिक होनी ही चाहिए</string>
+    <string name="dialog_website_error_name">क्या आप कोई नाम जोड़ना नहीं चाहते हैं?</string>
+    <string name="dialog_website_error_pagename">पृष्ठ का नाम जोड़े</string>
+    <string name="dialog_website_error_url">लापता है वेबसाइट पृष्ठ यूआरएल :(</string>
+    <string name="dialog_website_error_selector">पाठ्य चयनक लापता है</string>
+    <string name="dialog_website_save">संरक्षित करें</string>
+    <string name="dialog_website_name_hint">वेबसाइट का नाम</string>
+    <string name="dialog_website_page_name_hint">पृष्ठ का नाम</string>
+    <string name="dialog_website_url_hint">वेबसाइट का यूआरएल</string>
+    <string name="dialog_website_urlsuffix_hint">(वैकल्पिक) पृष्ठ संख्या प्रत्यय</string>
+    <string name="dialog_website_selector_hint">डीओएम चयनक</string>
+    <string name="dialog_website_itemperpage_hint">पृष्ठ में तत्वों की संख्या</string>
+    <string name="dialog_website_firstpagezero_hint">यदि पहला पृष्ठ क्रमांक 0 है</string>
+
+    <string name="dialog_websitechooser_title">अपनी पसंदीदा साईटों को चुने</string>
+
+
+    <!-- About fragment -->
+    <string name="about_title">बारे में</string>
+    <string name="about_made">प्यार से इनके द्वारा निर्मित किया गया हैं:</string>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_cat_display">डिस्प्ले</string>
+    <string name="pref_rowstriping_title">पंक्ति पट्टी उद्धरण</string>
+    <string name="pref_rowstriping_summary">हर उद्धरण को अलग रखने के लिए पृष्ठभूमि जोड़े</string>
+    <string name="pref_textsize_title">पाठ्य का आकार</string>
+    <string-array name="pref_textsize_title">
+    <item>ज्यादा छोटा</item>
+    <item>छोटा</item>
+    <item>साधारण</item>
+    <item>बड़ा</item>
+    <item>ज्यादा बड़ा</item>
+  </string-array>
+
+    <string name="anecdote_open_inbrowser">अपने ब्राउजर में खोले</string>
+    <string name="action_feedback">प्रतिक्रिया भेजें</string>
+
+</resources>
