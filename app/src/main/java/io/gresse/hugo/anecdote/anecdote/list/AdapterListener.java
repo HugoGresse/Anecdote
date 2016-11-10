@@ -10,7 +10,7 @@ import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
  * <p/>
  * Created by Hugo Gresse on 17/02/16.
  */
-public interface AnecdoteViewHolderListener {
+public interface AdapterListener {
 
     int ACTION_COPY                    = 1;
     int ACTION_SHARE                   = 2;

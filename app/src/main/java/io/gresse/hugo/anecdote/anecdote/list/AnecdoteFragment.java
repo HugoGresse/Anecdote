@@ -45,7 +45,7 @@ import io.gresse.hugo.anecdote.anecdote.social.ShareAnecdoteEvent;
  */
 public class AnecdoteFragment extends Fragment implements
         SwipeRefreshLayout.OnRefreshListener,
-        AnecdoteViewHolderListener {
+        AdapterListener {
 
     private static final String TAG                      = AnecdoteFragment.class.getSimpleName();
     public static final  String ARGS_WEBSITE_PARENT_SLUG = "key_website_parent_slug";
@@ -170,7 +170,7 @@ public class AnecdoteFragment extends Fragment implements
         mAdapter = new MixedContentAdapter(this, mAnecdoteService.getWebsitePage().isSinglePage);
 
         mAdapter.setData(mAnecdoteService.getAnecdotes());
-        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setAdapter((RecyclerView.Adapter) mAdapter);
 
         // Set default values
         mIsLoadingNewItems = false;
@@ -282,19 +282,19 @@ public class AnecdoteFragment extends Fragment implements
     public void onClick(Anecdote anecdote, View view, int action) {
         switch (action) {
             default:
-            case AnecdoteViewHolderListener.ACTION_COPY:
+            case AdapterListener.ACTION_COPY:
                 EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, anecdote, anecdote.getShareString(getContext()), CopyAnecdoteEvent.TYPE_ANECDOTE));
                 break;
-            case AnecdoteViewHolderListener.ACTION_SHARE:
+            case AdapterListener.ACTION_SHARE:
                 EventBus.getDefault().post(new ShareAnecdoteEvent(mWebsiteName, anecdote, anecdote.getShareString(getContext())));
                 break;
-            case AnecdoteViewHolderListener.ACTION_OPEN_IN_BROWSER_PRELOAD:
+            case AdapterListener.ACTION_OPEN_IN_BROWSER_PRELOAD:
                 EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteName, anecdote, true));
                 break;
-            case AnecdoteViewHolderListener.ACTION_OPEN_IN_BROWSER:
+            case AdapterListener.ACTION_OPEN_IN_BROWSER:
                 EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteName, anecdote, false));
                 break;
-            case AnecdoteViewHolderListener.ACTION_FULLSCREEN:
+            case AdapterListener.ACTION_FULLSCREEN:
                 fullscreenAnecdote(anecdote, view);
                 break;
         }

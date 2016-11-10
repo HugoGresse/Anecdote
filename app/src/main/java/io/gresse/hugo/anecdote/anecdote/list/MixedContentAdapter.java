@@ -1,40 +1,32 @@
 package io.gresse.hugo.anecdote.anecdote.list;
 
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
-import android.text.Html;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.anecdote.model.MediaType;
-import io.gresse.hugo.anecdote.view.PlayerView;
 
 /**
  * A generic adapters for all anecdotes
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
-public class MixedContentAdapter extends AnecdoteAdapter {
+public class MixedContentAdapter
+        extends RecyclerView.Adapter<AnecdoteAdapter.BaseAnecdoteViewHolder>
+        implements AnecdoteAdapter {
 
     public static final String TAG = MixedContentAdapter.class.getSimpleName();
 
@@ -45,19 +37,18 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     public static final int VIEW_TYPE_UNKNOWN = 4;
 
 
-    private List<Anecdote>             mAnecdotes;
-    private boolean                    mIsSinglePage;
+    private List<Anecdote>  mAnecdotes;
+    private boolean         mIsSinglePage;
     @Nullable
-    private AnecdoteViewHolderListener mAnecdoteViewHolderListener;
-    private int                        mTextSize;
-    private boolean                    mRowStriping;
-    private int                        mRowBackground;
-    private int                        mRowStripingBackground;
-    private int mExpandedPosition = -1;
+    private AdapterListener mAdapterListener;
+    private int             mTextSize;
+    private boolean         mRowStriping;
+    private int             mRowBackground;
+    private int             mRowStripingBackground;
 
-    public MixedContentAdapter(@Nullable AnecdoteViewHolderListener anecdoteViewHolderListener, boolean isSinglePage) {
+    public MixedContentAdapter(@Nullable AdapterListener adapterListener, boolean isSinglePage) {
         mAnecdotes = new ArrayList<>();
-        mAnecdoteViewHolderListener = anecdoteViewHolderListener;
+        mAdapterListener = adapterListener;
         mIsSinglePage = isSinglePage;
     }
 
@@ -78,6 +69,12 @@ public class MixedContentAdapter extends AnecdoteAdapter {
             };
             mainHandler.post(runnable);
         }
+    }
+
+    @Override
+    public void onViewDetachedFromWindow(BaseAnecdoteViewHolder holder) {
+        super.onViewDetachedFromWindow(holder);
+        holder.onViewDetached();
     }
 
     /**
@@ -138,16 +135,16 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         switch (viewType) {
             default:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote_unknown, parent, false);
-                return new UnknownViewHolder(v);
+                return new UnknownViewHolder(v, mAdapterListener, this, mTextSize, mRowStriping, mRowBackground, mRowStripingBackground);
             case VIEW_TYPE_TEXT:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote, parent, false);
-                return new TextViewHolder(v);
+                return new MixedBaseViewHolder(v, mAdapterListener, this, mTextSize, mRowStriping, mRowBackground, mRowStripingBackground);
             case VIEW_TYPE_IMAGE:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote_image, parent, false);
-                return new ImageViewHolder(v);
+                return new ImageViewHolder(v, mAdapterListener, this, mTextSize, mRowStriping, mRowBackground, mRowStripingBackground);
             case VIEW_TYPE_VIDEO:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote_video, parent, false);
-                return new VideoViewHolder(v);
+                return new VideoViewHolder(v, mAdapterListener, this, mTextSize, mRowStriping, mRowBackground, mRowStripingBackground);
             case VIEW_TYPE_LOAD:
                 v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_loader, parent, false);
                 return new LoadViewHolder(v);
@@ -157,7 +154,7 @@ public class MixedContentAdapter extends AnecdoteAdapter {
     @Override
     public void onBindViewHolder(BaseAnecdoteViewHolder holder, int position) {
         if (position < mAnecdotes.size()) {
-            holder.setData(position, mAnecdotes.get(position), position == mExpandedPosition);
+            holder.setData(position, mAnecdotes.get(position));
         }
     }
 
@@ -195,248 +192,21 @@ public class MixedContentAdapter extends AnecdoteAdapter {
         }
     }
 
-    /***************************
-     * ViewHolder
-     ***************************/
-
-    public abstract class MixedBaseViewHolder extends BaseAnecdoteViewHolder implements View.OnClickListener {
-
-        protected View mItemView;
-
-        @Bind(R.id.contentTextView)
-        protected TextView mTextView;
-
-        @Bind(R.id.expandLayout)
-        protected LinearLayout mExpandLayout;
-
-        @Bind(R.id.separator)
-        protected View mSeparatorView;
-
-        public MixedBaseViewHolder(View itemView) {
-            super(itemView);
-
-            mItemView = itemView;
-            ButterKnife.bind(this, itemView);
-            itemView.setOnClickListener(this);
-        }
-
-        @Override
-        public void setData(int position, Anecdote anecdote, boolean expanded) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                mTextView.setText(Html.fromHtml(anecdote.text, Html.FROM_HTML_MODE_LEGACY));
-            } else {
-                try {
-                    //noinspection deprecation
-                    mTextView.setText(Html.fromHtml(anecdote.text));
-                } catch (Error error){
-                    mTextView.setText(anecdote.text);
-                }
-            }
-            mTextView.setTextSize(mTextSize);
-
-            if (mRowStriping) {
-                if (position % 2 == 0) {
-                    mItemView.setBackgroundColor(mRowStripingBackground);
-                } else {
-                    mItemView.setBackgroundColor(mRowBackground);
-                }
-            }
-
-            if (mExpandLayout == null) {
-                return;
-            }
-
-            if (expanded) {
-                mSeparatorView.setVisibility(View.VISIBLE);
-                mExpandLayout.setVisibility(View.VISIBLE);
-                ((ViewGroup.MarginLayoutParams) itemView.getLayoutParams()).topMargin = 50;
-                ((ViewGroup.MarginLayoutParams) itemView.getLayoutParams()).bottomMargin = 50;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    itemView.setElevation(8);
-                }
-            } else {
-                mSeparatorView.setVisibility(View.GONE);
-                mExpandLayout.setVisibility(View.GONE);
-                ((ViewGroup.MarginLayoutParams) itemView.getLayoutParams()).topMargin = 0;
-                ((ViewGroup.MarginLayoutParams) itemView.getLayoutParams()).bottomMargin = 0;
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    itemView.setElevation(0);
-                }
-            }
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (mExpandedPosition == getAdapterPosition()) {
-                mExpandedPosition = -1;
-                notifyItemChanged(getAdapterPosition());
-                return;
-            }
-            // Notify expanded last position
-            notifyItemChanged(mExpandedPosition);
-            mExpandedPosition = getAdapterPosition();
-            // Notify new element
-            notifyItemChanged(mExpandedPosition);
-            if (mAnecdoteViewHolderListener != null) {
-                mAnecdoteViewHolderListener.onClick(
-                        mAnecdotes.get(getAdapterPosition()),
-                        itemView,
-                        AnecdoteViewHolderListener.ACTION_OPEN_IN_BROWSER_PRELOAD);
-            }
-        }
-
-        @OnClick(R.id.shareButton)
-        public void onShareClick() {
-            if (mAnecdoteViewHolderListener != null) {
-                mAnecdoteViewHolderListener.onClick(
-                        mAnecdotes.get(getAdapterPosition()),
-                        itemView,
-                        AnecdoteViewHolderListener.ACTION_SHARE);
-            }
-        }
-
-        @OnClick(R.id.copyButton)
-        public void onCopyClick() {
-            if (mAnecdoteViewHolderListener != null) {
-                mAnecdoteViewHolderListener.onClick(
-                        mAnecdotes.get(getAdapterPosition()),
-                        itemView,
-                        AnecdoteViewHolderListener.ACTION_COPY);
-            }
-        }
-
-        @OnClick(R.id.openButton)
-        public void onOpenClick() {
-            if (mAnecdoteViewHolderListener != null) {
-                mAnecdoteViewHolderListener.onClick(
-                        mAnecdotes.get(getAdapterPosition()),
-                        itemView,
-                        AnecdoteViewHolderListener.ACTION_OPEN_IN_BROWSER);
-            }
-        }
+    @Override
+    public Anecdote getItem(int position) {
+        return mAnecdotes.get(position);
     }
 
-    public class TextViewHolder extends MixedBaseViewHolder {
+    private class LoadViewHolder extends BaseAnecdoteViewHolder {
 
-        public TextViewHolder(View itemView) {
-            super(itemView);
-        }
-    }
-
-    public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
-
-        @Bind(R.id.imageView)
-        protected ImageView mImageView;
-
-        public ImageViewHolder(View itemView) {
-            super(itemView);
-
-            if (mImageView != null) {
-                mImageView.setOnClickListener(this);
-            }
-        }
-
-        @Override
-        public void setData(int position, Anecdote anecdote, boolean expanded) {
-            super.setData(position, anecdote, expanded);
-            String log = "setData: url:" + anecdote.media + " text:" + anecdote.text;
-
-            ViewCompat.setTransitionName(mImageView, String.valueOf(position) + "_image");
-            Glide.with(mImageView.getContext())
-                    .load(anecdote.media)
-                    .fitCenter()
-                    .into(mImageView);
-
-            Log.d(TAG, log);
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (!(v instanceof ImageView)) {
-                super.onClick(v);
-                return;
-            }
-            if (mAnecdoteViewHolderListener != null && mImageView != null) {
-                mAnecdoteViewHolderListener.onClick(
-                        mAnecdotes.get(getAdapterPosition()),
-                        mImageView,
-                        AnecdoteViewHolderListener.ACTION_FULLSCREEN);
-            }
-        }
-    }
-
-    public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
-
-        @Bind(R.id.exoplayerView)
-        protected PlayerView mPlayerView;
-
-        public VideoViewHolder(View itemView) {
-            super(itemView);
-
-            if (mPlayerView != null) {
-                mPlayerView.setOnClickListener(this);
-            }
-        }
-
-        @Override
-        public void setData(int position, Anecdote anecdote, boolean expanded) {
-            super.setData(position, anecdote, expanded);
-            if (mPlayerView != null && anecdote.media != null) {
-                mPlayerView.setVideoUrl(anecdote.media);
-            }
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (!(v instanceof PlayerView)) {
-                super.onClick(v);
-                return;
-            }
-            if (mAnecdoteViewHolderListener != null) {
-                mAnecdoteViewHolderListener.onClick(
-                        mAnecdotes.get(getAdapterPosition()),
-                        mPlayerView,
-                        AnecdoteViewHolderListener.ACTION_FULLSCREEN);
-            }
-        }
-    }
-
-
-    public class UnknownViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
-
-        @Bind(R.id.openLinearLayout)
-        public LinearLayout mContainerLayout;
-
-        public UnknownViewHolder(View itemView) {
-            super(itemView);
-
-            mContainerLayout.setOnClickListener(this);
-        }
-
-        @Override
-        public void onClick(View v) {
-            if (!(v instanceof LinearLayout)) {
-                super.onClick(v);
-                return;
-            }
-            if (mAnecdoteViewHolderListener != null) {
-                mAnecdoteViewHolderListener.onClick(
-                        mAnecdotes.get(getAdapterPosition()),
-                        null, 0);
-            }
-        }
-    }
-
-    public class LoadViewHolder extends BaseAnecdoteViewHolder {
-
-        public LoadViewHolder(View itemView) {
+        LoadViewHolder(View itemView) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);
         }
 
         @Override
-        public void setData(int position, Anecdote anecdote, boolean expanded) {
+        public void setData(int position, Anecdote anecdote) {
             // This view is static, no need to change it's data
         }
     }
