@@ -15,7 +15,7 @@ import java.net.URL;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.util.EventUtils;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 
 /**
  * About adapter
@@ -113,7 +113,7 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
         @Override
         public void onClick(View v) {
             if (mOnClickListener != null) {
-                EventUtils.trackThirdPartiesClick(authorTextView.getText().toString());
+                EventTracker.trackThirdPartiesClick(authorTextView.getText().toString());
                 mOnClickListener.onItemClick(mAuthorIntent);
             }
         }

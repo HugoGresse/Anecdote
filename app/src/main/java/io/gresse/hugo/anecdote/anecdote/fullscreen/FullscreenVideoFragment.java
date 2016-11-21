@@ -14,7 +14,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.util.EventUtils;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 import io.gresse.hugo.anecdote.view.PlayerView;
 
 /**
@@ -62,7 +62,7 @@ public class FullscreenVideoFragment extends FullscreenFragment {
     public void onResume() {
         super.onResume();
 
-        EventUtils.trackFragmentView(this, null, EventUtils.CONTENT_TYPE_ANECDOTE);
+        EventTracker.trackFragmentView(this, null, EventTracker.CONTENT_TYPE_ANECDOTE);
     }
 
     @OnClick(R.id.playerView)

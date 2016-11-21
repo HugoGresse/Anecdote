@@ -17,7 +17,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
-import io.gresse.hugo.anecdote.util.EventUtils;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 
 /**
  * About fragment
@@ -57,7 +57,7 @@ public class AboutFragment extends Fragment implements AboutAdapter.OnClickListe
         super.onResume();
         EventBus.getDefault().post(new ChangeTitleEvent(getString(R.string.action_about), this.getClass().getName()));
 
-        EventUtils.trackFragmentView(this, null, EventUtils.CONTENT_TYPE_APP);
+        EventTracker.trackFragmentView(this, null, EventTracker.CONTENT_TYPE_APP);
     }
 
     @Override

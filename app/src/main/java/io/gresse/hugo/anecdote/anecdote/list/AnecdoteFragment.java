@@ -25,18 +25,18 @@ import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
-import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
-import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenEvent;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.anecdote.model.MediaType;
 import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.anecdote.service.event.LoadNewAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.service.event.OnAnecdoteLoadedEvent;
-import io.gresse.hugo.anecdote.event.RequestFailedEvent;
-import io.gresse.hugo.anecdote.util.EventUtils;
+import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.social.OpenAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.social.ShareAnecdoteEvent;
+import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 
 /**
  * A generic anecdote fragment
@@ -139,7 +139,7 @@ public class AnecdoteFragment extends Fragment implements
         EventBus.getDefault().register(this);
         EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteSlug));
 
-        EventUtils.trackFragmentView(this, mWebsiteName, EventUtils.CONTENT_TYPE_ANECDOTE);
+        EventTracker.trackFragmentView(this, mWebsiteName, EventTracker.CONTENT_TYPE_ANECDOTE);
     }
 
     @Override
@@ -239,6 +239,7 @@ public class AnecdoteFragment extends Fragment implements
             case MediaType.IMAGE:
                 EventBus.getDefault().post(new FullscreenEvent(
                         FullscreenEvent.TYPE_IMAGE,
+                        mWebsiteName,
                         this,
                         view,
                         getString(R.string.anecdote_image_transition_name),
@@ -248,6 +249,7 @@ public class AnecdoteFragment extends Fragment implements
             case MediaType.VIDEO:
                 EventBus.getDefault().post(new FullscreenEvent(
                         FullscreenEvent.TYPE_VIDEO,
+                        mWebsiteName,
                         this,
                         view,
                         getString(R.string.anecdote_image_transition_name),

@@ -15,9 +15,9 @@ import java.util.List;
 
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.anecdote.model.MediaType;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 
 /**
  * A generic adapters for all anecdotes
@@ -171,7 +171,7 @@ public class MixedContentAdapter
         if (position < mAnecdotes.size()) {
             Anecdote anecdote = mAnecdotes.get(position);
             if (TextUtils.isEmpty(anecdote.type)) {
-                EventUtils.trackError("MixedContentAdapter", "Unknow type, using TEXT: " + anecdote.type);
+                EventTracker.trackError("MixedContentAdapter", "Unknow type, using TEXT: " + anecdote.type);
                 Log.e(TAG, "Unknow type, using TEXT: " + anecdote.type);
                 return VIEW_TYPE_TEXT;
             }
@@ -183,7 +183,7 @@ public class MixedContentAdapter
                 case MediaType.VIDEO:
                     return VIEW_TYPE_VIDEO;
                 default:
-                    EventUtils.trackError("MixedContentAdapter", "Unknow type: " + anecdote.type);
+                    EventTracker.trackError("MixedContentAdapter", "Unknow type: " + anecdote.type);
                     Log.e(TAG, "Unknow type: " + anecdote.type);
                     return VIEW_TYPE_UNKNOWN;
             }

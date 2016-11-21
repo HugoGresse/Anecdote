@@ -30,13 +30,13 @@ import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.WebsiteViewHolderListener;
 import io.gresse.hugo.anecdote.anecdote.fragment.WebsiteDialogFragment;
-import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.api.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.api.event.OnRemoteWebsiteResponseEvent;
-import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.api.model.Website;
+import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.storage.SpStorage;
-import io.gresse.hugo.anecdote.util.EventUtils;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 
 /**
  * Display a list of website from Firebase so the user can choose which website he want to load after initial
@@ -124,7 +124,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
             EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
         }
 
-        EventUtils.trackFragmentView(this, null, EventUtils.CONTENT_TYPE_APP);
+        EventTracker.trackFragmentView(this, null, EventTracker.CONTENT_TYPE_APP);
     }
 
     @Override
@@ -143,7 +143,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
             EventBus.getDefault().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_RESTORE)) {
             SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
-            EventUtils.trackWebsitesRestored();
+            EventTracker.trackWebsitesRestored();
             EventBus.getDefault().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_ADD)) {
             for (Website website : mSelectedWebsites) {
@@ -162,7 +162,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
     private void setAdapterData(List<Website> websites) {
         List<Website> websites1 = new ArrayList<>();
         websites1.addAll(websites);
-        if (websites1 != null && !websites1.isEmpty()) {
+        if (!websites1.isEmpty()) {
             if (!TextUtils.isEmpty(mMode) && !mMode.equals(BUNDLE_MODE_RESTORE)) {
                 // We want to add some websites : remove duplicates or already added ones
                 List<Website> savedWebsites = SpStorage.getWebsites(getActivity());

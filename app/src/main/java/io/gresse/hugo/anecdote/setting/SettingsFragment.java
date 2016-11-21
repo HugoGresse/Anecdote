@@ -7,9 +7,9 @@ import android.support.v7.preference.PreferenceFragmentCompat;
 import org.greenrobot.eventbus.EventBus;
 
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
-import io.gresse.hugo.anecdote.util.EventUtils;
 import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
+import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 
 /**
  * Anecdote preferences fragment
@@ -27,7 +27,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     public void onResume() {
         super.onResume();
         EventBus.getDefault().post(new ChangeTitleEvent(getString(R.string.action_settings), null));
-        EventUtils.trackFragmentView(this, null, EventUtils.CONTENT_TYPE_APP);
+        EventTracker.trackFragmentView(this, null, EventTracker.CONTENT_TYPE_APP);
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }
 
@@ -51,7 +51,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
             value = String.valueOf(sharedPreferences.getString(key, null));
         }
 
-        EventUtils.trackSettingChange(key, value);
+        EventTracker.trackSettingChange(key, value);
     }
 
 }

@@ -58,3 +58,7 @@
   **[] $VALUES;
   public *;
 }
+
+############
+# COUNTLY / OpenUDID
+-keep class org.openudid.** { *; }

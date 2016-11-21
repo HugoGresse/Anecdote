@@ -16,7 +16,7 @@ import org.greenrobot.eventbus.Subscribe;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.util.EventUtils;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 import uk.co.senab.photoview.PhotoViewAttacher;
 
 
@@ -71,7 +71,7 @@ public class FullscreenImageFragment extends FullscreenFragment implements Photo
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
-        EventUtils.trackFragmentView(this, null, EventUtils.CONTENT_TYPE_ANECDOTE);
+        EventTracker.trackFragmentView(this, null, EventTracker.CONTENT_TYPE_ANECDOTE);
     }
 
     @Override

@@ -1,26 +1,33 @@
-package io.gresse.hugo.anecdote.util;
+package io.gresse.hugo.anecdote.tracking;
 
+import android.app.Activity;
+import android.content.Context;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
-
-import com.crashlytics.android.answers.Answers;
-import com.crashlytics.android.answers.ContentViewEvent;
-import com.crashlytics.android.answers.CustomEvent;
 
 import io.gresse.hugo.anecdote.Configuration;
 import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
 
 /**
- * Event related utils
+ * Main entry point for tracking application activity. Sub flavors are responsable to implement
+ * {@link EventSenderInterface} with a class named "EventSender" and send the proper information to each services they
+ * manage.
  * <p/>
  * Created by Hugo Gresse on 25/04/16.
  */
-public class EventUtils {
+public class EventTracker {
 
     public static final String CONTENT_TYPE_ANECDOTE = "Anecdote";
     public static final String CONTENT_TYPE_APP = "App";
 
+    protected static EventSenderInterface sEvent;
+
+    public EventTracker(Context context) {
+        if (!isEventEnable()) return;
+
+        sEvent = new EventSender(context);
+    }
 
     /**
      * Return true if event reporting is enable, checking the BuildConfig
@@ -31,6 +38,23 @@ public class EventUtils {
         return !Configuration.DEBUG;
     }
 
+    /**
+     * Called by activities onStart
+     */
+    public static void onStart(Activity activity){
+        if (!isEventEnable()) return;
+
+        sEvent.onStart(activity);
+    }
+
+    /**
+     * Called by activties onStopre
+     */
+    public static void onStop(){
+        if (!isEventEnable()) return;
+
+        sEvent.onStop();
+    }
     /**
      * Track fragment view, should be called in onResume
      *
@@ -53,17 +77,11 @@ public class EventUtils {
             name = "ERROR";
         }
 
-        ContentViewEvent contentViewEvent = new ContentViewEvent();
-
-        contentViewEvent.putContentName(name);
-
         if (TextUtils.isEmpty(subName)) {
-            contentViewEvent.putContentType("Fragment");
-        } else {
-            contentViewEvent.putContentType(subName);
+            subName = "Fragment";
         }
 
-        Answers.getInstance().logContentView(contentViewEvent);
+        sEvent.sendView(name, subName);
     }
 
     /**
@@ -75,10 +93,7 @@ public class EventUtils {
     public static void trackError(String key, String value) {
         if (!isEventEnable()) return;
 
-        CustomEvent event = new CustomEvent("Error");
-        event.putCustomAttribute(key, value);
-
-        Answers.getInstance().logCustom(event);
+        sEvent.sendEvent("Error", key, value);
     }
 
     /**
@@ -90,17 +105,16 @@ public class EventUtils {
     public static void trackWebsiteEdit(String websiteName, boolean isSave) {
         if (!isEventEnable()) return;
 
-        CustomEvent event = new CustomEvent("Website edit");
-
+        String mode;
         if (isSave) {
-            event.putCustomAttribute("mode", "save");
+            mode = "save";
         } else {
-            event.putCustomAttribute("mode", "open");
+            mode = "open";
         }
 
-        event.putCustomAttribute("Website name", websiteName);
-
-        Answers.getInstance().logCustom(event);
+        sEvent.sendEvent("Website edit",
+                "mode", mode,
+                "Website name", websiteName);
     }
 
     /**
@@ -111,9 +125,7 @@ public class EventUtils {
     public static void trackWebsiteDelete(String websiteName) {
         if (!isEventEnable()) return;
 
-        Answers.getInstance().logCustom(
-                new CustomEvent("Website delete")
-                        .putCustomAttribute("Website name", websiteName));
+        sEvent.sendEvent("Website delete", "Website name", websiteName);
     }
 
     /**
@@ -124,9 +136,7 @@ public class EventUtils {
     public static void trackWebsiteDefault(String websiteName) {
         if (!isEventEnable()) return;
 
-        Answers.getInstance().logCustom(
-                new CustomEvent("Website set default")
-                        .putCustomAttribute("Website name", websiteName));
+        sEvent.sendEvent("Website delete", "Website set default", websiteName);
     }
 
     /**
@@ -135,7 +145,7 @@ public class EventUtils {
     public static void trackWebsitesRestored() {
         if (!isEventEnable()) return;
 
-        Answers.getInstance().logCustom(new CustomEvent("Websites restored"));
+        sEvent.sendEvent("Website restored");
     }
 
     /**
@@ -144,7 +154,7 @@ public class EventUtils {
     public static void trackCustomWebsiteAdded() {
         if (!isEventEnable()) return;
 
-        Answers.getInstance().logCustom(new CustomEvent("Websites custom added"));
+        sEvent.sendEvent("Websites custom added");
     }
 
     /**
@@ -155,10 +165,9 @@ public class EventUtils {
     public static void trackAnecdoteCopy(CopyAnecdoteEvent event) {
         if (!isEventEnable()) return;
 
-        Answers.getInstance().logCustom(
-                new CustomEvent("Anecdote copied")
-                        .putCustomAttribute("Website name", event.websiteName)
-                        .putCustomAttribute("Type", event.type));
+        sEvent.sendEvent("Anecdote copied",
+                "Website name", event.websiteName,
+                "Type", event.type);
     }
 
     /**
@@ -169,9 +178,8 @@ public class EventUtils {
     public static void trackAnecdoteShare(String websiteName) {
         if (!isEventEnable()) return;
 
-        Answers.getInstance().logCustom(
-                new CustomEvent("Anecdote shared")
-                        .putCustomAttribute("Website name", websiteName));
+        sEvent.sendEvent("Anecdote shared",
+                "Website name", websiteName);
     }
 
     /**
@@ -182,9 +190,8 @@ public class EventUtils {
     public static void trackAnecdoteDetails(String websiteName) {
         if (!isEventEnable()) return;
 
-        Answers.getInstance().logCustom(
-                new CustomEvent("Anecdote details")
-                        .putCustomAttribute("Website name", websiteName));
+        sEvent.sendEvent("Anecdote details",
+                "Website name", websiteName);
     }
 
     /**
@@ -195,9 +202,8 @@ public class EventUtils {
     public static void trackAnecdoteReadMore(String websiteName) {
         if (!isEventEnable()) return;
 
-        Answers.getInstance().logCustom(
-                new CustomEvent("Anecdote read more")
-                        .putCustomAttribute("Website name", websiteName));
+        sEvent.sendEvent("Anecdote read more",
+                "Website name", websiteName);
     }
 
     /**
@@ -208,9 +214,8 @@ public class EventUtils {
     public static void trackThirdPartiesClick(String thirdPartiesName) {
         if (!isEventEnable()) return;
 
-        Answers.getInstance().logCustom(
-                new CustomEvent("Third-parties click")
-                        .putCustomAttribute("Third-parties", thirdPartiesName));
+        sEvent.sendEvent("Third-parties click",
+                "Third-parties", thirdPartiesName);
     }
 
     /**
@@ -222,9 +227,8 @@ public class EventUtils {
     public static void trackSettingChange(String name, String value) {
         if (!isEventEnable()) return;
 
-        Answers.getInstance().logCustom(
-                new CustomEvent("Setting " + name + " changed")
-                        .putCustomAttribute("value", value));
+        sEvent.sendEvent("Setting " + name + " changed",
+                "value", value);
     }
 
     /**
@@ -235,8 +239,7 @@ public class EventUtils {
     public static void trackWebsiteWrongConfiguration(String websiteName) {
         if (!isEventEnable()) return;
 
-        Answers.getInstance().logCustom(
-                new CustomEvent("Website wrong configuration")
-                        .putCustomAttribute("Website name", websiteName));
+        sEvent.sendEvent("Website wrong configuration",
+                "Website name", websiteName);
     }
 }
