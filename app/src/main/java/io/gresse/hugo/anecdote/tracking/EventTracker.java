@@ -20,8 +20,9 @@ public class EventTracker {
 
     public static final String CONTENT_TYPE_ANECDOTE = "Anecdote";
     public static final String CONTENT_TYPE_APP = "App";
+    public static final String TRACKING_WEBSITE_NAME = "Website name";
 
-    protected static EventSenderInterface sEvent;
+    private static EventSenderInterface sEvent;
 
     public EventTracker(Context context) {
         if (!isEventEnable()) return;
@@ -77,11 +78,12 @@ public class EventTracker {
             name = "ERROR";
         }
 
-        if (TextUtils.isEmpty(subName)) {
-            subName = "Fragment";
+        String detail = subName;
+        if (TextUtils.isEmpty(detail)) {
+            detail = "Fragment";
         }
 
-        sEvent.sendView(name, subName);
+        sEvent.sendView(name, detail);
     }
 
     /**
@@ -114,7 +116,7 @@ public class EventTracker {
 
         sEvent.sendEvent("Website edit",
                 "mode", mode,
-                "Website name", websiteName);
+                TRACKING_WEBSITE_NAME, websiteName);
     }
 
     /**
@@ -125,7 +127,7 @@ public class EventTracker {
     public static void trackWebsiteDelete(String websiteName) {
         if (!isEventEnable()) return;
 
-        sEvent.sendEvent("Website delete", "Website name", websiteName);
+        sEvent.sendEvent("Website delete", TRACKING_WEBSITE_NAME, websiteName);
     }
 
     /**
@@ -166,7 +168,7 @@ public class EventTracker {
         if (!isEventEnable()) return;
 
         sEvent.sendEvent("Anecdote copied",
-                "Website name", event.websiteName,
+                TRACKING_WEBSITE_NAME, event.websiteName,
                 "Type", event.type);
     }
 
@@ -179,7 +181,7 @@ public class EventTracker {
         if (!isEventEnable()) return;
 
         sEvent.sendEvent("Anecdote shared",
-                "Website name", websiteName);
+                TRACKING_WEBSITE_NAME, websiteName);
     }
 
     /**
@@ -191,7 +193,7 @@ public class EventTracker {
         if (!isEventEnable()) return;
 
         sEvent.sendEvent("Anecdote details",
-                "Website name", websiteName);
+                TRACKING_WEBSITE_NAME, websiteName);
     }
 
     /**
@@ -203,7 +205,7 @@ public class EventTracker {
         if (!isEventEnable()) return;
 
         sEvent.sendEvent("Anecdote read more",
-                "Website name", websiteName);
+                TRACKING_WEBSITE_NAME, websiteName);
     }
 
     /**
@@ -240,6 +242,6 @@ public class EventTracker {
         if (!isEventEnable()) return;
 
         sEvent.sendEvent("Website wrong configuration",
-                "Website name", websiteName);
+                TRACKING_WEBSITE_NAME, websiteName);
     }
 }
