@@ -9,7 +9,7 @@ import android.widget.Toast;
 import org.greenrobot.eventbus.Subscribe;
 
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.util.EventUtils;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 import io.gresse.hugo.anecdote.util.Utils;
 import io.gresse.hugo.anecdote.util.chrome.ChromeCustomTabsManager;
 
@@ -60,7 +60,7 @@ public class SocialService {
     public void onShareAnecdote(ShareAnecdoteEvent event) {
         if(mActivity == null) return;
 
-        EventUtils.trackAnecdoteShare(event.websiteName);
+        EventTracker.trackAnecdoteShare(event.websiteName);
 
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
@@ -83,7 +83,7 @@ public class SocialService {
     public void onCopyAnecdote(CopyAnecdoteEvent event) {
         if(mActivity == null) return;
 
-        EventUtils.trackAnecdoteCopy(event);
+        EventTracker.trackAnecdoteCopy(event);
 
         Toast.makeText(mActivity, R.string.copied, Toast.LENGTH_SHORT).show();
         Utils.copyToClipboard(
@@ -103,7 +103,7 @@ public class SocialService {
             return;
         }
         if (mChromeCustomTabsManager != null) {
-            EventUtils.trackAnecdoteDetails(event.websiteName);
+            EventTracker.trackAnecdoteDetails(event.websiteName);
             mChromeCustomTabsManager.openChrome(mActivity, event.anecdote);
         }
     }

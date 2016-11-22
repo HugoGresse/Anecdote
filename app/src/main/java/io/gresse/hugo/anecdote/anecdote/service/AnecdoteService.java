@@ -20,15 +20,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import io.gresse.hugo.anecdote.event.Event;
+import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.anecdote.service.event.LoadNewAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.service.event.OnAnecdoteLoadedEvent;
-import io.gresse.hugo.anecdote.event.RequestFailedEvent;
-import io.gresse.hugo.anecdote.util.EventUtils;
-import io.gresse.hugo.anecdote.event.NetworkConnectivityChangeEvent;
-import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.model.WebsitePage;
+import io.gresse.hugo.anecdote.event.Event;
+import io.gresse.hugo.anecdote.event.NetworkConnectivityChangeEvent;
+import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.util.Utils;
 import okhttp3.Call;
@@ -212,7 +212,7 @@ public class AnecdoteService {
                     "Unable to parse " + mWebsitePage.name + " website",
                     null));
             if (mWebsite.source.equals(Website.SOURCE_REMOTE)) {
-                EventUtils.trackWebsiteWrongConfiguration(mWebsite.name + " " + mWebsitePage.name);
+                EventTracker.trackWebsiteWrongConfiguration(mWebsite.name + " " + mWebsitePage.name);
             }
             mEnd = true;
         }

@@ -15,7 +15,7 @@ import com.bumptech.glide.request.target.Target;
 import butterknife.Bind;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
-import io.gresse.hugo.anecdote.util.EventUtils;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 
 /**
  * Display images in a view to be used by RecyclerView as an ViewHolder
@@ -121,13 +121,13 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
             return true;
         }
 
-        EventUtils.trackError("Image download", e.toString());
+        EventTracker.trackError("Image download", e.toString());
         return false;
     }
 
     @Override
     public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-        reset();
+        //reset();
         return false;
     }
 }

@@ -33,7 +33,6 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.crashlytics.android.Crashlytics;
 import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
@@ -45,7 +44,6 @@ import java.util.List;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnItemSelected;
-import io.fabric.sdk.android.Fabric;
 import io.gresse.hugo.anecdote.about.AboutFragment;
 import io.gresse.hugo.anecdote.anecdote.ToolbarSpinnerAdapter;
 import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
@@ -69,7 +67,7 @@ import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.setting.SettingsFragment;
 import io.gresse.hugo.anecdote.storage.SpStorage;
-import io.gresse.hugo.anecdote.util.EventUtils;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
@@ -113,8 +111,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (EventUtils.isEventEnable()) {
-            Fabric.with(this, new Crashlytics());
+        if (EventTracker.isEventEnable()) {
+            new EventTracker(this);
         }
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
@@ -171,6 +169,18 @@ public class MainActivity extends AppCompatActivity
         super.onPause();
 
         EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        EventTracker.onStart(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        EventTracker.onStop();
     }
 
     @Override
@@ -426,12 +436,12 @@ public class MainActivity extends AppCompatActivity
                                 case R.id.action_delete:
                                     SpStorage.deleteWebsite(MainActivity.this, website);
                                     EventBus.getDefault().post(new WebsitesChangeEvent());
-                                    EventUtils.trackWebsiteDelete(website.name);
+                                    EventTracker.trackWebsiteDelete(website.name);
                                     break;
                                 case R.id.action_default:
                                     SpStorage.setDefaultWebsite(MainActivity.this, website);
                                     EventBus.getDefault().post(new WebsitesChangeEvent());
-                                    EventUtils.trackWebsiteDefault(website.name);
+                                    EventTracker.trackWebsiteDefault(website.name);
                                     break;
                                 default:
                                     Toast.makeText(
@@ -470,9 +480,9 @@ public class MainActivity extends AppCompatActivity
      */
     private void openWebsiteDialog(@Nullable Website website) {
         if (website == null) {
-            EventUtils.trackWebsiteEdit("", false);
+            EventTracker.trackWebsiteEdit("", false);
         } else {
-            EventUtils.trackWebsiteEdit(website.name, false);
+            EventTracker.trackWebsiteEdit(website.name, false);
         }
         FragmentManager fm = getSupportFragmentManager();
         DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(website);
@@ -589,6 +599,7 @@ public class MainActivity extends AppCompatActivity
         Bundle bundle = new Bundle();
 
         bundle.putString(FullscreenFragment.BUNDLE_ANECDOTE, new Gson().toJson(event.anecdote));
+        bundle.putString(FullscreenFragment.BUNDLE_WEBSITENAME, event.websiteName);
 
         switch (event.type) {
             case FullscreenEvent.TYPE_IMAGE:

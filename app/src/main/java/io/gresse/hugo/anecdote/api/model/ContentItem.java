@@ -21,9 +21,6 @@ public class ContentItem extends Item {
 
     public int priority;
 
-    public ContentItem() {
-    }
-
     public ContentItem(String type, int priority) {
         this.type = type;
         this.priority = priority;

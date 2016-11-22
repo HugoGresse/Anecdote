@@ -20,14 +20,14 @@ import org.greenrobot.eventbus.EventBus;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.anecdote.model.MediaType;
 import io.gresse.hugo.anecdote.api.model.Content;
 import io.gresse.hugo.anecdote.api.model.ContentItem;
 import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.model.WebsitePage;
+import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.storage.SpStorage;
-import io.gresse.hugo.anecdote.util.EventUtils;
+import io.gresse.hugo.anecdote.tracking.EventTracker;
 
 /**
  * FialogFragment to edit or add wesites
@@ -136,9 +136,9 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
                 SpStorage.saveWebsite(getContext(), mWebsite);
 
                 if (mEditMode) {
-                    EventUtils.trackWebsiteEdit(mWebsite.name, true);
+                    EventTracker.trackWebsiteEdit(mWebsite.name, true);
                 } else {
-                    EventUtils.trackCustomWebsiteAdded();
+                    EventTracker.trackCustomWebsiteAdded();
                 }
 
                 EventBus.getDefault().post(new WebsitesChangeEvent());
