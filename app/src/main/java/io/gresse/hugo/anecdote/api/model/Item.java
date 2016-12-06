@@ -43,6 +43,7 @@ public class Item {
      * A map of replacement to be done after fetching. The key is the string to replace and the value is the value to
      * replace the key from.
      */
+    @Nullable
     public Map<String, String> replaceMap;
 
     public Item() {
@@ -100,8 +101,10 @@ public class Item {
             data += suffix;
         }
 
-        for (Map.Entry<String, String> entry : replaceMap.entrySet()) {
-            data = data.replaceAll(entry.getKey(), entry.getValue());
+        if(replaceMap != null){
+            for (Map.Entry<String, String> entry : replaceMap.entrySet()) {
+                data = data.replaceAll(entry.getKey(), entry.getValue());
+            }
         }
 
         return data;
