@@ -62,10 +62,16 @@ class MixedContentAdapter
                             quotes)
             );
 
-            mAnecdotes.clear();
-            mAnecdotes.addAll(quotes);
+            if(!mAnecdotes.isEmpty()){
+                mAnecdotes.clear();
+                mAnecdotes.addAll(quotes);
+                diffResult.dispatchUpdatesTo(this);
+            } else {
+                // Prevnet recyclerView follow the loading wheel when first items are just added
+                mAnecdotes.addAll(quotes);
+                this.notifyDataSetChanged();
+            }
 
-            diffResult.dispatchUpdatesTo(this);
         } else {
             // Run this on main thread
             Handler mainHandler = new Handler(Looper.getMainLooper());
