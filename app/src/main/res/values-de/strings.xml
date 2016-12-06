@@ -1,0 +1,104 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name">Quote</string>
+
+    <string name="app_migration_1_0_0">Zu neuer Quote Version migriert</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_settings">Settings</string>
+    <string name="action_feedback">Send feedback</string>
+    <string name="action_about">About</string>
+    <string name="action_restore">Restore websites</string>
+    <string name="action_edit">Edit</string>
+    <string name="action_delete">Delete</string>
+    <string name="action_default">Default</string>
+    <string name="action_website_add">Add website</string>
+    <string name="action_website_newwebsite">New websites available!</string>
+    <string name="action_website_add_custom">Add custom website</string>
+    <string name="copied">Copied to clipboard</string>
+    <string name="not_implemented" translatable="false">Not implemented</string>
+    <string name="action_website_noteditable_toast">You can\'t edit a remote website</string>
+
+    <string name="app_share_credits"> - via Quote http://bit.ly/anecdoteapp </string>
+
+    <string name="anecdote_share_title">Share using</string>
+    <string-array name="anecdote_content_dialog">
+        <item>Copy link</item>
+    </string-array>
+
+
+    <string name="action_share">Share</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_open">Open</string>
+
+    <string name="open_intent_browser">Opening browser…</string>
+    <string name="open_intent_browser_error">Unable to open details, check url configuration</string>
+
+    <string name="action_website">Website actions</string>
+
+    <string name="dialog_website_new_title">New website</string>
+    <string name="dialog_website_edit_title">Edit</string>
+    <string name="dialog_website_add">Add</string>
+    <string name="dialog_website_error_itemperpage">The item per page must be more than 0</string>
+    <string name="dialog_website_error_name">Don\'t you want to add a name?</string>
+    <string name="dialog_website_error_pagename">Add a page name</string>
+    <string name="dialog_website_error_url">Missing website page url :(</string>
+    <string name="dialog_website_error_selector">Missing text selector</string>
+    <string name="dialog_website_save">Save</string>
+    <string name="dialog_website_name_hint">Website name</string>
+    <string name="dialog_website_page_name_hint">Page name</string>
+    <string name="dialog_website_url_hint">Website url</string>
+    <string name="dialog_website_urlsuffix_hint">(optional) Page number suffix</string>
+    <string name="dialog_website_selector_hint">DOM selector</string>
+    <string name="dialog_website_itemperpage_hint">Number of element in a page</string>
+    <string name="dialog_website_firstpagezero_hint">If the first page number is 0</string>
+
+    <string name="dialog_websitechooser_title">Select your favorites sites</string>
+
+
+    <!-- About fragment -->
+    <string name="about_title">About</string>
+    <string name="about_made">Made with love by</string>
+    <string name="about_made_person" translatable="false">Hugo Gresse http://hugo.gresse.io/</string>
+    <string name="using" translatable="false">Third-party libraries</string>
+    <string name="error_server_unknown" translatable="false">Something went wrong with the server :(</string>
+    <string-array name="about_libraries" translatable="false">
+        <item>OkHttp by Square http://square.github.io/okhttp/</item>
+        <item>Otto by Square http://square.github.io/otto/</item>
+        <item>Gson by Google http://github.com/google/gson</item>
+        <item>Jsoup by Jonathan Hedley http://jsoup.org/</item>
+        <item>ButterKnife by Jake Wharton http://jakewharton.github.io/butterknife/</item>
+        <item>Glide by Bumptech http://github.com/bumptech/glide</item>
+        <item>PhotoView by Chris Banes http://github.com/chrisbanes/PhotoView</item>
+        <item>SimpleExoPlayer by Hugo Gresse http://github.com/HugoGresse/SimpleExoPlayer</item>
+    </string-array>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_cat_display">Display</string>
+    <string name="pref_rowstriping_title">Quote row striping</string>
+    <string name="pref_rowstriping_summary">Add a background to separate each quotes</string>
+    <string name="pref_textsize_title">Text size</string>
+    <string-array name="pref_textsize_title">
+        <item>Extra small</item>
+        <item>Small</item>
+        <item>Normal</item>
+        <item>Large</item>
+        <item>Extra large</item>
+    </string-array>
+    <string name="pref_rowstriping_key" translatable="false">rowStriping</string>
+    <string name="pref_textsize_key" translatable="false">textSize</string>
+    <string-array name="pref_textsize_values" translatable="false">
+        <item>10</item>
+        <item>12</item>
+        <item>14</item>
+        <item>18</item>
+        <item>24</item>
+    </string-array>
+
+    <string name="anecdote_image_transition_name" translatable="false">imageTransitionName</string>
+    <string name="anecdote_video_transition_name" translatable="false">videoTransitionName</string>
+
+    <string name="anecdote_open_inbrowser">Open in your browser</string>
+
+</resources>
