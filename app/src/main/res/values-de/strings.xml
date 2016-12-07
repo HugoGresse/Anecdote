@@ -86,19 +86,7 @@
         <item>Groß</item>
         <item>Extra groß</item>
     </string-array>
-    <string name="pref_rowstriping_key" translatable="false">rowStriping</string>
-    <string name="pref_textsize_key" translatable="false">textSize</string>
-    <string-array name="pref_textsize_values" translatable="false">
-        <item>10</item>
-        <item>12</item>
-        <item>14</item>
-        <item>18</item>
-        <item>24</item>
-    </string-array>
-
-    <string name="anecdote_image_transition_name" translatable="false">imageTransitionName</string>
-    <string name="anecdote_video_transition_name" translatable="false">videoTransitionName</string>
-
+    
     <string name="anecdote_open_inbrowser">Im Browser öffnen</string>
 
 </resources>
