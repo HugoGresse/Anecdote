@@ -61,8 +61,8 @@
     <string name="about_title">Über</string>
     <string name="about_made">Gemacht mit Liebe von</string>
     <string name="about_made_person" translatable="false">Hugo Gresse http://hugo.gresse.io/</string>
-    <string name="using" translatable="false">Third-party libraries</string>
-    <string name="error_server_unknown" translatable="false">Something went wrong with the server :(</string>
+    <string name="using">Drittanbieter Bibliotheken</string>
+    <string name="error_server_unknown">Etwas lief mit dem Server schief :(</string>
     <string-array name="about_libraries" translatable="false">
         <item>OkHttp by Square http://square.github.io/okhttp/</item>
         <item>Otto by Square http://square.github.io/otto/</item>
