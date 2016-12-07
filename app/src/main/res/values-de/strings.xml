@@ -41,7 +41,7 @@
     <string name="dialog_website_edit_title">Editieren</string>
     <string name="dialog_website_add">Hinzufügen</string>
     <string name="dialog_website_error_itemperpage">Die Anzahl der Objekte pro Webseite müssen mehr als 0 sein</string>
-    <string name="dialog_website_error_name">Möchtest du nicht einen Namen hinzufügen</string>
+    <string name="dialog_website_error_name">Möchtest du nicht einen Namen hinzufügen?</string>
     <string name="dialog_website_error_pagename">Füge einen Namen hinzu</string>
     <string name="dialog_website_error_url">Fehlende URL :(</string>
     <string name="dialog_website_error_selector">Missing text selector</string>
@@ -50,9 +50,9 @@
     <string name="dialog_website_page_name_hint">Seitenname</string>
     <string name="dialog_website_url_hint">Webseiten URL</string>
     <string name="dialog_website_urlsuffix_hint">(optional) Page number suffix</string>
-    <string name="dialog_website_selector_hint">DOM selector</string>
+    <string name="dialog_website_selector_hint">DOM Selektor</string>
     <string name="dialog_website_itemperpage_hint">Anzahl der Objekte auf einer Seite</string>
-    <string name="dialog_website_firstpagezero_hint">If the first page number is 0</string>
+    <string name="dialog_website_firstpagezero_hint">Wenn die Nummer der ersten Seite 0 ist</string>
 
     <string name="dialog_websitechooser_title">Wähle deine Favoriten</string>
 
