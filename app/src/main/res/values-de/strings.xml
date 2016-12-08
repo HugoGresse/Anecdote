@@ -1,7 +1,7 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name">Quote</string>
+    <string name="app_name">Anekdote</string>
 
-    <string name="app_migration_1_0_0">Zu neuer Quote Version migriert</string>
+    <string name="app_migration_1_0_0">Zu einer neuen Version von Anekdote migriert</string>
 
     <string name="navigation_drawer_open">Öffne Navigation</string>
     <string name="navigation_drawer_close">Schließe Navigation</string>
@@ -20,7 +20,7 @@
     <string name="not_implemented" translatable="false">Not implemented</string>
     <string name="action_website_noteditable_toast">Du kannst keine Remote Webseite editieren</string>
 
-    <string name="app_share_credits"> - via Quote http://bit.ly/anecdoteapp </string>
+    <string name="app_share_credits"> - via Anekdote http://bit.ly/anecdoteapp </string>
 
     <string name="anecdote_share_title">Teilen via</string>
     <string-array name="anecdote_content_dialog">
