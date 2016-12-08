@@ -12,7 +12,7 @@
     <string name="action_restore">Webseiten wiederherstellen</string>
     <string name="action_edit">Editieren</string>
     <string name="action_delete">Löschen</string>
-    <string name="action_default">Standart</string>
+    <string name="action_default">Standard</string>
     <string name="action_website_add">Webseite hinzufügen</string>
     <string name="action_website_newwebsite">Neue Webseiten verfügbar!</string>
     <string name="action_website_add_custom">Eigene Webseite hinzufügen</string>
