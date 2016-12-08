@@ -17,7 +17,6 @@
     <string name="action_website_newwebsite">Neue Webseiten verfügbar!</string>
     <string name="action_website_add_custom">Eigene Webseite hinzufügen</string>
     <string name="copied">In Zwischenablage kopieren</string>
-    <string name="not_implemented" translatable="false">Not implemented</string>
     <string name="action_website_noteditable_toast">Du kannst keine Remote Webseite editieren</string>
 
     <string name="app_share_credits"> - via Anekdote http://bit.ly/anecdoteapp </string>
@@ -60,7 +59,6 @@
     <!-- About fragment -->
     <string name="about_title">Über</string>
     <string name="about_made">Gemacht mit Liebe von</string>
-    <string name="about_made_person" translatable="false">Hugo Gresse http://hugo.gresse.io/</string>
     <string name="using">Drittanbieter Bibliotheken</string>
     <string name="error_server_unknown">Etwas lief mit dem Server schief :(</string>
     <string-array name="about_libraries">
