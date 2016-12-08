@@ -43,12 +43,12 @@
     <string name="dialog_website_error_name">Möchtest du nicht einen Namen hinzufügen?</string>
     <string name="dialog_website_error_pagename">Füge einen Namen hinzu</string>
     <string name="dialog_website_error_url">Fehlende URL :(</string>
-    <string name="dialog_website_error_selector">Missing text selector</string>
+    <string name="dialog_website_error_selector">Fehlender DOM Selektor</string>
     <string name="dialog_website_save">Speichern</string>
     <string name="dialog_website_name_hint">Webseiten Name</string>
     <string name="dialog_website_page_name_hint">Seitenname</string>
     <string name="dialog_website_url_hint">Webseiten URL</string>
-    <string name="dialog_website_urlsuffix_hint">(optional) Page number suffix</string>
+    <string name="dialog_website_urlsuffix_hint">(optional) Seitennummer Anhang</string>
     <string name="dialog_website_selector_hint">DOM Selektor</string>
     <string name="dialog_website_itemperpage_hint">Anzahl der Objekte auf einer Seite</string>
     <string name="dialog_website_firstpagezero_hint">Wenn die Nummer der ersten Seite 0 ist</string>
@@ -74,8 +74,8 @@
 
     <!-- Strings related to Settings -->
     <string name="pref_cat_display">Display</string>
-    <string name="pref_rowstriping_title">Quote row striping</string>
-    <string name="pref_rowstriping_summary">Add a background to separate each quotes</string>
+    <string name="pref_rowstriping_title">Einträge trennen</string>
+    <string name="pref_rowstriping_summary">Füge Hintergrund hinzu um die Einträge abzugrenzen</string>
     <string name="pref_textsize_title">Textgröße</string>
     <string-array name="pref_textsize_title">
         <item>Extra klein</item>
