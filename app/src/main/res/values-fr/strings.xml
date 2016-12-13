@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Anecdote</string>
 
     <string name="navigation_drawer_open">Ouvrir le tiroir de navigation</string>
     <string name="navigation_drawer_close">Fermer le tiroir de navigation</string>
@@ -63,4 +62,8 @@
     <string name="action_open">Ouvrir</string>
     <string name="action_share">Partager</string>
     <string name="app_migration_1_0_0">Migré vers la nouvelle version d\'Anecdote</string>
+    <string name="error_server_unknown">Il y a un problème avec le serveur :(</string>
+    <string name="not_implemented">Pas implémenté</string>
+    <string name="using">Librairies tierces</string>
+    <string name="word_by">par</string>
 </resources>

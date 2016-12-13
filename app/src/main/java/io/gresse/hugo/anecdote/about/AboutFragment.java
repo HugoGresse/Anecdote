@@ -47,7 +47,13 @@ public class AboutFragment extends Fragment implements AboutAdapter.OnClickListe
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
         mRecyclerView.setLayoutManager(layoutManager);
 
-        AboutAdapter adapter = new AboutAdapter(this, getResources().getStringArray(R.array.about_libraries));
+        String[] aboutStringArray = getResources().getStringArray(R.array.about_libraries);
+        String byString = getResources().getString(R.string.word_by);
+        for(int i = 0; i < aboutStringArray.length; i++){
+            aboutStringArray[i] = String.format(aboutStringArray[i], byString);
+        }
+
+        AboutAdapter adapter = new AboutAdapter(this, aboutStringArray);
 
         mRecyclerView.setAdapter(adapter);
     }
