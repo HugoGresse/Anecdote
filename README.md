@@ -36,6 +36,10 @@ Author
 ------
 [Hugo Gresse](http://hugo.gresse.io)
 
+Contributor
+-----------
+[muller-ma](https://github.com/mueller-ma)
+
 
 License
 --------

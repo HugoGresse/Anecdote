@@ -14,6 +14,7 @@ import java.net.URL;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
 
@@ -80,18 +81,21 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
         public abstract void setData(String text);
     }
 
-    public class HeaderAboutViewHolder extends BaseAboutViewHolder implements View.OnClickListener {
+    public class HeaderAboutViewHolder extends BaseAboutViewHolder {
 
         private Intent mAuthorIntent;
+        private Intent mCommunityIntent;
 
         @Bind(R.id.me_textview)
         public TextView authorTextView;
+
+        @Bind(R.id.community_textview)
+        public TextView communityTextView;
 
         public HeaderAboutViewHolder(View itemView) {
             super(itemView);
 
             ButterKnife.bind(this, itemView);
-            authorTextView.setOnClickListener(this);
         }
 
         @Override
@@ -108,13 +112,34 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
             } catch (MalformedURLException e) {
                 // Do nothing
             }
+
+            String comunityString = communityTextView.getText().toString();
+
+            int communityStringEnd = comunityString.lastIndexOf("https://");
+            if (communityStringEnd == -1) {
+                communityTextView.setText(comunityString);
+            } else try {
+                communityTextView.setText(comunityString.substring(0, communityStringEnd));
+                URL url = new URL(comunityString.substring(communityStringEnd));
+                mCommunityIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(url.toString()));
+            } catch (MalformedURLException e) {
+                // Do nothing
+            }
         }
 
-        @Override
-        public void onClick(View v) {
+        @OnClick(R.id.me_textview)
+        public void onAuthorClick(View v) {
             if (mOnClickListener != null) {
                 EventTracker.trackThirdPartiesClick(authorTextView.getText().toString());
                 mOnClickListener.onItemClick(mAuthorIntent);
+            }
+        }
+
+        @OnClick(R.id.community_textview)
+        public void onCommunityClick(View v) {
+            if (mOnClickListener != null) {
+                EventTracker.trackThirdPartiesClick(communityTextView.getText().toString());
+                mOnClickListener.onItemClick(mCommunityIntent);
             }
         }
     }
