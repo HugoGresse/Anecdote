@@ -77,5 +77,6 @@
     <string name="not_implemented">Not implemented</string>
     <string name="using">Third-party libraries</string>
     <string name="word_by">द्वारा</string>
+    <string name="about_made_community">With the help of the community https://github.com/HugoGresse/Anecdote</string>
 
 </resources>

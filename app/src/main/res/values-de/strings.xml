@@ -86,5 +86,6 @@
     <string name="anecdote_open_inbrowser">Im Browser öffnen</string>
     <string name="not_implemented">Nicht implementiert</string>
     <string name="word_by">von</string>
+    <string name="about_made_community">Mit Hilfe der Gemeinschaft</string>
 
 </resources>

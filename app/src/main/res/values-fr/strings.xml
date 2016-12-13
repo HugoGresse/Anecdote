@@ -66,4 +66,5 @@
     <string name="not_implemented">Pas implémenté</string>
     <string name="using">Librairies tierces</string>
     <string name="word_by">par</string>
+    <string name="about_made_community">Avec l\'aide de la communauté https://github.com/HugoGresse/Anecdote</string>
 </resources>
