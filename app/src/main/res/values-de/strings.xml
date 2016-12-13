@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_migration_1_0_0">Zu einer neuen Version von Anekdote migriert</string>
+    <string name="app_migration_1_0_0">Zu einer neuen Version von Anecdote migriert</string>
 
     <string name="navigation_drawer_open">Öffne Navigation</string>
     <string name="navigation_drawer_close">Schließe Navigation</string>
@@ -17,7 +17,7 @@
     <string name="copied">In Zwischenablage kopieren</string>
     <string name="action_website_noteditable_toast">Du kannst keine Remote Webseite editieren</string>
 
-    <string name="app_share_credits"> - via Anekdote http://bit.ly/anecdoteapp </string>
+    <string name="app_share_credits"> - via Anecdote http://bit.ly/anecdoteapp </string>
 
     <string name="anecdote_share_title">Teilen via</string>
     <string-array name="anecdote_content_dialog">
@@ -59,16 +59,6 @@
     <string name="about_made">Gemacht mit Liebe von</string>
     <string name="using">Drittanbieter Bibliotheken</string>
     <string name="error_server_unknown">Etwas lief mit dem Server schief :(</string>
-    <string-array name="about_libraries">
-        <item>OkHttp von Square http://square.github.io/okhttp/</item>
-        <item>Otto von Square http://square.github.io/otto/</item>
-        <item>Gson von Google http://github.com/google/gson</item>
-        <item>Jsoup von Jonathan Hedley http://jsoup.org/</item>
-        <item>ButterKnife von Jake Wharton http://jakewharton.github.io/butterknife/</item>
-        <item>Glide von Bumptech http://github.com/bumptech/glide</item>
-        <item>PhotoView von Chris Banes http://github.com/chrisbanes/PhotoView</item>
-        <item>SimpleExoPlayer von Hugo Gresse http://github.com/HugoGresse/SimpleExoPlayer</item>
-    </string-array>
 
     <!-- Strings related to Settings -->
     <string name="pref_cat_display">Display</string>
@@ -86,6 +76,6 @@
     <string name="anecdote_open_inbrowser">Im Browser öffnen</string>
     <string name="not_implemented">Nicht implementiert</string>
     <string name="word_by">von</string>
-    <string name="about_made_community">Mit Hilfe der Gemeinschaft</string>
+    <string name="about_made_community">Mit Hilfe der Gemeinschaft https://github.com/HugoGresse/Anecdote</string>
 
 </resources>
