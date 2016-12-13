@@ -38,7 +38,7 @@ Author
 
 Contributor
 -----------
-[muller-ma](https://github.com/mueller-ma)
+[mueller-ma](https://github.com/mueller-ma)
 
 
 License
