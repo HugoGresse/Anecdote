@@ -63,6 +63,7 @@
     <string name="about_title">About</string>
     <string name="about_made">Made with love by</string>
     <string name="about_made_person" translatable="false">Hugo Gresse http://hugo.gresse.io/</string>
+    <string name="about_made_community">With the help of the community https://github.com/HugoGresse/Anecdote</string>
     <string name="using">Third-party libraries</string>
     <string name="error_server_unknown">Something went wrong with the server :(</string>
     <string-array name="about_libraries" translatable="false">
