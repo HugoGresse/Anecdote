@@ -9,28 +9,28 @@ Simply display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9GAG, Se couchez 
 ![9GAG Feed](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/design/screenshots/9gag.png)
 ![Websites](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/design/screenshots/website_selector.png)
 
-_This application contents does not belong to the application._
+_The application content does not belong to the application._
 
 Features
 --------
-- display 9GAG, VDM/FML (viedemerde.fr), DTC (danstonchat.com), Se couchez moins bête, Bash.org and much more (choose on first start which websites you want to read, based on Anecdote database)
-- infinit scroll
-- pull to refresh
-- manually adding websites (for expert) via HTML parsing
-- remote websites configuration update
-- no persistent data, no strange permissions, no ad
+- Display 9GAG, VDM/FML (viedemerde.fr), DTC (danstonchat.com), Se couchez moins bête, Bash.org and much more (choose on first start which websites you want to read, based on Anecdote database)
+- Infinite scroll
+- Pull to refresh
+- Manually adding websites (for expert) via HTML parsing
+- Remote websites configuration update
+- No persistent data, no strange permissions, no ads
 
 TODO
 --------
-- website to manage Anecdote websites
-- guide to add website (a follow through user step)
-- filter by country
-- offline management by task to download data at a given time
+- Website to manage Anecdote websites
+- Guide to add a website (a follow through user step)
+- Filter by country
+- Offline management by task to download data at a given time
 
 
 Contribution
 ------
-Feel free to contribute to this application (fork and make a pull-request). 
+Feel free to contribute to this application (fork and make a pull request). 
 
 Author
 ------
