@@ -33,8 +33,8 @@ public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClick
     }
 
     @Override
-    public void setData(int position, Anecdote anecdote) {
-        super.setData(position, anecdote);
+    public void setData(int position, boolean isExpanded, Anecdote anecdote) {
+        super.setData(position, isExpanded, anecdote);
         if (mPlayerView != null && anecdote.media != null) {
             mPlayerView.setVideoUrl(anecdote.media);
         }

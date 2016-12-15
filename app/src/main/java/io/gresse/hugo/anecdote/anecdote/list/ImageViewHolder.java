@@ -51,8 +51,8 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
     }
 
     @Override
-    public void setData(int position, Anecdote anecdote) {
-        super.setData(position, anecdote);
+    public void setData(int position, boolean isExpanded, Anecdote anecdote) {
+        super.setData(position, isExpanded, anecdote);
         String log = "setData: url:" + anecdote.media + " text:" + anecdote.text;
 
         ViewCompat.setTransitionName(mImageView, String.valueOf(position) + "_image");
@@ -114,7 +114,7 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
 
     @Override
     public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
-        if(mRetried < RETRY_COUNT){
+        if(mRetried < RETRY_COUNT && mImageUrl != null){
             mRetried ++;
             Log.d(TAG, "Retry " + mImageUrl + " retried?" + mRetried);
             loadImage();

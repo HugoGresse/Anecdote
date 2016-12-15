@@ -46,6 +46,7 @@ class MixedContentAdapter
     private boolean         mRowStriping;
     private int             mRowBackground;
     private int             mRowStripingBackground;
+    private int mExpandedPosition = -1;
 
     MixedContentAdapter(@Nullable AdapterListener adapterListener, boolean isSinglePage) {
         mAnecdotes = new ArrayList<>();
@@ -62,7 +63,7 @@ class MixedContentAdapter
                             quotes)
             );
 
-            if(!mAnecdotes.isEmpty()){
+            if (!mAnecdotes.isEmpty()) {
                 mAnecdotes.clear();
                 mAnecdotes.addAll(quotes);
                 diffResult.dispatchUpdatesTo(this);
@@ -130,7 +131,7 @@ class MixedContentAdapter
     @Override
     public void onBindViewHolder(BaseAnecdoteViewHolder holder, int position, List<Object> payloads) {
         if (position < mAnecdotes.size()) {
-            holder.setData(position, mAnecdotes.get(position));
+            holder.setData(position, mExpandedPosition == position, mAnecdotes.get(position));
         }
     }
 
@@ -173,6 +174,29 @@ class MixedContentAdapter
         return mAnecdotes.get(position);
     }
 
+    /**
+     * Set expanded item at the given position, used by viewHolder to prevent the adapter of a new expandedPosition and
+     * save it here
+     * @param position the expanded position
+     */
+    public void toggleExpanded(int position){
+        if (mExpandedPosition == position) {
+            Log.d(TAG, "onClick close current ");
+            mExpandedPosition = -1;
+            notifyItemChanged(position);
+            return;
+        }
+
+        // Notify expanded last position
+        if(mExpandedPosition >= 0){
+            notifyItemChanged(mExpandedPosition);
+        }
+        mExpandedPosition = position;
+        // Notify new element
+        notifyItemChanged(mExpandedPosition);
+        mExpandedPosition = position;
+    }
+
     private class LoadViewHolder extends BaseAnecdoteViewHolder {
 
         LoadViewHolder(View itemView) {
@@ -182,7 +206,7 @@ class MixedContentAdapter
         }
 
         @Override
-        public void setData(int position, Anecdote anecdote) {
+        public void setData(int position, boolean isExpanded, Anecdote anecdote) {
             // This view is static, no need to change it's data
         }
     }

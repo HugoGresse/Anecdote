@@ -21,13 +21,12 @@ public class MixedBaseViewHolder
         extends AnecdoteAdapter.BaseAnecdoteViewHolder
         implements View.OnClickListener {
 
-    private int mExpandedPosition = -1;
     protected final AdapterListener mAdapterListener;
     protected final MixedContentAdapter mAdapter;
-    private final int             mTextSize;
-    private final boolean         mRowStriping;
-    private final int             mRowBackground;
-    private final int             mRowStripingBackground;
+    private final   int                 mTextSize;
+    private final   boolean             mRowStriping;
+    private final   int                 mRowBackground;
+    private final   int                 mRowStripingBackground;
 
     private View mItemView;
 
@@ -64,14 +63,14 @@ public class MixedBaseViewHolder
     }
 
     @Override
-    public void setData(int position, Anecdote anecdote) {
+    public void setData(int position, boolean isExpanded, Anecdote anecdote) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             mTextView.setText(Html.fromHtml(anecdote.text, Html.FROM_HTML_MODE_LEGACY));
         } else {
             try {
                 //noinspection deprecation
                 mTextView.setText(Html.fromHtml(anecdote.text));
-            } catch (Error error){
+            } catch (Error error) {
                 mTextView.setText(anecdote.text);
             }
         }
@@ -89,7 +88,7 @@ public class MixedBaseViewHolder
             return;
         }
 
-        if ( position == mExpandedPosition) {
+        if (isExpanded) {
             mSeparatorView.setVisibility(View.VISIBLE);
             mExpandLayout.setVisibility(View.VISIBLE);
             ((ViewGroup.MarginLayoutParams) itemView.getLayoutParams()).topMargin = 50;
@@ -110,22 +109,7 @@ public class MixedBaseViewHolder
 
     @Override
     public void onClick(View v) {
-        if (mExpandedPosition == getAdapterPosition()) {
-            mExpandedPosition = -1;
-            mAdapter.notifyItemChanged(getAdapterPosition());
-            return;
-        }
-        // Notify expanded last position
-        mAdapter.notifyItemChanged(mExpandedPosition);
-        mExpandedPosition = getAdapterPosition();
-        // Notify new element
-        mAdapter.notifyItemChanged(mExpandedPosition);
-        if (mAdapterListener != null) {
-            mAdapterListener.onClick(
-                    mAdapter.getItem(getAdapterPosition()),
-                    itemView,
-                    AdapterListener.ACTION_OPEN_IN_BROWSER_PRELOAD);
-        }
+        mAdapter.toggleExpanded(getAdapterPosition());
     }
 
     @OnClick(R.id.shareButton)

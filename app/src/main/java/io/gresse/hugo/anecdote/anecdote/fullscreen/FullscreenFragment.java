@@ -91,7 +91,8 @@ public abstract class FullscreenFragment extends Fragment {
      * Toggle the  Overlay/UI above the fullscreen content. This should be called by child fragment
      */
     protected void toggleOverlayVisibility() {
-        if (mContentTextView.isShown()) {
+        // sometime mContentTextView is null, cf http://crashes.to/s/42615391f2d
+        if (mContentTextView != null && mContentTextView.isShown()) {
             Log.d(TAG, "toggleOverlayVisibility to GONE");
             mOverlayLinearLayout.setVisibility(View.GONE);
             mGradientView.setVisibility(View.GONE);
