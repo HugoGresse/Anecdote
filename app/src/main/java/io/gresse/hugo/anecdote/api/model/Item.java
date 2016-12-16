@@ -90,11 +90,17 @@ public class Item {
         }
 
         if (tempElement != null) {
+            String realData = null;
             if (TextUtils.isEmpty(attribute)) {
-                data += tempElement.html();
+                realData = tempElement.html();
             } else {
-                data += tempElement.attr(attribute);
+                realData = tempElement.attr(attribute);
             }
+
+            if(TextUtils.isEmpty(realData)){
+                return null;
+            }
+            data += realData;
         }
 
         if (!TextUtils.isEmpty(suffix)) {
