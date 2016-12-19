@@ -20,6 +20,8 @@ import io.gresse.hugo.anecdote.tracking.EventTracker;
 /**
  * Display images in a view to be used by RecyclerView as an ViewHolder
  *
+ * TODO : improve blank image sometines, see https://github.com/bumptech/glide/issues/550
+ *
  * Created by Hugo Gresse on 08/11/2016.
  */
 public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClickListener, RequestListener<String, GlideDrawable> {
@@ -67,7 +69,7 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
     @Override
     public void onViewDetached() {
         super.onViewDetached();
-        reset();
+        // We do not reset the view here, see http://stackoverflow.com/a/40073839/1377145
     }
 
     @Override
@@ -121,12 +123,13 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
             return true;
         }
 
-        EventTracker.trackError("Image download", e.toString());
+        EventTracker.trackError("Image download: " + mImageUrl, e.toString());
         return false;
     }
 
     @Override
     public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+        Log.d(TAG, "ResourceReady : " + mImageUrl + " isFromMemoryCache? " + isFromMemoryCache +" isFirstResource? " + isFirstResource);
         //reset();
         return false;
     }
