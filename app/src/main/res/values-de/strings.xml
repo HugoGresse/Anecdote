@@ -14,7 +14,7 @@
     <string name="action_website_add">Webseite hinzufügen</string>
     <string name="action_website_newwebsite">Neue Webseiten verfügbar!</string>
     <string name="action_website_add_custom">Eigene Webseite hinzufügen</string>
-    <string name="copied">In Zwischenablage kopieren</string>
+    <string name="copied">In Zwischenablage kopiert</string>
     <string name="action_website_noteditable_toast">Du kannst keine Remote Webseite editieren</string>
 
     <string name="app_share_credits"> - via Anecdote http://bit.ly/anecdoteapp </string>
