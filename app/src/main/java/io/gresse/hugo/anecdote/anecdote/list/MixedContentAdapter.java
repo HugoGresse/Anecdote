@@ -144,6 +144,11 @@ class MixedContentAdapter
     }
 
     @Override
+    public int getContentItemCount() {
+        return mAnecdotes.size();
+    }
+
+    @Override
     public int getItemViewType(int position) {
         if (position < mAnecdotes.size()) {
             Anecdote anecdote = mAnecdotes.get(position);

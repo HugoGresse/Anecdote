@@ -52,26 +52,31 @@ public class AnecdoteFragment extends Fragment implements
     public static final  String ARGS_WEBSITE_PAGE_SLUG   = "key_website_page_slug";
     public static final  String ARGS_WEBSITE_NAME        = "key_website_name";
 
+    /**
+     * Define the threshold to load new items. It's the number of items not visible after the current last visible.
+     */
+    public static final int PREFETECH_THRESHOLD = 4;
+
     @Bind(R.id.swipeRefreshLayout)
     public SwipeRefreshLayout mSwipeRefreshLayout;
 
     @Bind(R.id.recyclerView)
     public RecyclerView mRecyclerView;
 
-    protected String          mWebsiteParentSlug;
-    protected String          mWebsiteSlug;
-    protected String          mWebsiteName;
-    protected AnecdoteAdapter mAdapter;
+    protected String                        mWebsiteParentSlug;
+    protected String                        mWebsiteSlug;
+    protected String                        mWebsiteName;
+    protected AnecdoteAdapter               mAdapter;
     @Nullable
-    protected AnecdoteService mAnecdoteService;
-    protected boolean         mIsLoadingNewItems;
+    protected AnecdoteService               mAnecdoteService;
 
-    private LinearLayoutManager mLayoutManager;
-    private int                 mTotalItemCount;
-    private int                 mLastVisibleItem;
-    private int                 mNextPageNumber;
+    private   LinearLayoutManager mLayoutManager;
+    protected boolean             mIsLoadingNewItems;
+    private   int                 mTotalItemCount;
+    private   int                 mLastVisibleItem;
+    private   int                 mNextPageNumber;
     // TODO: check all loaded
-    private boolean             mAllAnecdotesLoaded;
+    private   boolean             mAllAnecdotesLoaded;
 
 
     @Override
@@ -99,28 +104,9 @@ public class AnecdoteFragment extends Fragment implements
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         mLayoutManager = new LinearLayoutManager(getActivity());
+
         mRecyclerView.setLayoutManager(mLayoutManager);
-
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-
-                mTotalItemCount = mLayoutManager.getItemCount();
-                mLastVisibleItem = mLayoutManager.findLastVisibleItemPosition();
-
-
-                // Scrolled to bottom. Do something here.
-                if (!mIsLoadingNewItems && mLastVisibleItem == mTotalItemCount - 4 && !mAllAnecdotesLoaded) {
-                    if (mAnecdoteService != null && mAnecdoteService.getWebsitePage().isSinglePage) {
-                        return;
-                    }
-                    mIsLoadingNewItems = true;
-                    Log.d(TAG, "Scrolled to end, load new anecdotes");
-                    loadNewAnecdotes(mNextPageNumber);
-                }
-            }
-        });
+        mRecyclerView.addOnScrollListener(mOnScrollListener);
 
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
@@ -187,11 +173,6 @@ public class AnecdoteFragment extends Fragment implements
             colorBackgroundStripping = getResources().getColor(R.color.rowColorBackgroundStripping);
         }
         mAdapter.setTextStyle(textSize, rowStripping, colorBackground, colorBackgroundStripping);
-
-
-        if (mAnecdoteService.getAnecdotes().isEmpty()) {
-            loadNewAnecdotes(mNextPageNumber);
-        }
     }
 
     /**
@@ -260,6 +241,42 @@ public class AnecdoteFragment extends Fragment implements
                 Log.w(TAG, "Not managed RichContent type");
                 break;
         }
+    }
+
+
+    private RecyclerView.OnScrollListener mOnScrollListener = new RecyclerView.OnScrollListener() {
+        @Override
+        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+            super.onScrolled(recyclerView, dx, dy);
+
+            // Scrolled to bottom. Do something here.
+            if (shouldPreloadNewAnecdote()) {
+                mIsLoadingNewItems = true;
+                Log.d(TAG, "Scrolled to end, load new anecdotes");
+                loadNewAnecdotes(mNextPageNumber);
+            }
+        }
+    };
+
+    /**
+     * Define the condition to preload enw anecdote before arriving at the end of the list
+     *
+     * @return true if should preload, false otherweise
+     */
+    private boolean shouldPreloadNewAnecdote() {
+        mTotalItemCount = mAdapter.getContentItemCount();
+        mLastVisibleItem = mLayoutManager.findLastVisibleItemPosition();
+        boolean willPrefetch = (mLastVisibleItem >= (mTotalItemCount - PREFETECH_THRESHOLD));
+
+        // Scrolled to bottom. Do something here.
+        if (!mIsLoadingNewItems && willPrefetch && !mAllAnecdotesLoaded) {
+            //noinspection RedundantIfStatement
+            if (mAnecdoteService != null && mAnecdoteService.getWebsitePage().isSinglePage) {
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     /***************************
