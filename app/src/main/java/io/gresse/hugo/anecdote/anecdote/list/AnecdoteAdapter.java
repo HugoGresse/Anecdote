@@ -14,6 +14,7 @@ import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
  */
 public interface AnecdoteAdapter {
 
+
     /**
      * Get an item for the specified position
      *
@@ -38,6 +39,13 @@ public interface AnecdoteAdapter {
      * @param colorBackgroundStripping row background color of the stripping
      */
     void setTextStyle(int textSize, boolean rowStriping, int colorBackground, int colorBackgroundStripping);
+
+    /**
+     * Get the number of items without the loading items counted.
+     *
+     * @return number of real content items
+     */
+    int getContentItemCount();
 
     abstract class BaseAnecdoteViewHolder extends RecyclerView.ViewHolder {
 

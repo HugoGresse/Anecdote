@@ -88,8 +88,8 @@ class MixedContentAdapter
 
     @Override
     public void onViewDetachedFromWindow(BaseAnecdoteViewHolder holder) {
-        super.onViewDetachedFromWindow(holder);
         holder.onViewDetached();
+        super.onViewDetachedFromWindow(holder);
     }
 
     @Override
@@ -141,6 +141,11 @@ class MixedContentAdapter
             return mAnecdotes.size();
         }
         return mAnecdotes.size() + 1;
+    }
+
+    @Override
+    public int getContentItemCount() {
+        return mAnecdotes.size();
     }
 
     @Override
