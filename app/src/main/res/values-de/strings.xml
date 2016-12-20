@@ -86,5 +86,6 @@
     <string name="error_responsefail">Unable to load website, error %s</string>
     <string name="error_wrongconfig">Website configuration is wrong</string>
     <string name="error_server">Server error</string>
+    <string name="action_retry">Retry</string>
 
 </resources>
