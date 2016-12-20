@@ -302,7 +302,7 @@ public class AnecdoteFragment extends Fragment implements
         switch (action) {
             default:
             case AdapterListener.ACTION_COPY:
-                EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, anecdote, anecdote.getShareString(getContext()), CopyAnecdoteEvent.TYPE_ANECDOTE));
+                EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, anecdote, CopyAnecdoteEvent.TYPE_ANECDOTE, anecdote.getShareString(getContext())));
                 break;
             case AdapterListener.ACTION_SHARE:
                 EventBus.getDefault().post(new ShareAnecdoteEvent(mWebsiteName, anecdote, anecdote.getShareString(getContext())));

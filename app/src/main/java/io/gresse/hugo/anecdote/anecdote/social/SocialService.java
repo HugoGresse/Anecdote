@@ -85,11 +85,11 @@ public class SocialService {
 
         EventTracker.trackAnecdoteCopy(event);
 
-        Toast.makeText(mActivity, R.string.copied, Toast.LENGTH_SHORT).show();
         Utils.copyToClipboard(
                 mActivity,
                 mActivity.getString(R.string.app_name),
                 event.shareString);
+        Toast.makeText(mActivity, R.string.copied, Toast.LENGTH_SHORT).show();
     }
 
     @Subscribe
