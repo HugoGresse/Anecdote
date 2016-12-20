@@ -516,7 +516,7 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection WrongConstant
         mSnackbar = Snackbar
-                .make(mCoordinatorLayout, event.message, Snackbar.LENGTH_INDEFINITE);
+                .make(mCoordinatorLayout, event.formatErrorMessage(this), Snackbar.LENGTH_INDEFINITE);
         mSnackbar
                 .setAction("Retry", new View.OnClickListener() {
                     @Override

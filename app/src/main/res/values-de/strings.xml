@@ -73,9 +73,18 @@
         <item>Extra groß</item>
     </string-array>
     
-    <string name="anecdote_open_inbrowser">Im Browser öffnen</string>
+    <string name="action_open_inbrowser">Im Browser öffnen</string>
     <string name="not_implemented">Nicht implementiert</string>
     <string name="word_by">von</string>
     <string name="about_made_community">Mit Hilfe der Gemeinschaft https://github.com/HugoGresse/Anecdote</string>
+    <string name="about_contentbelonging">The application contents does not belong to Anecdote.</string>
+    <string name="error_general">"Unknown error… "</string>
+    <string name="error_loadfail">Unable to load %s</string>
+    <string name="error_nointernet">No internet connection</string>
+    <string name="error_parsing">Unable to parse %s website</string>
+    <string name="error_processing">Something went wrong, try another website setting</string>
+    <string name="error_responsefail">Unable to load website, error %s</string>
+    <string name="error_wrongconfig">Website configuration is wrong</string>
+    <string name="error_server">Server error</string>
 
 </resources>

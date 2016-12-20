@@ -71,7 +71,8 @@ public class WebsiteApiService {
                 mFailedEvent = event;
                 postEventToMainThread(new RequestFailedEvent(
                         event,
-                        "No internet connection",
+                        RequestFailedEvent.ERROR_NOINTERNET,
+                        "",
                         e));
             }
 
@@ -82,7 +83,8 @@ public class WebsiteApiService {
                     mFailedEvent = event;
                     postEventToMainThread(new RequestFailedEvent(
                             event,
-                            "Something went wrong with the server",
+                            RequestFailedEvent.ERROR_SERVER,
+                            "",
                             null));
                     return;
                 }
