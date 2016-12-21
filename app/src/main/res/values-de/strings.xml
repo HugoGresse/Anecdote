@@ -87,5 +87,7 @@
     <string name="error_wrongconfig">Webseitenkonfiguration falsch</string>
     <string name="error_server">Serverfehler</string>
     <string name="action_retry">Wiederholen</string>
+    <string name="action_restore_summary">Alle Webseiten aus der App entfernen. Hilfreich, wenn einige Webseiten nicht funktionieren</string>
+    <string name="pref_cat_advanced">Erweiterte Einstellungen</string>
 
 </resources>

@@ -64,6 +64,7 @@ import io.gresse.hugo.anecdote.api.model.WebsitePage;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.event.ResetAppEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.setting.SettingsFragment;
 import io.gresse.hugo.anecdote.storage.SpStorage;
@@ -208,12 +209,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_restore:
-                changeFragment(
-                        WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_RESTORE),
-                        true,
-                        true);
-                return true;
             case R.id.action_about:
                 changeFragment(
                         Fragment.instantiate(this, AboutFragment.class.getName()),
@@ -727,6 +722,15 @@ public class MainActivity extends AppCompatActivity
         } else if (newNotification) {
             populateNavigationView(true);
         }
+    }
+
+
+    @Subscribe
+    public void onWebsiteReset(ResetAppEvent event) {
+        changeFragment(
+                WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_RESTORE),
+                true,
+                true);
     }
 
 

@@ -10,6 +10,7 @@
     <string name="action_feedback">Send feedback</string>
     <string name="action_about">About</string>
     <string name="action_restore">Restore websites</string>
+    <string name="action_restore_summary">Remove all websites from the app. May be useful if some websites are not working.</string>
     <string name="action_edit">Edit</string>
     <string name="action_delete">Delete</string>
     <string name="action_default">Default</string>
@@ -82,6 +83,7 @@
 
     <!-- Strings related to Settings -->
     <string name="pref_cat_display">Display</string>
+    <string name="pref_cat_advanced">Advanced settings</string>
     <string name="pref_rowstriping_title">Anecdote row striping</string>
     <string name="pref_rowstriping_summary">Add a background to separate each quotes</string>
     <string name="pref_textsize_title">Text size</string>
@@ -94,6 +96,7 @@
     </string-array>
     <string name="pref_rowstriping_key" translatable="false">rowStriping</string>
     <string name="pref_textsize_key" translatable="false">textSize</string>
+    <string name="pref_reset_key" translatable="false">reset</string>
     <string-array name="pref_textsize_values" translatable="false">
         <item>10</item>
         <item>12</item>

@@ -77,4 +77,6 @@
     <string name="error_loadfail">Impossible de charger %s</string>
     <string name="error_general">Erreur inconnue...</string>
     <string name="action_retry">Réessayer</string>
+    <string name="action_restore_summary">Enlève tous les sites de l\'application. Peut être utile si plusieurs sites ne marchent plus.</string>
+    <string name="pref_cat_advanced">Paramètres avancés</string>
 </resources>
