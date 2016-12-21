@@ -76,4 +76,5 @@
     <string name="error_nointernet">Pas de connection internet</string>
     <string name="error_loadfail">Impossible de charger %s</string>
     <string name="error_general">Erreur inconnue...</string>
+    <string name="action_retry">Réessayer</string>
 </resources>

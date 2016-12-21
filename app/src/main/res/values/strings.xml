@@ -32,6 +32,7 @@
     <string name="action_copy">Copy</string>
     <string name="action_open">Open</string>
     <string name="action_open_inbrowser">Open in your browser</string>
+    <string name="action_retry">Retry</string>
 
     <string name="open_intent_browser">Opening browser…</string>
     <string name="open_intent_browser_error">Unable to open details, check url configuration</string>
