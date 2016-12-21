@@ -30,7 +30,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/anecdote_open_inbrowser"
+            android:text="@string/action_open_inbrowser"
             android:id="@+id/openTextView"
             android:paddingLeft="@dimen/padding_anecdoterow_half"
             android:paddingStart="@dimen/padding_anecdoterow_half"

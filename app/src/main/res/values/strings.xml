@@ -31,6 +31,8 @@
     <string name="action_share">Share</string>
     <string name="action_copy">Copy</string>
     <string name="action_open">Open</string>
+    <string name="action_open_inbrowser">Open in your browser</string>
+    <string name="action_retry">Retry</string>
 
     <string name="open_intent_browser">Opening browser…</string>
     <string name="open_intent_browser_error">Unable to open details, check url configuration</string>
@@ -63,6 +65,7 @@
     <string name="about_title">About</string>
     <string name="about_made">Made with love by</string>
     <string name="about_made_person" translatable="false">Hugo Gresse http://hugo.gresse.io/</string>
+    <string name="about_contentbelonging">The application contents does not belong to Anecdote.</string>
     <string name="about_made_community">With the help of the community https://github.com/HugoGresse/Anecdote</string>
     <string name="using">Third-party libraries</string>
     <string name="error_server_unknown">Something went wrong with the server :(</string>
@@ -102,6 +105,13 @@
     <string name="anecdote_image_transition_name" translatable="false">imageTransitionName</string>
     <string name="anecdote_video_transition_name" translatable="false">videoTransitionName</string>
 
-    <string name="anecdote_open_inbrowser">Open in your browser</string>
+    <string name="error_general">Unknown error… </string>
+    <string name="error_nointernet">No internet connection</string>
+    <string name="error_server">Server error</string>
+    <string name="error_wrongconfig">Website configuration is wrong</string>
+    <string name="error_loadfail">Unable to load %s</string>
+    <string name="error_processing">Something went wrong, try another website setting</string>
+    <string name="error_responsefail">Unable to load website, error %s</string>
+    <string name="error_parsing">Unable to parse %s website</string>
 
 </resources>

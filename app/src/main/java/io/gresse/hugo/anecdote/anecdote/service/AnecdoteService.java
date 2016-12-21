@@ -44,14 +44,13 @@ import okhttp3.Response;
  */
 public class AnecdoteService {
 
-    protected Website              mWebsite;
-    protected WebsitePage          mWebsitePage;
-    protected OkHttpClient         mOkHttpClient;
-    protected String               mServiceName;
-    protected List<Anecdote>       mAnecdotes;
-    protected List<Event>          mFailEvents;
-    protected Map<Integer, String> mPaginationMap;
-    protected boolean mEnd = false;
+    private Website              mWebsite;
+    private WebsitePage          mWebsitePage;
+    private OkHttpClient         mOkHttpClient;
+    private String               mServiceName;
+    private List<Anecdote>       mAnecdotes;
+    private List<Event>          mFailEvents;
+    private Map<Integer, String> mPaginationMap;
 
     public AnecdoteService(Website website, WebsitePage websitePage) {
         mWebsite = website;
@@ -101,7 +100,7 @@ public class AnecdoteService {
     /**
      * Retry to send failed event
      */
-    public void retryFailedEvent() {
+    private void retryFailedEvent() {
         if (!mFailEvents.isEmpty()) {
             for (Event event : mFailEvents) {
                 EventBus.getDefault().post(event);
@@ -131,7 +130,8 @@ public class AnecdoteService {
             mFailEvents.add(event);
             postOnUiThread(new RequestFailedEvent(
                     event,
-                    "Website configuration is wrong: " + mWebsitePage.name,
+                    RequestFailedEvent.ERROR_WRONGCONFIG,
+                    mWebsitePage.name,
                     exception));
             return;
         }
@@ -143,7 +143,8 @@ public class AnecdoteService {
                 mFailEvents.add(event);
                 postOnUiThread(new RequestFailedEvent(
                         event,
-                        "Unable to load " + mWebsitePage.name,
+                        RequestFailedEvent.ERROR_LOADFAIL,
+                        mWebsitePage.name,
                         e));
             }
 
@@ -156,15 +157,18 @@ public class AnecdoteService {
                     } catch (Selector.SelectorParseException exception) {
                         postOnUiThread(new RequestFailedEvent(
                                 event,
-                                "Something went wrong, try another website setting",
+                                RequestFailedEvent.ERROR_PROCESSING,
+                                mWebsitePage.name,
                                 exception));
                     }
                 } else {
                     mFailEvents.add(event);
                     postOnUiThread(new RequestFailedEvent(
                             event,
-                            "Unable to load website: error " + response.code(),
-                            null));
+                            RequestFailedEvent.ERROR_RESPONSEFAIL,
+                            mWebsitePage.name,
+                            null,
+                            String.valueOf(response.code())));
                 }
 
             }
@@ -179,7 +183,8 @@ public class AnecdoteService {
             response.body().close();
             postOnUiThread(new RequestFailedEvent(
                     event,
-                    "Unable to parse " + mWebsitePage.name + " website",
+                    RequestFailedEvent.ERROR_PARSING,
+                    mWebsitePage.name,
                     null));
             return;
         } finally {
@@ -209,12 +214,12 @@ public class AnecdoteService {
             Log.w(mServiceName, "No elements :/");
             postOnUiThread(new RequestFailedEvent(
                     event,
-                    "Unable to parse " + mWebsitePage.name + " website",
+                    RequestFailedEvent.ERROR_PARSING,
+                    mWebsitePage.name,
                     null));
             if (mWebsite.source.equals(Website.SOURCE_REMOTE)) {
                 EventTracker.trackWebsiteWrongConfiguration(mWebsite.name + " " + mWebsitePage.name);
             }
-            mEnd = true;
         }
     }
 
@@ -223,7 +228,7 @@ public class AnecdoteService {
      *
      * @param event the event to post on Bus
      */
-    protected void postOnUiThread(final Event event) {
+    private void postOnUiThread(final Event event) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {

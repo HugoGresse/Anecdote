@@ -45,7 +45,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/usage"
-        android:text="The application contents does not belog to Anecdte."
+        android:text="@string/about_contentbelonging"
         android:textSize="12sp"
         android:fontFamily="sans-serif-light"
         android:layout_marginBottom="@dimen/activity_vertical_margin"

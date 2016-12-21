@@ -55,7 +55,7 @@
     <string name="pref_textsize_title">Taille du texte</string>
     <string name="action_website_noteditable_toast">Vous ne pouvez pas modifier un site distant</string>
     <string name="action_website_newwebsite">Nouveaux sites disponible</string>
-    <string name="anecdote_open_inbrowser">Ouvrir dans votre navigateur</string>
+    <string name="action_open_inbrowser">Ouvrir dans votre navigateur</string>
     <string name="dialog_website_page_name_hint">Nom de la page</string>
     <string name="dialog_website_error_pagename">AJoutez le nom de la page</string>
     <string name="action_copy">Copier</string>
@@ -67,4 +67,14 @@
     <string name="using">Librairies tierces</string>
     <string name="word_by">par</string>
     <string name="about_made_community">Avec l\'aide de la communauté https://github.com/HugoGresse/Anecdote</string>
+    <string name="about_contentbelonging">Le contenu de l\'application n\'appartient pas à Anecdote</string>
+    <string name="error_server">Erreur serveur</string>
+    <string name="error_wrongconfig">La configuration du site n\'est pas bonne</string>
+    <string name="error_responsefail">Impossible de charger le site, error %s</string>
+    <string name="error_processing">Quelquechose c\'est mal passé, essayez une autre configuration</string>
+    <string name="error_parsing">Impossible de parser le site %s</string>
+    <string name="error_nointernet">Pas de connection internet</string>
+    <string name="error_loadfail">Impossible de charger %s</string>
+    <string name="error_general">Erreur inconnue...</string>
+    <string name="action_retry">Réessayer</string>
 </resources>
