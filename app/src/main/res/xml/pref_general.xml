@@ -3,9 +3,6 @@
 
     <PreferenceCategory android:title="@string/pref_cat_display">
 
-        <!-- NOTE: Hide buttons to simplify the UI. Users can touch outside the dialog to
-             dismiss it. -->
-        <!-- NOTE: ListPreference's summary should be set to its value by the activity code. -->
         <ListPreference
             android:defaultValue="@integer/anecdote_textsize_default"
             android:entries="@array/pref_textsize_title"
@@ -21,6 +18,15 @@
             android:key="@string/pref_rowstriping_key"
             android:summary="@string/pref_rowstriping_summary"
             android:title="@string/pref_rowstriping_title"/>
+
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_cat_advanced">
+
+        <Preference
+            android:key="@string/pref_reset_key"
+            android:summary="@string/action_restore_summary"
+            android:title="@string/action_restore"/>
 
     </PreferenceCategory>
 
