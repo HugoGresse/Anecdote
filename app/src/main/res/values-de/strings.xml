@@ -85,7 +85,7 @@
     <string name="error_processing">Etwas lief schief, versuche andere Webseiten Einstellungen</string>
     <string name="error_responsefail">Fehler beim Laden der Webseite: %s</string>
     <string name="error_wrongconfig">Webseitenkonfiguration falsch</string>
-    <string name="error_server">Serverfehler</string>on is wrong</string>
+    <string name="error_server">Serverfehler</string>
     <string name="action_retry">Wiederholen</string>
 
 </resources>
