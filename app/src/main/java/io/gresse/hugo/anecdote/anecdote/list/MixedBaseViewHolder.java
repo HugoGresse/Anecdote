@@ -64,15 +64,15 @@ public class MixedBaseViewHolder
 
     @Override
     public void setData(int position, boolean isExpanded, Anecdote anecdote) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mTextView.setText(Html.fromHtml(anecdote.text, Html.FROM_HTML_MODE_LEGACY));
-        } else {
-            try {
-                //noinspection deprecation
-                mTextView.setText(Html.fromHtml(anecdote.text));
-            } catch (Error error) {
-                mTextView.setText(anecdote.text);
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mTextView.setText(Html.fromHtml(anecdote.text, Html.FROM_HTML_MODE_LEGACY));
+            } else {
+                    //noinspection deprecation
+                    mTextView.setText(Html.fromHtml(anecdote.text));
             }
+        } catch (Throwable error) {
+            mTextView.setText(anecdote.text);
         }
         mTextView.setTextSize(mTextSize);
 
