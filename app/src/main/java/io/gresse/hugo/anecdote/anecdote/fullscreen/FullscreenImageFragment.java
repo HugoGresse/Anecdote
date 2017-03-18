@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.github.chrisbanes.photoview.OnPhotoTapListener;
+import com.github.chrisbanes.photoview.PhotoViewAttacher;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -17,7 +19,6 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 
 /**
@@ -26,7 +27,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
  * <p/>
  * Created by Hugo Gresse on 20/04/16.
  */
-public class FullscreenImageFragment extends FullscreenFragment implements PhotoViewAttacher.OnPhotoTapListener, View.OnLongClickListener {
+public class FullscreenImageFragment extends FullscreenFragment implements OnPhotoTapListener, View.OnLongClickListener {
 
     public static final String TAG             = FullscreenImageFragment.class.getSimpleName();
     public static final String BUNDLE_IMAGEURL = "contentUrl";
@@ -103,14 +104,10 @@ public class FullscreenImageFragment extends FullscreenFragment implements Photo
      * implements PhotoViewAttacher.OnPhotoTapListener
      ***************************/
 
+
     @Override
-    public void onPhotoTap(View view, float x, float y) {
+    public void onPhotoTap(ImageView view, float x, float y) {
         super.toggleOverlayVisibility();
-    }
-
-    @Override
-    public void onOutsidePhotoTap() {
-
     }
 
     @Override
