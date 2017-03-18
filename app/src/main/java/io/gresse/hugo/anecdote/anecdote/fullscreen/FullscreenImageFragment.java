@@ -109,6 +109,11 @@ public class FullscreenImageFragment extends FullscreenFragment implements Photo
     }
 
     @Override
+    public void onOutsidePhotoTap() {
+
+    }
+
+    @Override
     public boolean onLongClick(View view) {
         super.onContentLongTouch(mImageUrl);
         return true;
