@@ -75,8 +75,28 @@
     <string name="error_parsing">Impossible de parser le site %s</string>
     <string name="error_nointernet">Pas de connection internet</string>
     <string name="error_loadfail">Impossible de charger %s</string>
-    <string name="error_general">Erreur inconnue...</string>
+    <string name="error_general">Erreur inconnue…</string>
     <string name="action_retry">Réessayer</string>
     <string name="action_restore_summary">Enlève tous les sites de l\'application. Peut être utile si plusieurs sites ne marchent plus.</string>
     <string name="pref_cat_advanced">Paramètres avancés</string>
+
+
+    <!-- Strings displayed only on Google Playstore. Optional, but good to have -->
+    <!-- Short description has to have less than 80 chars -->
+    <string name="app_short_description">La meilleur app pour lire vos anecdotes préférées (9GAG, VDM, DTC, SCMB)</string>
+    <string name="app_long_description">
+        Fonctionnalités:
+            - affiche les dernières anecdotes de 9GAG (Hot &amp; Trending), xkcd, DTC (Dans ton chat), VDM (Vie De Merde), Se coucher moins bête et d\'autres
+            - scroll infini et pull to refresh
+            - pas de pub et pas d\'autorisation bizarre
+            - possibilité d\'ajouter des sites vous mêmes si vous connaissez un peu l\'HTML
+
+
+        Anecdote est une application simple qui permet de lire les dernières anecdotes publiées sur 9GAG, Dans Ton Chat ©, Vie De Merde ©, Se Coucher moins Bête, Fuck My Life et bien plus. Elle est simple, très légère, n\'impactera pas les performances de votre téléphone/tablette quand elle n\'est pas affiché.
+
+        L\'application est open-source sur GitHub : https://github.com/HugoGresse/Anecdote
+
+        Le contenu de l\'application n\'appartient pas Anecdote.
+    </string>
+
 </resources>
