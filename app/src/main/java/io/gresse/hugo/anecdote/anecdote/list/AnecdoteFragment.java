@@ -188,6 +188,11 @@ public class AnecdoteFragment extends Fragment implements
             mNextPageNumber++;
             mAdapter.setData(mAnecdoteService.getAnecdotes());
         }
+
+        if(shouldPreloadNewAnecdote()){
+            Log.d(TAG, "afterRequestFinished, load new anecdotes");
+            loadNewAnecdotes(mNextPageNumber);
+        }
     }
 
     /**
@@ -196,6 +201,7 @@ public class AnecdoteFragment extends Fragment implements
      * @param page the page to load
      */
     protected void loadNewAnecdotes(int page) {
+        mIsLoadingNewItems = true;
         EventBus.getDefault().post(new LoadNewAnecdoteEvent(mWebsiteSlug, page));
     }
 
@@ -251,7 +257,6 @@ public class AnecdoteFragment extends Fragment implements
 
             // Scrolled to bottom. Do something here.
             if (shouldPreloadNewAnecdote()) {
-                mIsLoadingNewItems = true;
                 Log.d(TAG, "Scrolled to end, load new anecdotes");
                 loadNewAnecdotes(mNextPageNumber);
             }
@@ -341,7 +346,6 @@ public class AnecdoteFragment extends Fragment implements
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onAnecdoteReceived(OnAnecdoteLoadedEvent event) {
         if (!event.websitePageSlug.equals(mWebsiteSlug)) return;
-
         EventBus.getDefault().removeStickyEvent(event.getClass());
         afterRequestFinished(true);
     }

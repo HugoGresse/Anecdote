@@ -95,6 +95,7 @@ public class AnecdoteService {
      */
     public void cleanAnecdotes() {
         mAnecdotes.clear();
+        mPaginationMap.clear();
     }
 
     /**
