@@ -1,0 +1,96 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <string name="app_migration_1_0_0">Миграция на новую версию Anecdote</string>
+
+    <string name="navigation_drawer_open">Открыть navigation drawer</string>
+    <string name="navigation_drawer_close">Закрыть navigation drawer</string>
+
+    <string name="action_settings">Настройки</string>
+    <string name="action_feedback">Отослать обратную связь</string>
+    <string name="action_about">О программе</string>
+    <string name="action_restore">Восстановить вебсайты</string>
+    <string name="action_restore_summary">Удалить все вебсайты из приложения. М.б. полезно для нерабочих.</string>
+    <string name="action_edit">Правка</string>
+    <string name="action_delete">Удалить</string>
+    <string name="action_default">Умолчание</string>
+    <string name="action_website_add">Добавить вебсайт</string>
+    <string name="action_website_newwebsite">Доступны новые вебсайты</string>
+    <string name="action_website_add_custom">Добавить настраив. вебсайт</string>
+    <string name="copied">Скопировано в буфер</string>
+    <string name="not_implemented">Не реализовано</string>
+    <string name="action_website_noteditable_toast">Нельзя править отдаленный вебсайт</string>
+
+    <string name="app_share_credits">- через Anecdote http://bit.ly/anecdoteapp</string>
+
+    <string name="anecdote_share_title">Поделиться через</string>
+    <string-array name="anecdote_content_dialog">
+        <item>Копирование ссылки</item>
+    </string-array>
+
+
+    <string name="action_share">Поделиться</string>
+    <string name="action_copy">Копировать</string>
+    <string name="action_open">Открыть</string>
+    <string name="action_open_inbrowser">Открыть в браузере</string>
+    <string name="action_retry">Повтор</string>
+
+    <string name="open_intent_browser">Открытие браузера…</string>
+    <string name="open_intent_browser_error">Не открываются детали, проверьте конфиг. адреса</string>
+
+    <string name="action_website">Вебсайт действия</string>
+
+    <string name="word_by">с</string>
+
+    <string name="dialog_website_new_title">Новый вебсайт</string>
+    <string name="dialog_website_edit_title">Правка</string>
+    <string name="dialog_website_add">Добавить</string>
+    <string name="dialog_website_error_itemperpage">Пункт на страницу д.б. больше 0</string>
+    <string name="dialog_website_error_name">Добавить имя?</string>
+    <string name="dialog_website_error_pagename">Добавить имя страницы</string>
+    <string name="dialog_website_error_url">Отсутствует адрес вебсайта</string>
+    <string name="dialog_website_error_selector">Отсутствует выделение текста</string>
+    <string name="dialog_website_save">Сохранить</string>
+    <string name="dialog_website_name_hint">Имя вебсайта</string>
+    <string name="dialog_website_page_name_hint">Имя страницы</string>
+    <string name="dialog_website_url_hint">Адрес вебсайта</string>
+    <string name="dialog_website_urlsuffix_hint">(опц.) Суффикс номера страницы</string>
+    <string name="dialog_website_selector_hint">DOM selector</string>
+    <string name="dialog_website_itemperpage_hint">Количество элементов на странице</string>
+    <string name="dialog_website_firstpagezero_hint">Если номер первой страницы 0</string>
+
+    <string name="dialog_websitechooser_title">Выберите любимые сайты</string>
+
+
+    <!-- About fragment -->
+    <string name="about_title">О программе</string>
+    <string name="about_made">Сделано с любовью</string>
+    <string name="about_contentbelonging">Содержимое приложения не принадлежит Anecdote.</string>
+    <string name="about_made_community">С помощью сообщества https://github.com/HugoGresse/Anecdote</string>
+    <string name="using">Сторонние библиотеки</string>
+    <string name="error_server_unknown">Что-то не так с сервером</string>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_cat_display">Отображение</string>
+    <string name="pref_cat_advanced">Расширенные настройки</string>
+    <string name="pref_rowstriping_title">Полосатость строк</string>
+    <string name="pref_rowstriping_summary">Добавить фон для разделения цитат</string>
+    <string name="pref_textsize_title">Размер текста</string>
+    <string-array name="pref_textsize_title">
+        <item>чрезмерно малых</item>
+        <item>маленький</item>
+        <item>средних</item>
+        <item>крупных</item>
+        <item>сверхбольшой</item>
+    </string-array>
+
+
+    <string name="error_general">Неизвестная ошибка…</string>
+    <string name="error_nointernet">Нет соединения с интернетом</string>
+    <string name="error_server">Ошибка сервера</string>
+    <string name="error_wrongconfig">Конфигурация вебсайта неверна</string>
+    <string name="error_loadfail">Нельзя загрузить %s</string>
+    <string name="error_processing">Что-то не так, пробуйте другие настройки вебсайта</string>
+    <string name="error_responsefail">Не загружается вебсайт, ошибка %s</string>
+    <string name="error_parsing">Нельзя разобрать %s вебсайт</string>
+
+</resources>
