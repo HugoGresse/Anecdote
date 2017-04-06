@@ -10,7 +10,7 @@ import android.widget.CompoundButton;
 
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.WebsiteViewHolderListener;
@@ -107,7 +107,7 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
 
     public class WebsiteViewHolder extends BaseWebsiteViewHolder implements CompoundButton.OnCheckedChangeListener {
 
-        @Bind(R.id.checkBox)
+        @BindView(R.id.checkBox)
         protected CheckBox checkBox;
 
         public WebsiteViewHolder(View itemView) {

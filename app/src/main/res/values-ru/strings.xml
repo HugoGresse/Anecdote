@@ -25,6 +25,7 @@
     <string name="anecdote_share_title">Поделиться через</string>
     <string-array name="anecdote_content_dialog">
         <item>Копирование ссылки</item>
+        <item>скачать</item>
     </string-array>
 
 
@@ -92,5 +93,6 @@
     <string name="error_processing">Что-то не так, пробуйте другие настройки вебсайта</string>
     <string name="error_responsefail">Не загружается вебсайт, ошибка %s</string>
     <string name="error_parsing">Нельзя разобрать %s вебсайт</string>
+    <string name="notice_image_saved">Изображение сохранено!</string>
 
 </resources>

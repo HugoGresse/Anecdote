@@ -14,7 +14,7 @@
         android:paddingLeft="@dimen/padding_anecdoterow"
         android:paddingRight="@dimen/padding_anecdoterow"/>
 
-    <ImageView
+    <io.gresse.hugo.anecdote.view.CustomImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="300dp"

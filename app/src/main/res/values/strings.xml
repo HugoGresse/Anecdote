@@ -18,6 +18,8 @@
     <string name="action_website_newwebsite">New websites available!</string>
     <string name="action_website_add_custom">Add custom website</string>
     <string name="copied">Copied to clipboard</string>
+    <string name="notice_image_saved">Image saved!</string>
+
     <string name="not_implemented">Not implemented</string>
     <string name="action_website_noteditable_toast">You can\'t edit a remote website</string>
 
@@ -26,6 +28,7 @@
     <string name="anecdote_share_title">Share using</string>
     <string-array name="anecdote_content_dialog">
         <item>Copy link</item>
+        <item>Download</item>
     </string-array>
 
 

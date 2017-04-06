@@ -13,8 +13,9 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
@@ -28,14 +29,16 @@ public class AboutFragment extends Fragment implements AboutAdapter.OnClickListe
 
     public static final String TAG = AboutFragment.class.getSimpleName();
 
-    @Bind(R.id.recyclerView)
+    @BindView(R.id.recyclerView)
     public RecyclerView mRecyclerView;
+
+    private Unbinder mUnbinder;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_about, container, false);
-        ButterKnife.bind(this, v);
+        mUnbinder = ButterKnife.bind(this, v);
         return v;
     }
 
@@ -56,6 +59,11 @@ public class AboutFragment extends Fragment implements AboutAdapter.OnClickListe
         AboutAdapter adapter = new AboutAdapter(this, aboutStringArray);
 
         mRecyclerView.setAdapter(adapter);
+    }
+
+    @Override public void onDestroyView() {
+        super.onDestroyView();
+        mUnbinder.unbind();
     }
 
     @Override

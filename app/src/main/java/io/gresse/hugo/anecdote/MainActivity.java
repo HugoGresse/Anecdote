@@ -41,7 +41,7 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnItemSelected;
 import io.gresse.hugo.anecdote.about.AboutFragment;
@@ -62,6 +62,7 @@ import io.gresse.hugo.anecdote.api.event.OnRemoteWebsiteResponseEvent;
 import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.model.WebsitePage;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
+import io.gresse.hugo.anecdote.event.DisplaySnackbarEvent;
 import io.gresse.hugo.anecdote.event.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.event.ResetAppEvent;
@@ -73,6 +74,10 @@ import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
 /**
+ * TODO :
+ * - download image + dialog + name of the snackbar and not the TOAST
+ * - slide between images
+ * - favoris
  *
  */
 public class MainActivity extends AppCompatActivity
@@ -80,25 +85,25 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    @Bind(R.id.coordinatorLayout)
+    @BindView(R.id.coordinatorLayout)
     public CoordinatorLayout mCoordinatorLayout;
 
-    @Bind(R.id.app_bar_layout)
+    @BindView(R.id.app_bar_layout)
     public AppBarLayout mAppBarLayout;
 
-    @Bind(R.id.toolbar)
+    @BindView(R.id.toolbar)
     public Toolbar mToolbar;
 
-    @Bind(R.id.drawer_layout)
+    @BindView(R.id.drawer_layout)
     public DrawerLayout mDrawerLayout;
 
-    @Bind(R.id.nav_view)
+    @BindView(R.id.nav_view)
     public NavigationView mNavigationView;
 
-    @Bind(R.id.toolbarSpinner)
+    @BindView(R.id.toolbarSpinner)
     public Spinner mToolbarSpinner;
 
-    @Bind(R.id.fragment_container)
+    @BindView(R.id.fragment_container)
     public View mFragmentContainer;
 
     protected ServiceProvider             mServiceProvider;
@@ -724,7 +729,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-
     @Subscribe
     public void onWebsiteReset(ResetAppEvent event) {
         changeFragment(
@@ -733,6 +737,24 @@ public class MainActivity extends AppCompatActivity
                 true);
     }
 
+    @Subscribe
+    public void onDisplaySnackbarEvent(final DisplaySnackbarEvent event){
+        if(mSnackbar != null && mSnackbar.isShownOrQueued()){
+            mSnackbar.dismiss();
+        }
+
+        mSnackbar = Snackbar.make(mCoordinatorLayout, event.toastMessage, Snackbar.LENGTH_INDEFINITE);
+        mSnackbar
+                .setAction(event.actionString, new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mSnackbar = null;
+                        MainActivity.this.startActivity(event.intentToRun);
+                    }
+                })
+                .setDuration(event.duration)
+                .show();
+    }
 
     /***************************
      * Implements NetworkConnectivityListener.ConnectivityListener

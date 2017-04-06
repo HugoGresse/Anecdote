@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
@@ -29,7 +29,7 @@ public class FullscreenVideoFragment extends FullscreenFragment {
 
     private String mVideoUrl;
 
-    @Bind(R.id.playerView)
+    @BindView(R.id.playerView)
     public PlayerView mPlayerView;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -45,7 +45,7 @@ public class FullscreenVideoFragment extends FullscreenFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_fullscreen_video, container, false);
-        ButterKnife.bind(this, view);
+        mUnbinder = ButterKnife.bind(this, view);
         return view;
     }
 
@@ -72,7 +72,7 @@ public class FullscreenVideoFragment extends FullscreenFragment {
 
     @OnLongClick(R.id.playerView)
     public boolean onLongClick(){
-        super.onContentLongTouch(mVideoUrl);
+        super.onContentLongTouch(mVideoUrl, null);
         return true;
     }
 }

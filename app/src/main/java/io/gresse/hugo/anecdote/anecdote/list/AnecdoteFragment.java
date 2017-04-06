@@ -20,8 +20,9 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
@@ -57,26 +58,25 @@ public class AnecdoteFragment extends Fragment implements
      */
     public static final int PREFETECH_THRESHOLD = 4;
 
-    @Bind(R.id.swipeRefreshLayout)
+    @BindView(R.id.swipeRefreshLayout)
     public SwipeRefreshLayout mSwipeRefreshLayout;
 
-    @Bind(R.id.recyclerView)
+    @BindView(R.id.recyclerView)
     public RecyclerView mRecyclerView;
 
-    protected String                        mWebsiteParentSlug;
-    protected String                        mWebsiteSlug;
-    protected String                        mWebsiteName;
-    protected AnecdoteAdapter               mAdapter;
+    protected String          mWebsiteParentSlug;
+    protected String          mWebsiteSlug;
+    protected String          mWebsiteName;
+    protected AnecdoteAdapter mAdapter;
     @Nullable
-    protected AnecdoteService               mAnecdoteService;
+    protected AnecdoteService mAnecdoteService;
 
     private   LinearLayoutManager mLayoutManager;
     protected boolean             mIsLoadingNewItems;
     private   int                 mTotalItemCount;
     private   int                 mLastVisibleItem;
     private   int                 mNextPageNumber;
-    // TODO: check all loaded
-    private   boolean             mAllAnecdotesLoaded;
+    private   Unbinder            mUnbinder;
 
 
     @Override
@@ -91,14 +91,14 @@ public class AnecdoteFragment extends Fragment implements
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_anecdote, container, false);
-        ButterKnife.bind(this, view);
+        mUnbinder = ButterKnife.bind(this, view);
         return view;
     }
 
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        mUnbinder.unbind();
     }
 
     @Override
@@ -153,7 +153,7 @@ public class AnecdoteFragment extends Fragment implements
             return;
         }
 
-        mAdapter = new MixedContentAdapter(this, mAnecdoteService.getWebsitePage().isSinglePage);
+        mAdapter = new MixedContentAdapter(this, mAnecdoteService.getWebsitePage().isSinglePage, mWebsiteName);
 
         mAdapter.setData(mAnecdoteService.getAnecdotes());
         mRecyclerView.setAdapter((RecyclerView.Adapter) mAdapter);
@@ -189,7 +189,7 @@ public class AnecdoteFragment extends Fragment implements
             mAdapter.setData(mAnecdoteService.getAnecdotes());
         }
 
-        if(shouldPreloadNewAnecdote()){
+        if (shouldPreloadNewAnecdote()) {
             Log.d(TAG, "afterRequestFinished, load new anecdotes");
             loadNewAnecdotes(mNextPageNumber);
         }
@@ -274,7 +274,7 @@ public class AnecdoteFragment extends Fragment implements
         boolean willPrefetch = (mLastVisibleItem >= (mTotalItemCount - PREFETECH_THRESHOLD));
 
         // Scrolled to bottom. Do something here.
-        if (!mIsLoadingNewItems && willPrefetch && !mAllAnecdotesLoaded) {
+        if (!mIsLoadingNewItems && willPrefetch) {
             //noinspection RedundantIfStatement
             if (mAnecdoteService != null && mAnecdoteService.getWebsitePage().isSinglePage) {
                 return false;

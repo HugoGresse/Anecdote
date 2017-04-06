@@ -17,8 +17,9 @@ import com.google.gson.reflect.TypeToken;
 
 import org.greenrobot.eventbus.EventBus;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.MediaType;
 import io.gresse.hugo.anecdote.api.model.Content;
@@ -38,32 +39,33 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
 
     public static final String ARGS_WEBSITE = "args_website";
 
-    @Bind(R.id.nameContainer)
+    @BindView(R.id.nameContainer)
     public TextInputLayout mNameTextInputLayout;
-    @Bind(R.id.nameEditText)
+    @BindView(R.id.nameEditText)
     public EditText        mNameEditText;
-    @Bind(R.id.pageNameContainer)
+    @BindView(R.id.pageNameContainer)
     public TextInputLayout mPageNameTextInputLayout;
-    @Bind(R.id.pageNameEditText)
+    @BindView(R.id.pageNameEditText)
     public EditText        mPageNameEditText;
-    @Bind(R.id.urlContainer)
+    @BindView(R.id.urlContainer)
     public TextInputLayout mUrlTextInputLayout;
-    @Bind(R.id.urlEditText)
+    @BindView(R.id.urlEditText)
     public EditText        mUrlEditText;
-    @Bind(R.id.urlSuffixEditText)
+    @BindView(R.id.urlSuffixEditText)
     public EditText        mUrlSuffixEditText;
-    @Bind(R.id.selectorContainer)
+    @BindView(R.id.selectorContainer)
     public TextInputLayout mSelectorTextInputLayout;
-    @Bind(R.id.selectorEditText)
+    @BindView(R.id.selectorEditText)
     public EditText        mSelectorEditText;
-    @Bind(R.id.firstPageZeroSwitchCompat)
+    @BindView(R.id.firstPageZeroSwitchCompat)
     public SwitchCompat    mFirstPageZeroSwitchCompat;
-    @Bind(R.id.saveButton)
+    @BindView(R.id.saveButton)
     public Button          mSaveButton;
 
-    protected Website mWebsite;
+    protected Website     mWebsite;
     protected WebsitePage mWebsitePage;
-    protected boolean mEditMode;
+    protected boolean     mEditMode;
+    private   Unbinder    mUnbinder;
 
     public static WebsiteDialogFragment newInstance(@Nullable Website website) {
         WebsiteDialogFragment frag = new WebsiteDialogFragment();
@@ -79,7 +81,7 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_dialog_website, container);
-        ButterKnife.bind(this, view);
+        mUnbinder = ButterKnife.bind(this, view);
         return view;
     }
 
@@ -122,12 +124,12 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
                 mWebsitePage.urlSuffix = mUrlSuffixEditText.getText().toString();
                 mWebsitePage.isFirstPageZero = mFirstPageZeroSwitchCompat.isChecked();
                 mWebsitePage.selector = mSelectorEditText.getText().toString();
-                if(mWebsitePage.content == null){
+                if (mWebsitePage.content == null) {
                     mWebsitePage.content = new Content();
                     mWebsitePage.content.items.add(new ContentItem(MediaType.TEXT, 1));
                 }
 
-                if(mWebsite.pages.size() > 0){
+                if (mWebsite.pages.size() > 0) {
                     mWebsite.pages.set(0, mWebsitePage);
                 } else {
                     mWebsite.pages.add(mWebsitePage);
@@ -150,7 +152,7 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        mUnbinder.unbind();
     }
 
     protected void initAdd() {

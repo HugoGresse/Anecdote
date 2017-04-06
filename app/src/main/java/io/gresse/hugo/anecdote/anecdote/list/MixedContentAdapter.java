@@ -38,6 +38,7 @@ class MixedContentAdapter
     private static final int VIEW_TYPE_UNKNOWN = 4;
 
 
+    private String          mWebsiteName;
     private List<Anecdote>  mAnecdotes;
     private boolean         mIsSinglePage;
     @Nullable
@@ -48,7 +49,8 @@ class MixedContentAdapter
     private int             mRowStripingBackground;
     private int mExpandedPosition = -1;
 
-    MixedContentAdapter(@Nullable AdapterListener adapterListener, boolean isSinglePage) {
+    MixedContentAdapter(@Nullable AdapterListener adapterListener, boolean isSinglePage, String websiteName) {
+        mWebsiteName = websiteName;
         mAnecdotes = new ArrayList<>();
         mAdapterListener = adapterListener;
         mIsSinglePage = isSinglePage;
@@ -131,7 +133,7 @@ class MixedContentAdapter
     @Override
     public void onBindViewHolder(BaseAnecdoteViewHolder holder, int position, List<Object> payloads) {
         if (position < mAnecdotes.size()) {
-            holder.setData(position, mExpandedPosition == position, mAnecdotes.get(position));
+            holder.setData(position, mExpandedPosition == position, mWebsiteName, mAnecdotes.get(position));
         }
     }
 
@@ -182,9 +184,10 @@ class MixedContentAdapter
     /**
      * Set expanded item at the given position, used by viewHolder to prevent the adapter of a new expandedPosition and
      * save it here
+     *
      * @param position the expanded position
      */
-    public void toggleExpanded(int position){
+    void toggleExpanded(int position) {
         if (mExpandedPosition == position) {
             Log.d(TAG, "onClick close current ");
             mExpandedPosition = -1;
@@ -193,7 +196,7 @@ class MixedContentAdapter
         }
 
         // Notify expanded last position
-        if(mExpandedPosition >= 0){
+        if (mExpandedPosition >= 0) {
             notifyItemChanged(mExpandedPosition);
         }
         mExpandedPosition = position;
@@ -211,7 +214,7 @@ class MixedContentAdapter
         }
 
         @Override
-        public void setData(int position, boolean isExpanded, Anecdote anecdote) {
+        public void setData(int position, boolean isExpanded, String websiteName, Anecdote anecdote) {
             // This view is static, no need to change it's data
         }
     }

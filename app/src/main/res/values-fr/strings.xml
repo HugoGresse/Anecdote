@@ -20,6 +20,7 @@
     <string name="anecdote_share_title">Partagez avec</string>
     <string-array name="anecdote_content_dialog" >
         <item>Copier le lien</item>
+        <item>Télécharger</item>
     </string-array>
 
     <string name="open_intent_browser">Ouverture du navigateur…</string>
@@ -98,5 +99,6 @@
 
         Le contenu de l\'application n\'appartient pas Anecdote.
     </string>
+    <string name="notice_image_saved">Image sauvegardé !</string>
 
 </resources>

@@ -1,25 +1,23 @@
 package io.gresse.hugo.anecdote.anecdote.fullscreen;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.greenrobot.eventbus.EventBus;
 
-import butterknife.Bind;
-import butterknife.ButterKnife;
+import butterknife.BindView;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.R;
+import io.gresse.hugo.anecdote.anecdote.MediaContextDialog;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.social.OpenAnecdoteEvent;
@@ -38,14 +36,15 @@ public abstract class FullscreenFragment extends Fragment {
 
     protected Anecdote mAnecdote;
     protected String   mWebsiteName;
+    protected Unbinder mUnbinder;
 
-    @Bind(R.id.gradientBottom)
+    @BindView(R.id.gradientBottom)
     public View mGradientView;
 
-    @Bind(R.id.overlayLinearLayout)
+    @BindView(R.id.overlayLinearLayout)
     public LinearLayout mOverlayLinearLayout;
 
-    @Bind(R.id.contentTextView)
+    @BindView(R.id.contentTextView)
     public TextView mContentTextView;
 
     @Override
@@ -73,7 +72,7 @@ public abstract class FullscreenFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        mUnbinder.unbind();
     }
 
     @Override
@@ -106,24 +105,8 @@ public abstract class FullscreenFragment extends Fragment {
     /**
      * Display a dialog to have some option
      */
-    protected void onContentLongTouch(final String contentUrl) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setItems(R.array.anecdote_content_dialog, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int which) {
-                // The 'which' argument contains the index position
-                // of the selected item
-                switch (which) {
-                    // Copy
-                    case 0:
-                        EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, mAnecdote, CopyAnecdoteEvent.TYPE_MEDIA, contentUrl));
-                        break;
-                    default:
-                        Toast.makeText(getActivity(), R.string.not_implemented, Toast.LENGTH_SHORT).show();
-                        break;
-                }
-            }
-        });
-        builder.show();
+    protected void onContentLongTouch(String contentUrl, View viewTouched) {
+        MediaContextDialog.openDialog(getActivity(), mWebsiteName, mAnecdote, contentUrl, viewTouched);
     }
 
     /***************************

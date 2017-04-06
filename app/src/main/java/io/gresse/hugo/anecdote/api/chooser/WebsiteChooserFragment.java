@@ -23,9 +23,10 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.WebsiteViewHolderListener;
@@ -53,16 +54,17 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
     public static final String BUNDLE_MODE_RESTORE = "restore";
     public static final String BUNDLE_MODE_ADD     = "add";
 
-    @Bind(R.id.recyclerView)
+    @BindView(R.id.recyclerView)
     public RecyclerView mRecyclerView;
 
-    @Bind(R.id.saveButton)
+    @BindView(R.id.saveButton)
     public Button mSaveButton;
 
     @Nullable
     protected String                mMode;
     private   WebsiteChooserAdapter mAdapter;
     private   List<Website>         mSelectedWebsites;
+    private   Unbinder              mUnbinder;
 
     public static WebsiteChooserFragment newInstance(String mode) {
         WebsiteChooserFragment fragment = new WebsiteChooserFragment();
@@ -81,7 +83,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_websitechooser, container, false);
-        ButterKnife.bind(this, view);
+        mUnbinder = ButterKnife.bind(this, view);
         return view;
     }
 
@@ -106,7 +108,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        ButterKnife.unbind(this);
+        mUnbinder.unbind();
     }
 
     @Override

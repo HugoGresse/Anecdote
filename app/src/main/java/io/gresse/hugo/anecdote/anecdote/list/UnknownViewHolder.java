@@ -3,7 +3,7 @@ package io.gresse.hugo.anecdote.anecdote.list;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import io.gresse.hugo.anecdote.R;
 
 /**
@@ -13,7 +13,7 @@ import io.gresse.hugo.anecdote.R;
  */
 public class UnknownViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
 
-    @Bind(R.id.openLinearLayout)
+    @BindView(R.id.openLinearLayout)
     public LinearLayout mContainerLayout;
 
     public UnknownViewHolder(View itemView,

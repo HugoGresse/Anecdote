@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
@@ -21,7 +21,7 @@ public class MixedBaseViewHolder
         extends AnecdoteAdapter.BaseAnecdoteViewHolder
         implements View.OnClickListener {
 
-    protected final AdapterListener mAdapterListener;
+    protected final AdapterListener     mAdapterListener;
     protected final MixedContentAdapter mAdapter;
     private final   int                 mTextSize;
     private final   boolean             mRowStriping;
@@ -29,17 +29,19 @@ public class MixedBaseViewHolder
     private final   int                 mRowStripingBackground;
 
     private View mItemView;
+    protected String mWebsiteName = "";
+    protected Anecdote mCurrentAnecdote;
 
     @SuppressWarnings("WeakerAccess")
-    @Bind(R.id.contentTextView)
+    @BindView(R.id.contentTextView)
     public TextView mTextView;
 
     @SuppressWarnings("WeakerAccess")
-    @Bind(R.id.expandLayout)
+    @BindView(R.id.expandLayout)
     public LinearLayout mExpandLayout;
 
     @SuppressWarnings("WeakerAccess")
-    @Bind(R.id.separator)
+    @BindView(R.id.separator)
     public View mSeparatorView;
 
     public MixedBaseViewHolder(View itemView,
@@ -63,16 +65,18 @@ public class MixedBaseViewHolder
     }
 
     @Override
-    public void setData(int position, boolean isExpanded, Anecdote anecdote) {
+    public void setData(int position, boolean isExpanded, String websiteName, Anecdote anecdote) {
+        mWebsiteName = websiteName;
+        mCurrentAnecdote = anecdote;
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                mTextView.setText(Html.fromHtml(anecdote.text, Html.FROM_HTML_MODE_LEGACY));
+                mTextView.setText(Html.fromHtml(mCurrentAnecdote.text, Html.FROM_HTML_MODE_LEGACY));
             } else {
-                    //noinspection deprecation
-                    mTextView.setText(Html.fromHtml(anecdote.text));
+                //noinspection deprecation
+                mTextView.setText(Html.fromHtml(mCurrentAnecdote.text));
             }
         } catch (Throwable error) {
-            mTextView.setText(anecdote.text);
+            mTextView.setText(mCurrentAnecdote.text);
         }
         mTextView.setTextSize(mTextSize);
 

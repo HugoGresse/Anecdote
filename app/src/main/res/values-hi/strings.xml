@@ -22,6 +22,7 @@
     <string name="anecdote_share_title">का उपयोग कर साझा करें</string>
     <string-array name="anecdote_content_dialog">
     <item>कड़ी की प्रतिलिप करें</item>
+    <item>Download</item>
   </string-array>
 
 
@@ -90,5 +91,6 @@
     <string name="action_retry">Retry</string>
     <string name="action_restore_summary">Remove all websites from the app. May be useful if some websites are not working.</string>
     <string name="pref_cat_advanced">Advanced settings</string>
+    <string name="notice_image_saved">Image saved!</string>
 
 </resources>

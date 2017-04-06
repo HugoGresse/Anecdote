@@ -53,7 +53,7 @@ public interface AnecdoteAdapter {
             super(itemView);
         }
 
-        public abstract void setData(int position, boolean isExpanded, Anecdote anecdote);
+        public abstract void setData(int position, boolean isExpanded, String websiteName, Anecdote anecdote);
 
         /**
          * When the viewHolder is detached from the window = it's not visible anymore and will maybe be recycled

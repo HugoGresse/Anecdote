@@ -15,7 +15,7 @@ import com.github.chrisbanes.photoview.PhotoViewAttacher;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
@@ -34,7 +34,7 @@ public class FullscreenImageFragment extends FullscreenFragment implements OnPho
 
     private String mImageUrl;
 
-    @Bind(R.id.imageView)
+    @BindView(R.id.imageView)
     public ImageView mImageView;
 
 
@@ -50,7 +50,7 @@ public class FullscreenImageFragment extends FullscreenFragment implements OnPho
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_fullscreen_image, container, false);
-        ButterKnife.bind(this, view);
+        mUnbinder = ButterKnife.bind(this, view);
         return view;
     }
 
@@ -112,7 +112,7 @@ public class FullscreenImageFragment extends FullscreenFragment implements OnPho
 
     @Override
     public boolean onLongClick(View view) {
-        super.onContentLongTouch(mImageUrl);
+        super.onContentLongTouch(mImageUrl, mImageView);
         return true;
     }
 }

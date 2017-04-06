@@ -2,7 +2,7 @@ package io.gresse.hugo.anecdote.anecdote.list;
 
 import android.view.View;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.view.PlayerView;
@@ -15,7 +15,7 @@ import io.gresse.hugo.anecdote.view.PlayerView;
 public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
 
     @SuppressWarnings("WeakerAccess")
-    @Bind(R.id.exoplayerView)
+    @BindView(R.id.exoplayerView)
     public PlayerView mPlayerView;
 
     public VideoViewHolder(View itemView,
@@ -33,8 +33,8 @@ public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClick
     }
 
     @Override
-    public void setData(int position, boolean isExpanded, Anecdote anecdote) {
-        super.setData(position, isExpanded, anecdote);
+    public void setData(int position, boolean isExpanded, String websiteName, Anecdote anecdote) {
+        super.setData(position, isExpanded, websiteName, anecdote);
         if (mPlayerView != null && anecdote.media != null) {
             mPlayerView.setVideoUrl(anecdote.media);
         }

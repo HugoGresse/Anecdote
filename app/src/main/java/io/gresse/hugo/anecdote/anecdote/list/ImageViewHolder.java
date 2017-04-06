@@ -12,10 +12,12 @@ import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import io.gresse.hugo.anecdote.R;
+import io.gresse.hugo.anecdote.anecdote.MediaContextDialog;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
+import io.gresse.hugo.anecdote.view.CustomImageView;
 
 /**
  * Display images in a view to be used by RecyclerView as an ViewHolder
@@ -24,19 +26,18 @@ import io.gresse.hugo.anecdote.tracking.EventTracker;
  *
  * Created by Hugo Gresse on 08/11/2016.
  */
-public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClickListener, RequestListener<String, GlideDrawable> {
+public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClickListener, RequestListener<String, GlideDrawable>, View.OnLongClickListener {
 
     private static final  String TAG         = ImageViewHolder.class.getSimpleName();
     private static final int    RETRY_COUNT = 2;
 
+    private String mWebsiteName;
     private int mRetried;
     @Nullable
     private String mImageUrl;
 
-    @Bind(R.id.imageView)
-    ImageView mImageView;
-
-
+    @BindView(R.id.imageView)
+    CustomImageView mImageView;
 
     public ImageViewHolder(View itemView,
                            AdapterListener adapterListener,
@@ -49,12 +50,13 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
 
         if (mImageView != null) {
             mImageView.setOnClickListener(this);
+            mImageView.setOnLongClickListener(this);
         }
     }
 
     @Override
-    public void setData(int position, boolean isExpanded, Anecdote anecdote) {
-        super.setData(position, isExpanded, anecdote);
+    public void setData(int position, boolean isExpanded, String websiteName, Anecdote anecdote) {
+        super.setData(position, isExpanded, websiteName, anecdote);
         String log = "setData: url:" + anecdote.media + " text:" + anecdote.text;
 
         ViewCompat.setTransitionName(mImageView, String.valueOf(position) + "_image");
@@ -108,6 +110,14 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
                 .error(R.drawable.ic_error_white_24dp)
                 .listener(this)
                 .into(mImageView);
+
+        mImageView.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View view) {
+                MediaContextDialog.openDialog(mImageView.getContext(), mWebsiteName, mCurrentAnecdote, mImageUrl, mImageView);
+                return true;
+            }
+        });
     }
 
     /**
@@ -131,6 +141,11 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
     public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
         Log.d(TAG, "ResourceReady : " + mImageUrl + " isFromMemoryCache? " + isFromMemoryCache +" isFirstResource? " + isFirstResource);
         //reset();
+        return false;
+    }
+
+    @Override
+    public boolean onLongClick(View view) {
         return false;
     }
 }

@@ -22,6 +22,7 @@
     <string name="anecdote_share_title">Teilen via</string>
     <string-array name="anecdote_content_dialog">
         <item>Kopiere Link</item>
+        <item>Herunterladen</item>
     </string-array>
 
 
@@ -89,5 +90,6 @@
     <string name="action_retry">Wiederholen</string>
     <string name="action_restore_summary">Alle Webseiten aus der App entfernen. Hilfreich, wenn einige Webseiten nicht funktionieren</string>
     <string name="pref_cat_advanced">Erweiterte Einstellungen</string>
+    <string name="notice_image_saved">Bild gespeichert!</string>
 
 </resources>

@@ -12,7 +12,7 @@ import android.widget.TextView;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.gresse.hugo.anecdote.R;
@@ -86,10 +86,10 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
         private Intent mAuthorIntent;
         private Intent mCommunityIntent;
 
-        @Bind(R.id.me_textview)
+        @BindView(R.id.me_textview)
         public TextView authorTextView;
 
-        @Bind(R.id.community_textview)
+        @BindView(R.id.community_textview)
         public TextView communityTextView;
 
         public HeaderAboutViewHolder(View itemView) {
@@ -146,7 +146,7 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
 
     public class LibAboutViewHolder extends BaseAboutViewHolder implements View.OnClickListener {
 
-        @Bind(R.id.libTextView)
+        @BindView(R.id.libTextView)
         public TextView textView;
 
         public LibAboutViewHolder(View itemView) {
