@@ -94,7 +94,7 @@
     <string name="error_responsefail">Не загружается вебсайт, ошибка %s</string>
     <string name="error_parsing">Нельзя разобрать %s вебсайт</string>
     <string name="notice_image_saved">Изображение сохранено!</string>
-    
+
 
     <string name="app_short_description">Новые цитаты (9GAG, FML, Bash.org, xkcd) каждый день в простом приложении.</string>
     <string name="app_long_description">
