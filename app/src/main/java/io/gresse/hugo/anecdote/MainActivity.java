@@ -75,10 +75,8 @@ import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 
 /**
  * TODO :
- * - download image + dialog + name of the snackbar and not the TOAST
+ * - favoris - WIP
  * - slide between images
- * - favoris
- *
  */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NetworkConnectivityListener.ConnectivityListener {

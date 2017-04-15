@@ -94,5 +94,22 @@
     <string name="error_responsefail">Не загружается вебсайт, ошибка %s</string>
     <string name="error_parsing">Нельзя разобрать %s вебсайт</string>
     <string name="notice_image_saved">Изображение сохранено!</string>
+    
 
+    <string name="app_short_description">Новые цитаты (9GAG, FML, Bash.org, xkcd) каждый день в простом приложении.</string>
+    <string name="app_long_description">
+        Особенности:
+            - 9GAG фид (изображения и видео) с 9GAG Hot, Trending and Fresh
+            - xkcd
+            - фиды цитат с fmylife.com (FML), Bash.org, viedemerde.fr (VDM), danstonchat.com (DTC) и более
+            - простой и эффективный интерфейс
+            - бесконечный скролл и протяжка для обновления
+            - нет странных разрешений, нет фоновых заданий
+            - добавление своего веб-сайта нужно немного знать html
+
+        Anecdote - это простое и мощное приложение для чтения сайтов цитат. Очень легкое, быстрое и простое.
+
+        С открытым исходным кодом на GitHub: https://github.com/HugoGresse/Anecdote
+        Контент, отображаемый в приложении не принадлежит Anecdote.
+    </string>
 </resources>
