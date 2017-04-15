@@ -11,8 +11,7 @@ Simply display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9GAG, Se couchez 
 <br>
 <a id="status-image-popup" class="open-popup" href="#" title="build status image" name="status-images" data-ember-action="944">
 <img src="https://travis-ci.org/HugoGresse/Anecdote.svg" alt="build:started">
-</a> 
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/19dc2d46b91843658d08396476c4f550)](https://www.codacy.com/app/hugo-gresse/Anecdote?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=HugoGresse/Anecdote&amp;utm_campaign=Badge_Grade)
+</a> <a href="https://www.codacy.com/app/hugo-gresse/Anecdote?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=HugoGresse/Anecdote&amp;utm_campaign=Badge_Grade"><img src="https://api.codacy.com/project/badge/Grade/19dc2d46b91843658d08396476c4f550"/></a>
 
 ![9GAG Feed](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/design/screenshots/9gag.png)
 ![Websites](https://raw.githubusercontent.com/HugoGresse/Anecdote/master/design/screenshots/website_selector.png)
