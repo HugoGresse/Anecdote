@@ -29,6 +29,10 @@ android {
         versionName "1.1.5"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions.annotationProcessorOptions {
+            arguments = [ 'toothpick_registry_package_name': 'io.gresse.hugo.anecdote' ]
+        }
     }
 
     project.ext.set("archivesBaseName", "Anecdote");
@@ -102,6 +106,9 @@ dependencies {
     compile "com.android.support:recyclerview-v7:${androidSupportLibraries}"
     compile "com.android.support:customtabs:${androidSupportLibraries}"
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
+    compile 'com.github.stephanenicolas.toothpick:toothpick-runtime:1.0.6'
+    compile 'com.github.stephanenicolas.toothpick:smoothie:1.0.6'
+    annotationProcessor 'com.github.stephanenicolas.toothpick:toothpick-compiler:1.0.6'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'org.jsoup:jsoup:1.8.3'

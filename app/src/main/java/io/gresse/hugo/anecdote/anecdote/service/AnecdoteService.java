@@ -82,6 +82,13 @@ public class AnecdoteService {
     }
 
     /**
+     * @return the full website page name which looks like eg. “9GAG Latest"
+     */
+    public String getPageFullName(){
+        return mWebsite.name + " " + mWebsitePage.name;
+    }
+
+    /**
      * Return the list of anecdotes already loaded by the service
      *
      * @return list of anecdote
@@ -197,7 +204,7 @@ public class AnecdoteService {
         if (elements != null && !elements.isEmpty()) {
             Element tempElement = null;
 
-            /**
+            /*
              * We get each item to select the correct data and apply the WebsiteItem options (replace, prefix, etc).
              * We pass the first parameter to the getData to not create a new Object each time
              */

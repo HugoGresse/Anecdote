@@ -1,12 +1,12 @@
 package io.gresse.hugo.anecdote.util.chrome;
 
-import android.app.Activity;
+import android.app.Application;
 import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.support.annotation.NonNull;
 import android.support.customtabs.CustomTabsCallback;
 import android.support.customtabs.CustomTabsClient;
 import android.support.customtabs.CustomTabsIntent;
@@ -15,6 +15,8 @@ import android.support.customtabs.CustomTabsSession;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
+
+import javax.inject.Inject;
 
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
@@ -37,29 +39,30 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
     // Configuration
     private int      mToolbarBackgroundColor;
 
-    public ChromeCustomTabsManager(@NonNull Activity activity) {
-        mToolbarBackgroundColor = ContextCompat.getColor(activity, R.color.colorAccent);
+    @Inject
+    public ChromeCustomTabsManager(Application application) {
+        mToolbarBackgroundColor = ContextCompat.getColor(application, R.color.colorAccent);
     }
 
     /**
      * Bins to custom chrome tab service
      */
-    public void bindCustomTabsService(Activity activity) {
+    public void bindCustomTabsService(Context context) {
         if (mClient != null) return;
         mConnection = new ChromeCustomTabsConnection(this);
-        CustomTabsClient.bindCustomTabsService(activity, CHROME_PACKAGE, mConnection);
+        CustomTabsClient.bindCustomTabsService(context, CHROME_PACKAGE, mConnection);
     }
 
     /**
      * Unbind from custom tabs chrome service
      */
-    public void unbindCustomTabsService(Activity activity) {
-        if (mConnection == null || activity == null) return;
+    public void unbindCustomTabsService(Context context) {
+        if (mConnection == null || context == null) return;
 
         Log.i(TAG, "Unbinding");
 
         try {
-            activity.unbindService(mConnection);
+            context.unbindService(mConnection);
         } catch (IllegalArgumentException ignored) {
             // No need to unbind the service as it's not binded
         }
@@ -104,54 +107,55 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
     /**
      * Open url
      */
-    public void openChrome(Activity activity, Anecdote anecdote) {
-        String packageName = CustomTabsHelper.getPackageNameToUse(activity);
+    public void openChrome(Context context, Anecdote anecdote) {
+        String packageName = CustomTabsHelper.getPackageNameToUse(context);
 
         //If we cant find a package name, it means theres no browser that supports
         //Chrome Custom Tabs installed. So, we fallback to the webview
         if (packageName == null) {
             try {
-                Toast.makeText(activity, R.string.open_intent_browser, Toast.LENGTH_SHORT).show();
-                activity.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(anecdote.permalink)));
+                Toast.makeText(context, R.string.open_intent_browser, Toast.LENGTH_SHORT).show();
+                context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(anecdote.permalink)));
             } catch (ActivityNotFoundException exception) {
-                Toast.makeText(activity, R.string.open_intent_browser_error, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, R.string.open_intent_browser_error, Toast.LENGTH_SHORT).show();
             }
             return;
         }
 
         Log.i(TAG, "openChrome");
         CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder(getSession());
-        setIntentAction(activity, builder, anecdote);
+        setIntentAction(context, builder, anecdote);
 
         builder.setShowTitle(true);
         builder.enableUrlBarHiding();
         builder.setToolbarColor(mToolbarBackgroundColor);
 
-        builder.setSecondaryToolbarColor(ContextCompat.getColor(activity, android.R.color.white));
-        builder.setStartAnimations(activity, R.anim.slide_in_right, R.anim.hold);
-        builder.setExitAnimations(activity, R.anim.hold, R.anim.slide_out_left);
+        builder.setSecondaryToolbarColor(ContextCompat.getColor(context, android.R.color.white));
+        builder.setStartAnimations(context, R.anim.slide_in_right, R.anim.hold);
+        builder.setExitAnimations(context, R.anim.hold, R.anim.slide_out_left);
         builder.setCloseButtonIcon(
-                BitmapFactory.decodeResource(activity.getResources(), R.drawable.ic_navigation_arrow_back));
+                BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_navigation_arrow_back));
 
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.intent.setPackage(packageName);
-        customTabsIntent.launchUrl(activity, Uri.parse(anecdote.permalink));
+        customTabsIntent.intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        customTabsIntent.launchUrl(context, Uri.parse(anecdote.permalink));
     }
 
-    private void setIntentAction(Activity activity, CustomTabsIntent.Builder builder, Anecdote anecdote){
+    private void setIntentAction(Context context, CustomTabsIntent.Builder builder, Anecdote anecdote){
         Intent sharingIntent = new Intent(Intent.ACTION_SEND);
         sharingIntent.setType("text/plain");
 
-        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, activity.getString(R.string.app_name));
+        sharingIntent.putExtra(Intent.EXTRA_SUBJECT, context.getString(R.string.app_name));
 
         sharingIntent.putExtra(
                 Intent.EXTRA_TEXT,
-                anecdote.getPlainTextContent() + " " + activity.getString(R.string.app_share_credits));
+                anecdote.getPlainTextContent() + " " + context.getString(R.string.app_share_credits));
 
         builder.setActionButton(
-                BitmapFactory.decodeResource(activity.getResources(), R.drawable.ic_social_share),
-                anecdote.getPlainTextContent() + " " + activity.getString(R.string.app_share_credits),
-                PendingIntent.getActivity(activity, 0, sharingIntent, 0),
+                BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_social_share),
+                anecdote.getPlainTextContent() + " " + context.getString(R.string.app_share_credits),
+                PendingIntent.getActivity(context, 0, sharingIntent, 0),
                 false);
     }
 }

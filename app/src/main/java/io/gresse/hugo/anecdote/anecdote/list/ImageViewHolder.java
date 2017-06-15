@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 
 import butterknife.BindView;
@@ -104,12 +105,13 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
             return;
         }
 
+        GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(mImageView);
+
         Glide.with(mImageView.getContext())
                 .load(mImageUrl)
-                .fitCenter()
-                .error(R.drawable.ic_error_white_24dp)
                 .listener(this)
-                .into(mImageView);
+                .error(R.drawable.ic_error_white_24dp)
+                .into(imageViewTarget);
 
         mImageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override

@@ -15,14 +15,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
 import android.transition.Fade;
 import android.util.Log;
 import android.view.Menu;
@@ -40,6 +38,8 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -70,8 +70,12 @@ import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.setting.SettingsFragment;
 import io.gresse.hugo.anecdote.storage.SpStorage;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
+import io.gresse.hugo.anecdote.util.FragmentStackManager;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.view.ImageTransitionSet;
+import toothpick.Scope;
+import toothpick.Toothpick;
+import toothpick.smoothie.module.SmoothieActivityModule;
 
 /**
  * TODO :
@@ -104,6 +108,7 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.fragment_container)
     public View mFragmentContainer;
 
+    @Inject
     protected ServiceProvider             mServiceProvider;
     protected NetworkConnectivityListener mNetworkConnectivityListener;
     protected List<Website>               mWebsites;
@@ -111,15 +116,20 @@ public class MainActivity extends AppCompatActivity
     protected ToolbarSpinnerAdapter       mToolbarSpinnerAdapter;
     protected int                         mToolbarScrollFlags;
     protected CoordinatorLayout.Behavior  mFragmentLayoutBehavior;
+    protected FragmentStackManager        mFragmentStackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Scope scope = Toothpick.openScopes(getApplication(), ServiceProvider.class, this);
+        scope.installModules(new SmoothieActivityModule(this));
         super.onCreate(savedInstanceState);
+        Toothpick.inject(this, scope);
         if (EventTracker.isEventEnable()) {
             new EventTracker(this);
         }
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
 
         setSupportActionBar(mToolbar);
 
@@ -133,10 +143,9 @@ public class MainActivity extends AppCompatActivity
         // Process migration before getting anything else from shared preferences
         boolean openWebsiteChooserAddMode = SpStorage.migrate(this);
 
-        mServiceProvider = new ServiceProvider(this);
         mWebsites = SpStorage.getWebsites(this);
         mServiceProvider.createAnecdoteService(mWebsites);
-        mServiceProvider.register(EventBus.getDefault(), this);
+        mServiceProvider.register(EventBus.getDefault());
 
         populateNavigationView(false);
 
@@ -145,6 +154,8 @@ public class MainActivity extends AppCompatActivity
 
         AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
         mToolbarScrollFlags = params.getScrollFlags();
+
+        mFragmentStackManager = new FragmentStackManager(mSnackbar);
 
         if (openWebsiteChooserAddMode) {
             changeFragment(WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_ADD), false, false);
@@ -189,6 +200,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
+        Toothpick.closeScope(this);
         mServiceProvider.unregister(EventBus.getDefault());
         mNetworkConnectivityListener.stopListening();
         super.onDestroy();
@@ -226,7 +238,7 @@ public class MainActivity extends AppCompatActivity
                 return true;
             case R.id.action_feedback:
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto","hugo.gresse@gmail.com", null));
+                        "mailto", "hugo.gresse@gmail.com", null));
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " feedback");
                 startActivity(Intent.createChooser(emailIntent, "Send email..."));
                 return true;
@@ -299,8 +311,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     /**
-     */
-    /**
      * Change tu current displayed fragment by a new one.
      *
      * @param frag            the new fragment to display
@@ -314,55 +324,13 @@ public class MainActivity extends AppCompatActivity
                                 boolean animate,
                                 @Nullable View sharedView,
                                 @Nullable String sharedName) {
-        String log = "changeFragment: ";
-        String backStateName = ((Object) frag).getClass().getName();
-
-        if (frag instanceof AnecdoteFragment) {
-            backStateName += frag.getArguments().getString(AnecdoteFragment.ARGS_WEBSITE_PAGE_SLUG);
-        }
-
-        try {
-            FragmentManager manager = getSupportFragmentManager();
-            boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
-
-            if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null) { //fragment not in back stack, create it.
-                FragmentTransaction transaction = manager.beginTransaction();
-
-                if (animate) {
-                    log += " animate";
-                    transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                }
-                if (sharedView != null && !TextUtils.isEmpty(sharedName)) {
-                    ViewCompat.setTransitionName(sharedView, sharedName);
-                    transaction.addSharedElement(sharedView, sharedName);
-                }
-
-                transaction.replace(R.id.fragment_container, frag, backStateName);
-
-                if (saveInBackstack) {
-                    log += " addToBackTack(" + backStateName + ")";
-                    transaction.addToBackStack(backStateName);
-                } else {
-                    log += " NO addToBackTack(" + backStateName + ")";
-                }
-
-                transaction.commit();
-
-                // If some snackbar is display, hide it
-                if (mSnackbar != null && mSnackbar.isShownOrQueued()) {
-                    mSnackbar.dismiss();
-                }
-
-            } else if (!fragmentPopped && manager.findFragmentByTag(backStateName) != null) {
-                log += " fragment not popped but finded: " + backStateName;
-            } else {
-                log += " nothing to do : " + backStateName + " fragmentPopped: " + fragmentPopped;
-                // custom effect if fragment is already instanciated
-            }
-            Log.d(TAG, log);
-        } catch (IllegalStateException exception) {
-            Log.w(TAG, "Unable to commit fragment, could be activity as been killed in background. " + exception.toString());
-        }
+        mFragmentStackManager.changeFragment(
+                this,
+                frag,
+                saveInBackstack,
+                animate,
+                sharedView,
+                sharedName);
     }
 
     /**
@@ -385,7 +353,7 @@ public class MainActivity extends AppCompatActivity
 
         mServiceProvider.unregister(EventBus.getDefault());
         mServiceProvider.createAnecdoteService(mWebsites);
-        mServiceProvider.register(EventBus.getDefault(), this);
+        mServiceProvider.register(EventBus.getDefault());
 
         if (!mWebsites.isEmpty()) {
             changeAnecdoteFragment(mWebsites.get(0), mWebsites.get(0).pages.get(0));
@@ -736,8 +704,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Subscribe
-    public void onDisplaySnackbarEvent(final DisplaySnackbarEvent event){
-        if(mSnackbar != null && mSnackbar.isShownOrQueued()){
+    public void onDisplaySnackbarEvent(final DisplaySnackbarEvent event) {
+        if (mSnackbar != null && mSnackbar.isShownOrQueued()) {
             mSnackbar.dismiss();
         }
 
