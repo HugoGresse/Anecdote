@@ -3,10 +3,10 @@
 Simply display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9GAG, Se couchez moins bête, Bash.org in a **simple** interface. 
 
 <a href="https://play.google.com/store/apps/details?id=io.gresse.hugo.anecdote" target="_blank">
-  <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" height="60"/>
+  <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" height="80"/>
 </a>
 <a href="https://f-droid.org/repository/browse/?fdid=io.gresse.hugo.anecdote" target="_blank">
-  <img src="https://f-droid.org/badge/get-it-on.png" height="60"/>
+  <img src="https://f-droid.org/badge/get-it-on.png" height="80"/>
 </a>
 <br>
 <a id="status-image-popup" class="open-popup" href="#" title="build status image" name="status-images" data-ember-action="944">
@@ -47,8 +47,8 @@ Author
 
 Contributors
 -----------
-[mueller-ma](https://github.com/mueller-ma)
-[ashed](https://github.com/ashed)
+ - [mueller-ma](https://github.com/mueller-ma)
+ - [ashed](https://github.com/ashed)
 
 
 License
@@ -68,3 +68,5 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+Google Play and the Google Play logo are trademarks of Google Inc.
