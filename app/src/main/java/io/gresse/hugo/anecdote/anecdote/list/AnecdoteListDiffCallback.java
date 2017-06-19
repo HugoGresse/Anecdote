@@ -8,7 +8,7 @@ import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 
 /**
  * Manage diff change between anecdotes list to be used by adapters
- *
+ * <p>
  * Created by Hugo Gresse on 21/11/2016.
  */
 
@@ -36,7 +36,9 @@ public class AnecdoteListDiffCallback extends DiffUtil.Callback {
     public boolean areItemsTheSame(int oldItemPosition, int newItemPosition) {
         Anecdote first = mNewList.get(newItemPosition);
         Anecdote second = mOldList.get(oldItemPosition);
-        if (first.permalink != null && second.permalink != null) {
+        if (first.favoritesTimestamp != second.favoritesTimestamp) {
+            return false;
+        } else if (first.permalink != null && second.permalink != null) {
             return first.permalink.equals(second.permalink);
         } else if (first.permalink != null || second.permalink != null) {
             return false;

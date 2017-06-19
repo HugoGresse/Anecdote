@@ -3,5 +3,6 @@
 
     <item name="drawer_group_content" type="id"/>
     <item name="drawer_group_action" type="id"/>
+    <item name="drawer_group_favorites" type="id"/>
 
 </resources>

@@ -1,4 +1,4 @@
-package io.gresse.hugo.anecdote.anecdote.fragment;
+package io.gresse.hugo.anecdote.anecdote;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

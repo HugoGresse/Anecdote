@@ -40,7 +40,7 @@ class MixedContentAdapter
 
     private String          mWebsiteName;
     private List<Anecdote>  mAnecdotes;
-    private boolean         mIsSinglePage;
+    private boolean         mDisplayLoader;
     @Nullable
     private AdapterListener mAdapterListener;
     private int             mTextSize;
@@ -49,11 +49,12 @@ class MixedContentAdapter
     private int             mRowStripingBackground;
     private int mExpandedPosition = -1;
 
-    MixedContentAdapter(@Nullable AdapterListener adapterListener, boolean isSinglePage, String websiteName) {
+    MixedContentAdapter(@Nullable AdapterListener adapterListener, String websiteName) {
         mWebsiteName = websiteName;
         mAnecdotes = new ArrayList<>();
         mAdapterListener = adapterListener;
-        mIsSinglePage = isSinglePage;
+        mDisplayLoader = true;
+        setHasStableIds(true);
     }
 
     @Override
@@ -70,7 +71,7 @@ class MixedContentAdapter
                 mAnecdotes.addAll(quotes);
                 diffResult.dispatchUpdatesTo(this);
             } else {
-                // Prevnet recyclerView follow the loading wheel when first items are just added
+                // Prevent recyclerView follow the loading wheel when first items are just added
                 mAnecdotes.addAll(quotes);
                 this.notifyDataSetChanged();
             }
@@ -86,6 +87,12 @@ class MixedContentAdapter
             };
             mainHandler.post(runnable);
         }
+    }
+
+    @Override
+    public void setLoaderDisplay(boolean displayLoader){
+        mDisplayLoader = displayLoader;
+        notifyItemChanged(mAnecdotes.size());
     }
 
     @Override
@@ -139,10 +146,21 @@ class MixedContentAdapter
 
     @Override
     public int getItemCount() {
-        if (!mAnecdotes.isEmpty() && mIsSinglePage) {
+        if (!mAnecdotes.isEmpty() && !mDisplayLoader) {
             return mAnecdotes.size();
         }
         return mAnecdotes.size() + 1;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        if(position < mAnecdotes.size()){
+            return getItem(position).hashCode();
+        } else if (position >= mAnecdotes.size()){
+            return 2;
+        } else {
+            return 1;
+        }
     }
 
     @Override
@@ -189,7 +207,6 @@ class MixedContentAdapter
      */
     void toggleExpanded(int position) {
         if (mExpandedPosition == position) {
-            Log.d(TAG, "onClick close current ");
             mExpandedPosition = -1;
             notifyItemChanged(position);
             return;

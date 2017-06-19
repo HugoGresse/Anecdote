@@ -58,15 +58,12 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
     @Override
     public void setData(int position, boolean isExpanded, String websiteName, Anecdote anecdote) {
         super.setData(position, isExpanded, websiteName, anecdote);
-        String log = "setData: url:" + anecdote.media + " text:" + anecdote.text;
 
         ViewCompat.setTransitionName(mImageView, String.valueOf(position) + "_image");
 
         reset();
         mImageUrl = anecdote.media;
         loadImage();
-
-        Log.d(TAG, log);
     }
 
     @Override
@@ -141,7 +138,6 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
 
     @Override
     public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-        Log.d(TAG, "ResourceReady : " + mImageUrl + " isFromMemoryCache? " + isFromMemoryCache +" isFirstResource? " + isFirstResource);
         //reset();
         return false;
     }

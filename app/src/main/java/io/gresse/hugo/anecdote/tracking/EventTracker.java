@@ -244,4 +244,16 @@ public class EventTracker {
         sEvent.sendEvent("Website wrong configuration",
                 TRACKING_WEBSITE_NAME, websiteName);
     }
+
+    /**
+     * Track when to data has been retrieved from this website, indicating possibly an issue with the selectors
+     *
+     * @param websiteName the website name
+     */
+    public static void trackFavorite(String websiteName) {
+        if (!isEventEnable()) return;
+
+        sEvent.sendEvent("Anecdote favorite",
+                TRACKING_WEBSITE_NAME, websiteName);
+    }
 }

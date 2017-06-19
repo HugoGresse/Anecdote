@@ -35,6 +35,7 @@
     <string name="action_share">Share</string>
     <string name="action_copy">Copy</string>
     <string name="action_open">Open</string>
+    <string name="action_favoris">Favorites</string>
     <string name="action_open_inbrowser">Open in your browser</string>
     <string name="action_retry">Retry</string>
 
@@ -119,6 +120,7 @@
     <string name="error_processing">Something went wrong, try another website setting</string>
     <string name="error_responsefail">Unable to load website, error %s</string>
     <string name="error_parsing">Unable to parse %s website</string>
+    <string name="error_nodata">It\'s empty :/</string>
 
 
     <!-- Strings displayed only on Google Playstore. Optional, but good to have -->

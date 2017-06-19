@@ -1,10 +1,10 @@
 package io.gresse.hugo.anecdote.anecdote.list;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.preference.PreferenceManager;
 import android.support.v7.widget.LinearLayoutManager;
@@ -20,38 +20,51 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.ArrayList;
+
+import javax.inject.Inject;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenEvent;
+import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenActivity;
+import io.gresse.hugo.anecdote.anecdote.like.FavoritesRepository;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
-import io.gresse.hugo.anecdote.anecdote.model.MediaType;
 import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
+import io.gresse.hugo.anecdote.anecdote.service.event.FavoritesEvent;
 import io.gresse.hugo.anecdote.anecdote.service.event.LoadNewAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.service.event.OnAnecdoteLoadedEvent;
+import io.gresse.hugo.anecdote.anecdote.service.event.UpdateAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.social.OpenAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.social.ShareAnecdoteEvent;
+import io.gresse.hugo.anecdote.api.model.Website;
+import io.gresse.hugo.anecdote.api.model.WebsitePage;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
+import io.gresse.hugo.anecdote.util.TitledFragment;
+import io.gresse.hugo.anecdote.view.EnhancedFrameLayout;
+import toothpick.Scope;
+import toothpick.Toothpick;
 
 /**
  * A generic anecdote fragment
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
-public class AnecdoteFragment extends Fragment implements
+public class AnecdoteFragment extends TitledFragment implements
         SwipeRefreshLayout.OnRefreshListener,
         AdapterListener {
 
     private static final String TAG                      = AnecdoteFragment.class.getSimpleName();
-    public static final  String ARGS_WEBSITE_PARENT_SLUG = "key_website_parent_slug";
+    private static final String ARGS_WEBSITE_PARENT_NAME = "key_website_parent_name";
+    private static final String ARGS_WEBSITE_PARENT_SLUG = "key_website_parent_slug";
     public static final  String ARGS_WEBSITE_PAGE_SLUG   = "key_website_page_slug";
-    public static final  String ARGS_WEBSITE_NAME        = "key_website_name";
+    private static final String ARGS_WEBSITE_NAME        = "key_website_name";
 
     /**
      * Define the threshold to load new items. It's the number of items not visible after the current last visible.
@@ -59,25 +72,39 @@ public class AnecdoteFragment extends Fragment implements
     public static final int PREFETECH_THRESHOLD = 4;
 
     @BindView(R.id.swipeRefreshLayout)
-    public SwipeRefreshLayout mSwipeRefreshLayout;
-
+    public SwipeRefreshLayout  mSwipeRefreshLayout;
+    @BindView(R.id.recyclerViewContainer)
+    public EnhancedFrameLayout mRecyclerViewContainer;
     @BindView(R.id.recyclerView)
-    public RecyclerView mRecyclerView;
+    public RecyclerView        mRecyclerView;
 
-    protected String          mWebsiteParentSlug;
-    protected String          mWebsiteSlug;
-    protected String          mWebsiteName;
-    protected AnecdoteAdapter mAdapter;
+    private   String              mWebsiteName;
+    protected String              mWebsiteSlug;
+    protected String              mPageSlug;
+    protected String              mWebsiteAndPageName;
+    protected AnecdoteAdapter     mAdapter;
     @Nullable
-    protected AnecdoteService mAnecdoteService;
+    protected AnecdoteService     mAnecdoteService;
+    @Inject
+    protected FavoritesRepository mFavoritesRepository;
 
-    private   LinearLayoutManager mLayoutManager;
-    protected boolean             mIsLoadingNewItems;
-    private   int                 mTotalItemCount;
-    private   int                 mLastVisibleItem;
-    private   int                 mNextPageNumber;
-    private   Unbinder            mUnbinder;
+    private LinearLayoutManager mLayoutManager;
+    private boolean             mIsLoadingNewItems;
+    private boolean             mNoData;
+    private boolean             mEverythingLoaded;
+    private int                 mNextPageNumber;
+    private Unbinder            mUnbinder;
 
+    public static AnecdoteFragment newInstance(Website website, WebsitePage page) {
+        AnecdoteFragment fragment = new AnecdoteFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_PARENT_NAME, website.name);
+        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_PARENT_SLUG, website.slug);
+        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_PAGE_SLUG, page.slug);
+        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, website.name + " " + page.name);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -103,6 +130,10 @@ public class AnecdoteFragment extends Fragment implements
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        Scope scope = Toothpick.openScopes(getActivity().getApplicationContext(), this);
+        Toothpick.inject(this, scope);
+        mFavoritesRepository.setup();
+
         mLayoutManager = new LinearLayoutManager(getActivity());
 
         mRecyclerView.setLayoutManager(mLayoutManager);
@@ -123,9 +154,9 @@ public class AnecdoteFragment extends Fragment implements
         super.onResume();
 
         EventBus.getDefault().register(this);
-        EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteSlug));
+        EventBus.getDefault().post(new ChangeTitleEvent(this, mPageSlug, true));
 
-        EventTracker.trackFragmentView(this, mWebsiteName, EventTracker.CONTENT_TYPE_ANECDOTE);
+        EventTracker.trackFragmentView(this, mWebsiteAndPageName, EventTracker.CONTENT_TYPE_ANECDOTE);
     }
 
     @Override
@@ -134,11 +165,22 @@ public class AnecdoteFragment extends Fragment implements
         EventBus.getDefault().unregister(this);
     }
 
+
+    @Override
+    public String getTitle() {
+        return mWebsiteName;
+    }
+
+    public String getWebsitePageSlug() {
+        return mPageSlug;
+    }
+
     protected void init() {
         if (getArguments() != null) {
-            mWebsiteParentSlug = getArguments().getString(ARGS_WEBSITE_PARENT_SLUG);
-            mWebsiteSlug = getArguments().getString(ARGS_WEBSITE_PAGE_SLUG);
-            mWebsiteName = getArguments().getString(ARGS_WEBSITE_NAME);
+            mWebsiteName = getArguments().getString(ARGS_WEBSITE_PARENT_NAME);
+            mWebsiteSlug = getArguments().getString(ARGS_WEBSITE_PARENT_SLUG);
+            mPageSlug = getArguments().getString(ARGS_WEBSITE_PAGE_SLUG);
+            mWebsiteAndPageName = getArguments().getString(ARGS_WEBSITE_NAME);
         }
 
         // Get text pref
@@ -146,14 +188,15 @@ public class AnecdoteFragment extends Fragment implements
         int textSize = Integer.parseInt(preferences.getString(getString(R.string.pref_textsize_key), String.valueOf(getResources().getInteger(R.integer.anecdote_textsize_default))));
         boolean rowStripping = preferences.getBoolean(getString(R.string.pref_rowstriping_key), getResources().getBoolean(R.bool.pref_rowstripping_default));
 
-        mAnecdoteService = ((MainActivity) getActivity()).getAnecdoteService(mWebsiteSlug);
+        mAnecdoteService = ((MainActivity) getActivity()).getAnecdoteService(mPageSlug);
 
         if (mAnecdoteService == null) {
             Log.e(TAG, "Unable to get an AnecdoteService");
             return;
         }
 
-        mAdapter = new MixedContentAdapter(this, mAnecdoteService.getWebsitePage().isSinglePage, mWebsiteName);
+        mAdapter = new MixedContentAdapter(this, mWebsiteAndPageName);
+        mAdapter.setLoaderDisplay(!mAnecdoteService.getWebsitePage().isSinglePage);
 
         mAdapter.setData(mAnecdoteService.getAnecdotes());
         mRecyclerView.setAdapter((RecyclerView.Adapter) mAdapter);
@@ -182,17 +225,33 @@ public class AnecdoteFragment extends Fragment implements
      */
     protected void afterRequestFinished(boolean dataChanged) {
         mIsLoadingNewItems = false;
-        mSwipeRefreshLayout.setRefreshing(false);
 
         if (dataChanged && mAnecdoteService != null) {
-            mNextPageNumber++;
-            mAdapter.setData(mAnecdoteService.getAnecdotes());
+            if (mAnecdoteService.getAnecdotes().size() == 0) {
+                // We don't have any data to display, we prevent any more request and display a nice friendly message.
+                mNoData = true;
+                mRecyclerViewContainer.displayOverlay(R.layout.overlay_nodata);
+                return;
+            } else {
+                if (mAdapter.getContentItemCount() > 0 &&
+                        mAdapter.getContentItemCount() >= mAnecdoteService.getAnecdotes().size()) {
+                    mAdapter.setLoaderDisplay(false);
+                    mEverythingLoaded = true;
+                } else {
+                    mAdapter.setLoaderDisplay(true);
+                }
+                mNextPageNumber++;
+                mAdapter.setData(mAnecdoteService.getAnecdotes());
+            }
         }
 
-        if (shouldPreloadNewAnecdote()) {
+        mRecyclerViewContainer.hideOverlay();
+
+        if (shouldLoadNewAnecdote()) {
             Log.d(TAG, "afterRequestFinished, load new anecdotes");
             loadNewAnecdotes(mNextPageNumber);
         }
+
     }
 
     /**
@@ -202,7 +261,7 @@ public class AnecdoteFragment extends Fragment implements
      */
     protected void loadNewAnecdotes(int page) {
         mIsLoadingNewItems = true;
-        EventBus.getDefault().post(new LoadNewAnecdoteEvent(mWebsiteSlug, page));
+        EventBus.getDefault().post(new LoadNewAnecdoteEvent(mPageSlug, page));
     }
 
     /**
@@ -213,7 +272,7 @@ public class AnecdoteFragment extends Fragment implements
      */
     private void fullscreenAnecdote(Anecdote anecdote, View view) {
         if (anecdote.media == null) {
-            EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteName, anecdote, false));
+            EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteAndPageName, anecdote, false));
             return;
         }
 
@@ -222,31 +281,38 @@ public class AnecdoteFragment extends Fragment implements
             return;
         }
 
-        switch (anecdote.type) {
-            case MediaType.IMAGE:
-                EventBus.getDefault().post(new FullscreenEvent(
-                        FullscreenEvent.TYPE_IMAGE,
-                        mWebsiteName,
-                        this,
-                        view,
-                        getString(R.string.anecdote_image_transition_name),
-                        anecdote
-                ));
-                break;
-            case MediaType.VIDEO:
-                EventBus.getDefault().post(new FullscreenEvent(
-                        FullscreenEvent.TYPE_VIDEO,
-                        mWebsiteName,
-                        this,
-                        view,
-                        getString(R.string.anecdote_image_transition_name),
-                        anecdote
-                ));
-                break;
-            default:
-                Log.w(TAG, "Not managed RichContent type");
-                break;
-        }
+        Intent intent = FullscreenActivity.createIntent(
+                getContext(),
+                mAnecdoteService.getAnecdotes().indexOf(anecdote),
+                mPageSlug);
+
+        startActivity(intent);
+
+//        switch (anecdote.type) {
+//            case MediaType.IMAGE:
+//                EventBus.getDefault().post(new FullscreenEvent(
+//                        FullscreenEvent.TYPE_IMAGE,
+//                        mWebsiteAndPageName,
+//                        this,
+//                        view,
+//                        getString(R.string.anecdote_image_transition_name),
+//                        anecdote
+//                ));
+//                break;
+//            case MediaType.VIDEO:
+//                EventBus.getDefault().post(new FullscreenEvent(
+//                        FullscreenEvent.TYPE_VIDEO,
+//                        mWebsiteAndPageName,
+//                        this,
+//                        view,
+//                        getString(R.string.anecdote_image_transition_name),
+//                        anecdote
+//                ));
+//                break;
+//            default:
+//                Log.w(TAG, "Not managed RichContent type");
+//                break;
+//        }
     }
 
 
@@ -256,7 +322,7 @@ public class AnecdoteFragment extends Fragment implements
             super.onScrolled(recyclerView, dx, dy);
 
             // Scrolled to bottom. Do something here.
-            if (shouldPreloadNewAnecdote()) {
+            if (shouldLoadNewAnecdote()) {
                 Log.d(TAG, "Scrolled to end, load new anecdotes");
                 loadNewAnecdotes(mNextPageNumber);
             }
@@ -268,13 +334,13 @@ public class AnecdoteFragment extends Fragment implements
      *
      * @return true if should preload, false otherweise
      */
-    private boolean shouldPreloadNewAnecdote() {
-        mTotalItemCount = mAdapter.getContentItemCount();
-        mLastVisibleItem = mLayoutManager.findLastVisibleItemPosition();
-        boolean willPrefetch = (mLastVisibleItem >= (mTotalItemCount - PREFETECH_THRESHOLD));
+    private boolean shouldLoadNewAnecdote() {
+        int totalItemCount = mAdapter.getContentItemCount();
+        int lastVisibleItem = mLayoutManager.findLastVisibleItemPosition();
+        boolean willPrefetch = (lastVisibleItem >= (totalItemCount - PREFETECH_THRESHOLD));
 
         // Scrolled to bottom. Do something here.
-        if (!mIsLoadingNewItems && willPrefetch) {
+        if (!mIsLoadingNewItems && willPrefetch && !mNoData && !mEverythingLoaded) {
             //noinspection RedundantIfStatement
             if (mAnecdoteService != null && mAnecdoteService.getWebsitePage().isSinglePage) {
                 return false;
@@ -293,7 +359,12 @@ public class AnecdoteFragment extends Fragment implements
         if (mAnecdoteService == null) {
             return;
         }
+        mSwipeRefreshLayout.setRefreshing(false);
+
+        // Reset the no data flag
+        mNoData = mEverythingLoaded = false;
         mAnecdoteService.cleanAnecdotes();
+        mAdapter.setData(new ArrayList<Anecdote>());
         loadNewAnecdotes(mNextPageNumber = 0);
     }
 
@@ -307,19 +378,22 @@ public class AnecdoteFragment extends Fragment implements
         switch (action) {
             default:
             case AdapterListener.ACTION_COPY:
-                EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteName, anecdote, CopyAnecdoteEvent.TYPE_ANECDOTE, anecdote.getShareString(getContext())));
+                EventBus.getDefault().post(new CopyAnecdoteEvent(mWebsiteAndPageName, anecdote, CopyAnecdoteEvent.TYPE_ANECDOTE, anecdote.getShareString(getContext())));
                 break;
             case AdapterListener.ACTION_SHARE:
-                EventBus.getDefault().post(new ShareAnecdoteEvent(mWebsiteName, anecdote, anecdote.getShareString(getContext())));
+                EventBus.getDefault().post(new ShareAnecdoteEvent(mWebsiteAndPageName, anecdote, anecdote.getShareString(getContext())));
                 break;
             case AdapterListener.ACTION_OPEN_IN_BROWSER_PRELOAD:
-                EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteName, anecdote, true));
+                EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteAndPageName, anecdote, true));
                 break;
             case AdapterListener.ACTION_OPEN_IN_BROWSER:
-                EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteName, anecdote, false));
+                EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsiteAndPageName, anecdote, false));
                 break;
             case AdapterListener.ACTION_FULLSCREEN:
                 fullscreenAnecdote(anecdote, view);
+                break;
+            case AdapterListener.ACTION_FAVORIS:
+                EventBus.getDefault().post(new FavoritesEvent(mPageSlug, anecdote, !anecdote.isFavorite()));
                 break;
         }
     }
@@ -337,7 +411,7 @@ public class AnecdoteFragment extends Fragment implements
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onRequestFailedEvent(RequestFailedEvent event) {
         if (event.originalEvent instanceof LoadNewAnecdoteEvent &&
-                !((LoadNewAnecdoteEvent) event.originalEvent).websitePageSlug.equals(mWebsiteSlug)) return;
+                !((LoadNewAnecdoteEvent) event.originalEvent).websitePageSlug.equals(mPageSlug)) return;
 
         EventBus.getDefault().removeStickyEvent(event.getClass());
         afterRequestFinished(false);
@@ -345,7 +419,6 @@ public class AnecdoteFragment extends Fragment implements
 
     @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onAnecdoteReceived(OnAnecdoteLoadedEvent event) {
-        if (!event.websitePageSlug.equals(mWebsiteSlug)) return;
         EventBus.getDefault().removeStickyEvent(event.getClass());
         afterRequestFinished(true);
     }
@@ -353,6 +426,13 @@ public class AnecdoteFragment extends Fragment implements
     @Subscribe
     public void onUpdateAnecdoteFragment(UpdateAnecdoteFragmentEvent event) {
         init();
-        EventBus.getDefault().post(new ChangeTitleEvent(mWebsiteSlug));
+        EventBus.getDefault().post(new ChangeTitleEvent(this, mPageSlug, true));
+    }
+
+    @Subscribe
+    public void onUpdateAnecdote(UpdateAnecdoteEvent event) {
+        if (mAnecdoteService != null) {
+            afterRequestFinished(true);
+        }
     }
 }

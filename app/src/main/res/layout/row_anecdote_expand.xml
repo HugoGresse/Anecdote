@@ -13,25 +13,33 @@
             android:id="@+id/shareButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/action_share"
-            android:src="@drawable/ic_social_share2"/>
+            style="@style/BottomActionButton"
+            android:src="@drawable/ic_share_white_24dp"/>
 
         <ImageButton
             android:id="@+id/copyButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/action_copy"
-            android:src="@drawable/ic_content_content_copy"/>
+            style="@style/BottomActionButton"
+            android:src="@drawable/ic_content_copy_white_24dp"/>
 
         <ImageButton
             android:id="@+id/openButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="?attr/selectableItemBackground"
             android:contentDescription="@string/action_open"
-            android:src="@drawable/ic_action_open_in_browser"/>
+            style="@style/BottomActionButton"
+            android:src="@drawable/ic_open_in_browser_white_24dp"/>
+
+        <ImageButton
+            android:id="@+id/favoritesButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/action_open"
+            style="@style/BottomActionButton"
+            android:src="@drawable/ic_favorite_white_24dp"/>
 
     </LinearLayout>
 

@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -47,12 +48,13 @@ import butterknife.OnItemSelected;
 import io.gresse.hugo.anecdote.about.AboutFragment;
 import io.gresse.hugo.anecdote.anecdote.ToolbarSpinnerAdapter;
 import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
-import io.gresse.hugo.anecdote.anecdote.fragment.WebsiteDialogFragment;
+import io.gresse.hugo.anecdote.anecdote.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.ChangeFullscreenEvent;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenEvent;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenFragment;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenImageFragment;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenVideoFragment;
+import io.gresse.hugo.anecdote.anecdote.like.FavoritesRepository;
 import io.gresse.hugo.anecdote.anecdote.list.AnecdoteFragment;
 import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.api.WebsiteApiService;
@@ -79,7 +81,7 @@ import toothpick.smoothie.module.SmoothieActivityModule;
 
 /**
  * TODO :
- * - favoris - WIP
+ * - favoris - WIP Offline service websitePageSlug in Anecdote
  * - slide between images
  */
 public class MainActivity extends AppCompatActivity
@@ -120,7 +122,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Scope scope = Toothpick.openScopes(getApplication(), ServiceProvider.class, this);
+        Scope scope = Toothpick.openScopes(getApplication(), this);
         scope.installModules(new SmoothieActivityModule(this));
         super.onCreate(savedInstanceState);
         Toothpick.inject(this, scope);
@@ -129,7 +131,6 @@ public class MainActivity extends AppCompatActivity
         }
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-
 
         setSupportActionBar(mToolbar);
 
@@ -144,7 +145,7 @@ public class MainActivity extends AppCompatActivity
         boolean openWebsiteChooserAddMode = SpStorage.migrate(this);
 
         mWebsites = SpStorage.getWebsites(this);
-        mServiceProvider.createAnecdoteService(mWebsites);
+        mServiceProvider.createAnecdoteService(this, mWebsites);
         mServiceProvider.register(EventBus.getDefault());
 
         populateNavigationView(false);
@@ -174,9 +175,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
 
         EventBus.getDefault().register(this);
-        if (!getWebsiteApiService().isWebsitesDownloaded()) {
-            EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
-        }
+        EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
     }
 
     @Override
@@ -248,29 +247,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getGroupId()) {
             case R.id.drawer_group_content:
                 for (Website website : mWebsites) {
                     if (website.name.equals(item.getTitle())) {
-                        changeAnecdoteFragment(website, website.pages.get(0));
-
-                        // We redisplay the toolbar if it was scrollUp by removing the scrollFlags,
-                        // wait a litle and reset the last scrollFlags on it (doing it right after was not working
-                        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
-                        final int scrollFlags = layoutParams.getScrollFlags();
-                        layoutParams.setScrollFlags(0);
-
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                layoutParams.setScrollFlags(scrollFlags);
-                                mToolbar.setLayoutParams(layoutParams);
-                            }
-                        }, 100);
+                        goToWebsite(website);
                         break;
                     }
                 }
+                break;
+            case R.id.drawer_group_favorites:
+                goToWebsite(FavoritesRepository.getFavoritesWebsite(this));
                 break;
             case R.id.drawer_group_action:
                 changeFragment(
@@ -294,10 +282,27 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /***************************
+    /* **************************
      * inner methods
      ***************************/
 
+    private void goToWebsite(Website website){
+        changeAnecdoteFragment(website, website.pages.get(0));
+
+        // We redisplay the toolbar if it was scrollUp by removing the scrollFlags,
+        // wait a litle and reset the last scrollFlags on it (doing it right after was not working
+        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+        final int scrollFlags = layoutParams.getScrollFlags();
+        layoutParams.setScrollFlags(0);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                layoutParams.setScrollFlags(scrollFlags);
+                mToolbar.setLayoutParams(layoutParams);
+            }
+        }, 100);
+    }
 
     /**
      * Change tu current displayed fragment by a new one.
@@ -339,20 +344,14 @@ public class MainActivity extends AppCompatActivity
      * @param website the website specification to be displayed in the fragment
      */
     private void changeAnecdoteFragment(Website website, WebsitePage websitePage) {
-        Fragment fragment = Fragment.instantiate(this, AnecdoteFragment.class.getName());
-        Bundle bundle = new Bundle();
-        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_PARENT_SLUG, website.slug);
-        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_PAGE_SLUG, websitePage.slug);
-        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, website.name + " " + websitePage.name);
-        fragment.setArguments(bundle);
-        changeFragment(fragment, true, false);
+        changeFragment(AnecdoteFragment.newInstance(website, websitePage), true, false);
     }
 
     private void resetAnecdoteServices() {
         mWebsites = SpStorage.getWebsites(this);
 
         mServiceProvider.unregister(EventBus.getDefault());
-        mServiceProvider.createAnecdoteService(mWebsites);
+        mServiceProvider.createAnecdoteService(this, mWebsites);
         mServiceProvider.register(EventBus.getDefault());
 
         if (!mWebsites.isEmpty()) {
@@ -426,6 +425,10 @@ public class MainActivity extends AppCompatActivity
             });
         }
 
+        navigationViewMenu.add(R.id.drawer_group_favorites, Menu.NONE, Menu.NONE, R.string.action_favoris)
+                .setIcon(R.drawable.ic_favorite_white_24dp);
+        navigationViewMenu.setGroupCheckable(R.id.drawer_group_favorites, true, true);
+
         navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_add)
                 .setIcon(R.drawable.ic_action_content_add);
 
@@ -496,16 +499,15 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeTitle(ChangeTitleEvent event) {
-        if (event.websiteSlug != null) {
-
-            AnecdoteService anecdoteService = getAnecdoteService(event.websiteSlug);
+        if(event.spinnerEnable) {
+            AnecdoteService anecdoteService = getAnecdoteService(event.additionalTitle);
             if (anecdoteService != null) {
-                int selectedItem = mToolbarSpinnerAdapter.populate(anecdoteService.getWebsite(), event.websiteSlug);
+                int selectedItem = mToolbarSpinnerAdapter.populate(anecdoteService.getWebsite(), event.additionalTitle);
                 mToolbarSpinnerAdapter.notifyDataSetChanged();
                 mToolbarSpinner.setSelection(selectedItem);
             }
 
-            /**
+            /*
              * When the current toolbar is not displaying an AnecdoteFragment and that we want to display an
              * AnecdoteFragment now, we need to set back the scrollflags.
              */
@@ -514,15 +516,12 @@ public class MainActivity extends AppCompatActivity
                 params.setScrollFlags(mToolbarScrollFlags);
             }
 
-            mToolbar.setTitle("");
-            mToolbarSpinner.setVisibility(View.VISIBLE);
-
-            for (int i = 0; i < mWebsites.size(); i++) {
-                if (mWebsites.get(i).slug.equals(event.websiteSlug)) {
-                    //mToolbar.setTitle(mWebsites.get(i).name);
-                    mNavigationView.getMenu().getItem(i).setChecked(true);
-                    break;
-                }
+            if(anecdoteService != null && anecdoteService.getWebsite().pages.size() > 1){
+                mToolbar.setTitle("");
+                mToolbarSpinner.setVisibility(View.VISIBLE);
+            } else {
+                mToolbar.setTitle(event.title);
+                mToolbarSpinner.setVisibility(View.GONE);
             }
         } else {
             if (getSupportActionBar() != null) {
@@ -532,6 +531,15 @@ public class MainActivity extends AppCompatActivity
             mToolbar.setTitle(event.title);
             AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
             params.setScrollFlags(0);
+        }
+
+        Menu menu = mNavigationView.getMenu();
+        for (int i = 0; i < mNavigationView.getMenu().size(); i++) {
+            if (menu.getItem(i).getTitle().equals(event.title)) {
+                mNavigationView.getMenu().getItem(i).setChecked(true);
+            } else {
+                mNavigationView.getMenu().getItem(i).setChecked(false);
+            }
         }
     }
 
@@ -605,7 +613,7 @@ public class MainActivity extends AppCompatActivity
                 changeFragment(fragment, true, false, event.transitionView, event.transitionName);
                 break;
             default:
-                Log.d(TAG, "Not managed text type");
+                Log.w(TAG, "Not managed text type");
                 break;
         }
     }
@@ -651,7 +659,7 @@ public class MainActivity extends AppCompatActivity
         if (!event.isSuccessful) return;
         if (mWebsites == null || mWebsites.isEmpty()) return;
 
-        /****
+        /*
          * Check remote website and local to update local configuration if needed
          */
         Website tempWebsite;

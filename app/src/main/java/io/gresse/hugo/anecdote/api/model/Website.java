@@ -14,6 +14,7 @@ public class Website {
 
     public static final String SOURCE_LOCAL  = "local";
     public static final String SOURCE_REMOTE = "remote";
+    public static final String SOURCE_CALCULATED = "calc";
 
     public int    version;
     public String slug;
@@ -26,12 +27,12 @@ public class Website {
     public List<WebsitePage> pages;
 
     public Website() {
-        this(null);
+        this(null, SOURCE_LOCAL);
     }
 
-    public Website(String name) {
+    public Website(String name, String source) {
         this.pages = new ArrayList<>();
-        this.source = SOURCE_LOCAL;
+        this.source = source;
         this.name = name;
     }
 
@@ -50,6 +51,8 @@ public class Website {
         if (TextUtils.isEmpty(slug)) {
             if (source.equals(SOURCE_REMOTE)) {
                 slug = "api-" + name;
+            } else if (source.equals(SOURCE_CALCULATED)) {
+                slug = "calc-" + name;
             } else {
                 slug = "local-" + name;
             }
@@ -72,7 +75,7 @@ public class Website {
      * @return true if editable
      */
     public boolean isEditable() {
-        return !source.equals(SOURCE_REMOTE);
+        return source.equals(SOURCE_LOCAL);
     }
 
     @Override

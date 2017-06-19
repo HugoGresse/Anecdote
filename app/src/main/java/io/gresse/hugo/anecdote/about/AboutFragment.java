@@ -3,7 +3,6 @@ package io.gresse.hugo.anecdote.about;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.R;
+import io.gresse.hugo.anecdote.util.TitledFragment;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
 
@@ -25,7 +25,7 @@ import io.gresse.hugo.anecdote.tracking.EventTracker;
  * <p/>
  * Created by Hugo Gresse on 14/02/16.
  */
-public class AboutFragment extends Fragment implements AboutAdapter.OnClickListener {
+public class AboutFragment extends TitledFragment implements AboutAdapter.OnClickListener {
 
     public static final String TAG = AboutFragment.class.getSimpleName();
 
@@ -69,7 +69,7 @@ public class AboutFragment extends Fragment implements AboutAdapter.OnClickListe
     @Override
     public void onResume() {
         super.onResume();
-        EventBus.getDefault().post(new ChangeTitleEvent(getString(R.string.action_about), this.getClass().getName()));
+        EventBus.getDefault().post(new ChangeTitleEvent(getTitle()));
 
         EventTracker.trackFragmentView(this, null, EventTracker.CONTENT_TYPE_APP);
     }
@@ -78,5 +78,10 @@ public class AboutFragment extends Fragment implements AboutAdapter.OnClickListe
     public void onItemClick(Intent intent) {
         Toast.makeText(getActivity(), R.string.open_intent_browser, Toast.LENGTH_SHORT).show();
         startActivity(intent);
+    }
+
+    @Override
+    public String getTitle() {
+        return getString(R.string.about_title);
     }
 }
