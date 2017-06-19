@@ -136,7 +136,7 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
 
         super.onRestoreInstanceState(state);
     }
-    /***************************
+    /* *************************
      * Getter/Setter
      ***************************/
 
@@ -203,7 +203,6 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
         mSimpleExoPlayer = new SimpleExoPlayer(getContext(), mMediaFile, this);
         mSimpleExoPlayer.setDebug(false);
         mSimpleExoPlayer.init();
-        mSimpleExoPlayer.mute();
 
         if (mPreLoad) {
             mSimpleExoPlayer.preLoad();
@@ -222,6 +221,7 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
 
     @Override
     public void playerIsLoaded() {
+        mSimpleExoPlayer.mute();
         // No need to listen this listener
     }
 
@@ -247,6 +247,7 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
 
     @Override
     public void playerSurfaceDestroyedShouldPause() {
+        mSimpleExoPlayer.pause();
         // No need to listen this listener
     }
 
