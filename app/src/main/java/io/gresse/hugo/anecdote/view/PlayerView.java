@@ -203,6 +203,7 @@ public class PlayerView extends AspectRatioTextureView implements SimpleExoPlaye
         mSimpleExoPlayer = new SimpleExoPlayer(getContext(), mMediaFile, this);
         mSimpleExoPlayer.setDebug(false);
         mSimpleExoPlayer.init();
+        mSimpleExoPlayer.mute();
 
         if (mPreLoad) {
             mSimpleExoPlayer.preLoad();
