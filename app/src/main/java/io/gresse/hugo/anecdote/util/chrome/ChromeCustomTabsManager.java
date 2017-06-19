@@ -5,7 +5,7 @@ import android.app.PendingIntent;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.customtabs.CustomTabsCallback;
 import android.support.customtabs.CustomTabsClient;
@@ -20,6 +20,7 @@ import javax.inject.Inject;
 
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.util.Utils;
 
 /**
  * Manage Chrome custom tabs binding and launching
@@ -130,11 +131,11 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
         builder.enableUrlBarHiding();
         builder.setToolbarColor(mToolbarBackgroundColor);
 
-        builder.setSecondaryToolbarColor(ContextCompat.getColor(context, android.R.color.white));
+        builder.setSecondaryToolbarColor(Color.WHITE);
         builder.setStartAnimations(context, R.anim.slide_in_right, R.anim.hold);
         builder.setExitAnimations(context, R.anim.hold, R.anim.slide_out_left);
         builder.setCloseButtonIcon(
-                BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_navigation_arrow_back));
+                Utils.getBitmapFromVectorDrawable(context, R.drawable.ic_arrow_back_white_24dp));
 
         CustomTabsIntent customTabsIntent = builder.build();
         customTabsIntent.intent.setPackage(packageName);
@@ -153,7 +154,7 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
                 anecdote.getPlainTextContent() + " " + context.getString(R.string.app_share_credits));
 
         builder.setActionButton(
-                BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_social_share),
+                Utils.getBitmapFromVectorDrawable(context, R.drawable.ic_share_white_24dp),
                 anecdote.getPlainTextContent() + " " + context.getString(R.string.app_share_credits),
                 PendingIntent.getActivity(context, 0, sharingIntent, 0),
                 false);
