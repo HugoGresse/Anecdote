@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-             xmlns:tools="http://schemas.android.com/tools"
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              android:background="@android:color/black"
-             android:fitsSystemWindows="false"
-              android:orientation="vertical"
              android:animateLayoutChanges="true"
              android:gravity="center">
 
-    <io.gresse.hugo.anecdote.view.CustomImageView
-        android:id="@+id/imageView"
+    <io.gresse.hugo.anecdote.view.PlayerView
+        android:id="@+id/playerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:transitionName="@string/anecdote_image_transition_name"
-        tools:ignore="ContentDescription"/>
+        android:layout_gravity="center"/>
 
-    <include layout="@layout/fragment_fullscreen_base"/>
+    <include layout="@layout/activity_fullscreen_base"/>
 
 </FrameLayout>

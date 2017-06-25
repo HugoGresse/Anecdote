@@ -24,7 +24,7 @@ public class OfflineAnecdoteService extends AnecdoteService {
     @Inject
     public FavoritesRepository mFavoritesRepository;
 
-
+    @Inject
     public OfflineAnecdoteService(Website website, WebsitePage websitePage) {
         super(website, websitePage);
     }

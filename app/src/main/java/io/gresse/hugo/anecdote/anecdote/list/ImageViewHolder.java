@@ -32,7 +32,6 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
     private static final  String TAG         = ImageViewHolder.class.getSimpleName();
     private static final int    RETRY_COUNT = 2;
 
-    private String mWebsiteName;
     private int mRetried;
     @Nullable
     private String mImageUrl;

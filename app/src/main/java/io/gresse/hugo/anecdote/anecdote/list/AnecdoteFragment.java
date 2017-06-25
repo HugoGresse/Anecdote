@@ -1,5 +1,6 @@
 package io.gresse.hugo.anecdote.anecdote.list;
 
+import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -276,43 +277,30 @@ public class AnecdoteFragment extends TitledFragment implements
             return;
         }
 
-        if (anecdote.type == null) {
-            Log.w(TAG, "fullscreenAnecdote null Anecdote");
+        if (anecdote.type == null || mAnecdoteService == null) {
+            Log.w(TAG, "Fullscreen not possible");
             return;
         }
 
         Intent intent = FullscreenActivity.createIntent(
                 getContext(),
                 mAnecdoteService.getAnecdotes().indexOf(anecdote),
-                mPageSlug);
+                anecdote,
+                mPageSlug,
+                view);
 
-        startActivity(intent);
 
-//        switch (anecdote.type) {
-//            case MediaType.IMAGE:
-//                EventBus.getDefault().post(new FullscreenEvent(
-//                        FullscreenEvent.TYPE_IMAGE,
-//                        mWebsiteAndPageName,
-//                        this,
-//                        view,
-//                        getString(R.string.anecdote_image_transition_name),
-//                        anecdote
-//                ));
-//                break;
-//            case MediaType.VIDEO:
-//                EventBus.getDefault().post(new FullscreenEvent(
-//                        FullscreenEvent.TYPE_VIDEO,
-//                        mWebsiteAndPageName,
-//                        this,
-//                        view,
-//                        getString(R.string.anecdote_image_transition_name),
-//                        anecdote
-//                ));
-//                break;
-//            default:
-//                Log.w(TAG, "Not managed RichContent type");
-//                break;
-//        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            startActivity(
+                    intent,
+                    ActivityOptions.makeSceneTransitionAnimation(
+                            getActivity(),
+                            view,
+                            view.getTransitionName()).toBundle()
+            );
+        } else {
+            startActivity(intent);
+        }
     }
 
 

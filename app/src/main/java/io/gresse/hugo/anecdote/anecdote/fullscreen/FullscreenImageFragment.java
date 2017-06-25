@@ -49,7 +49,7 @@ public class FullscreenImageFragment extends FullscreenFragment implements OnPho
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_fullscreen_image, container, false);
+        View view = inflater.inflate(R.layout.activity_fullscreen_image, container, false);
         mUnbinder = ButterKnife.bind(this, view);
         return view;
     }

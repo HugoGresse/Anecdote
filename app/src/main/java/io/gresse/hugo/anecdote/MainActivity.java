@@ -2,7 +2,6 @@ package io.gresse.hugo.anecdote;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -22,7 +21,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
-import android.transition.Fade;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -31,8 +29,6 @@ import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
-
-import com.google.gson.Gson;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -50,10 +46,6 @@ import io.gresse.hugo.anecdote.anecdote.ToolbarSpinnerAdapter;
 import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.anecdote.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.ChangeFullscreenEvent;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenEvent;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenFragment;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenImageFragment;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenVideoFragment;
 import io.gresse.hugo.anecdote.anecdote.like.FavoritesRepository;
 import io.gresse.hugo.anecdote.anecdote.list.AnecdoteFragment;
 import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
@@ -74,10 +66,8 @@ import io.gresse.hugo.anecdote.storage.SpStorage;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
 import io.gresse.hugo.anecdote.util.FragmentStackManager;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
-import io.gresse.hugo.anecdote.view.ImageTransitionSet;
 import toothpick.Scope;
 import toothpick.Toothpick;
-import toothpick.smoothie.module.SmoothieActivityModule;
 
 /**
  * TODO :
@@ -123,7 +113,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Scope scope = Toothpick.openScopes(getApplication(), this);
-        scope.installModules(new SmoothieActivityModule(this));
         super.onCreate(savedInstanceState);
         Toothpick.inject(this, scope);
         if (EventTracker.isEventEnable()) {
@@ -274,6 +263,7 @@ public class MainActivity extends AppCompatActivity
         mDrawerLayout.closeDrawer(GravityCompat.START);
         return true;
     }
+
 
     @OnItemSelected(R.id.toolbarSpinner)
     public void onSpinnerSelected(AppCompatSpinner adapter, View v, int i, long lng) {
@@ -430,12 +420,12 @@ public class MainActivity extends AppCompatActivity
         navigationViewMenu.setGroupCheckable(R.id.drawer_group_favorites, true, true);
 
         navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_add)
-                .setIcon(R.drawable.ic_action_content_add);
+                .setIcon(R.drawable.ic_add_white_24dp);
 
         if (addNewNotification) {
             navigationViewMenu
                     .add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_newwebsite)
-                    .setIcon(R.drawable.ic_action_info_outline);
+                    .setIcon(R.drawable.ic_info_outline_white_24dp);
         }
 
         navigationViewMenu.setGroupCheckable(R.id.drawer_group_content, true, true);
@@ -565,57 +555,6 @@ public class MainActivity extends AppCompatActivity
         resetAnecdoteServices();
         populateNavigationView(false);
         EventBus.getDefault().post(new UpdateAnecdoteFragmentEvent());
-    }
-
-    @Subscribe
-    public void onFullscreenEvent(FullscreenEvent event) {
-        Fragment fragment;
-        Bundle bundle = new Bundle();
-
-        bundle.putString(FullscreenFragment.BUNDLE_ANECDOTE, new Gson().toJson(event.anecdote));
-        bundle.putString(FullscreenFragment.BUNDLE_WEBSITENAME, event.websiteName);
-
-        switch (event.type) {
-            case FullscreenEvent.TYPE_IMAGE:
-                fragment = Fragment.instantiate(this, FullscreenImageFragment.class.getName());
-
-                // Note that we need the API version check here because the actual transition classes (e.g. Fade)
-                // are not in the support library and are only available in API 21+. The methods we are calling on the Fragment
-                // ARE available in the support library (though they don't do anything on API < 21)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    fragment.setSharedElementEnterTransition(new ImageTransitionSet());
-                    fragment.setEnterTransition(new Fade());
-                    event.currentFragment.setExitTransition(new Fade());
-                    fragment.setSharedElementReturnTransition(new ImageTransitionSet());
-                }
-
-                bundle.putString(FullscreenImageFragment.BUNDLE_IMAGEURL, event.anecdote.media);
-                fragment.setArguments(bundle);
-
-                changeFragment(fragment, true, false, event.transitionView, event.transitionName);
-                break;
-            case FullscreenEvent.TYPE_VIDEO:
-                fragment = Fragment.instantiate(this, FullscreenVideoFragment.class.getName());
-
-                // Note that we need the API version check here because the actual transition classes (e.g. Fade)
-                // are not in the support library and are only available in API 21+. The methods we are calling on the Fragment
-                // ARE available in the support library (though they don't do anything on API < 21)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    fragment.setSharedElementEnterTransition(new ImageTransitionSet());
-                    fragment.setEnterTransition(new Fade());
-                    event.currentFragment.setExitTransition(new Fade());
-                    fragment.setSharedElementReturnTransition(new ImageTransitionSet());
-                }
-
-                bundle.putString(FullscreenVideoFragment.BUNDLE_VIDEOURL, event.anecdote.media);
-                fragment.setArguments(bundle);
-
-                changeFragment(fragment, true, false, event.transitionView, event.transitionName);
-                break;
-            default:
-                Log.w(TAG, "Not managed text type");
-                break;
-        }
     }
 
     @Subscribe
