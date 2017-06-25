@@ -125,8 +125,8 @@
 
     <!-- Strings displayed only on Google Playstore. Optional, but good to have -->
     <!-- Short description has to have less than 80 chars -->
-    <string name="app_short_description" translatable="false">New quotes (9GAG, FML, Bash.org, xkcd) every day in a simple app</string>
-    <string name="app_long_description" translatable="false">
+    <string name="app_short_description">New quotes (9GAG, FML, Bash.org, xkcd) every day in a simple app</string>
+    <string name="app_long_description">
         Features:
             - 9GAG feed (image and video) with 9GAG Hot, Trending and Fresh
             - xkcd

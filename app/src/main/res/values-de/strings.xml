@@ -94,4 +94,24 @@
     <string name="action_favoris">Favoriten</string>
     <string name="error_nodata">Es ist leer</string>
 
+    <!-- Strings displayed only on Google Playstore. Optional, but good to have -->
+    <!-- Short description has to have less than 80 chars -->
+    <string name="app_short_description">New quotes (9GAG, FML, Bash.org, xkcd) every day in a simple app</string>
+    <string name="app_long_description">
+        Features:
+            - 9GAG feed (image and video) with 9GAG Hot, Trending and Fresh
+            - xkcd
+            - quotes feeds from fmylife.com (FML), Bash.org, viedemerde.fr (VDM), danstonchat.com (DTC) and more
+            - simple and effective user interface
+            - infinite scroll and pull to refresh
+            - no strange permissions, no background tasks
+            - add your own website with some HTML knowledge
+
+        Anecdote is a simple yet powerful application to read your favorites quotes websites. It\'s very light, not intrusive, fast and simple.
+
+        It is open-source on GitHub here: https://github.com/HugoGresse/Anecdote
+
+        The content displayed in the application do not belongs to Anecdote.
+    </string>
+
 </resources>
