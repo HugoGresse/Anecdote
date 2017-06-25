@@ -1,6 +1,8 @@
 # Anecdote 
 
-Simply display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9GAG, Se couchez moins bête, Bash.org in a **simple** interface. 
+Android app that simply display videos, images and text from the best sources  (9GAG, XKCD, CommitStrip, VDM/FML (viedemerde.fr), DTC (danstonchat.com), Se couchez moins bête, Bash.org). 
+
+This is a Free and Open Source Software (FOSS).
 
 <a href="https://play.google.com/store/apps/details?id=io.gresse.hugo.anecdote" target="_blank">
   <img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png" height="60"/>
@@ -9,6 +11,7 @@ Simply display VDM/FML (viedemerde.fr), DTC (danstonchat.com), 9GAG, Se couchez 
   <img src="https://f-droid.org/badge/get-it-on.png" height="60"/>
 </a>
 <br>
+[![API](https://img.shields.io/badge/API-16%2B-brightgreen.svg?style=flat)](https://android-arsenal.com/api?level=16)
 <a id="status-image-popup" class="open-popup" href="#" title="build status image" name="status-images" data-ember-action="944">
 <img src="https://travis-ci.org/HugoGresse/Anecdote.svg" alt="build:started">
 </a> 
@@ -21,30 +24,54 @@ _The application content does not belong to the application._
 
 Features
 --------
-- Display 9GAG, VDM/FML (viedemerde.fr), DTC (danstonchat.com), Se couchez moins bête, Bash.org and much more (choose on first start which websites you want to read, based on Anecdote database)
+- Sources: 
+    - 9GAG, 
+    - xkcd
+    - CommitStrip (FR & EN)
+    - VDM/FML (viedemerde.fr), 
+    - DTC (danstonchat.com), 
+    - Se couchez moins bête, 
+    - Bash.org,
+    - Expressions à la con,
+    - Nuit sans folie
 - Infinite scroll
 - Pull to refresh
-- Manually adding websites (for expert) via HTML parsing
-- Remote websites configuration update
-- No persistent data, no strange permissions, no ads
+- Manually adding websites (for expert) via HTML parsing (to be improved)
+- Remote websites configuration update (no need to udpate the app when a website is no more working, the app will be updated on startup when ready)
+- No strange permissions, no ads
 
-TODO
+TODO (by priority)
 --------
-- Website to manage Anecdote websites
+- Improved video preview (with controls)
 - Guide to add a website (a follow through user step)
 - Filter by country
+- Website to manage Anecdote websites
 - Offline management by task to download data at a given time
 
 
 Contribution
-------
+------------
 Feel free to contribute to this application (fork and make a pull request). 
+
+Donations
+---------
+
+This project needs you! If you would like to support this project's further development, the creator of this project or the continuous maintenance of this project, feel free to donate. Your donation is highly appreciated (and I love food, rhum and 🍻). Thank you!
+
+**PayPal**
+
+* **[Donate $5]**: Thank's for creating this project, here's a beer for you!
+* **[Donate $10]**: Keep up the good work, I love it!
+* **[Donate $50]**: I really really want to support this project, great job!
+
+or... 
+
+<a href='https://ko-fi.com/A513OEI' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi5.png?v=0' border='0' alt='Buy Me a beer at ko-fi.com' /></a>
 
 Author
 ------
 [Hugo Gresse](http://hugo.gresse.io)
 
-<a href='https://ko-fi.com/A513OEI' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi5.png?v=0' border='0' alt='Buy Me a Coffee at ko-fi.com' /></a>
 
 Contributors
 -----------
@@ -69,3 +96,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+
+[Donate $5]:   https://paypal.me/HugoGresse/5
+[Donate $10]:  https://paypal.me/HugoGresse/10
+[Donate $50]:  https://paypal.me/HugoGresse/50
