@@ -92,11 +92,9 @@ public abstract class FullscreenFragment extends Fragment {
     protected void toggleOverlayVisibility() {
         // sometime mContentTextView is null, cf http://crashes.to/s/42615391f2d
         if (mContentTextView != null && mContentTextView.isShown()) {
-            Log.d(TAG, "toggleOverlayVisibility to GONE");
             mOverlayLinearLayout.setVisibility(View.GONE);
             mGradientView.setVisibility(View.GONE);
         } else {
-            Log.d(TAG, "toggleOverlayVisibility to VISIBLE");
             mOverlayLinearLayout.setVisibility(View.VISIBLE);
             mGradientView.setVisibility(View.VISIBLE);
         }

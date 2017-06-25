@@ -100,5 +100,7 @@
         Le contenu de l\'application n\'appartient pas Anecdote.
     </string>
     <string name="notice_image_saved">Image sauvegardé !</string>
+    <string name="action_favoris">Favoris</string>
+    <string name="error_nodata">C\'est vide :/</string>
 
 </resources>

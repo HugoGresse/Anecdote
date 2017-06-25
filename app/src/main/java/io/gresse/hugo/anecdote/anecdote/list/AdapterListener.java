@@ -17,6 +17,7 @@ public interface AdapterListener {
     int ACTION_OPEN_IN_BROWSER_PRELOAD = 3;
     int ACTION_OPEN_IN_BROWSER         = 4;
     int ACTION_FULLSCREEN              = 5;
+    int ACTION_FAVORIS                 = 6;
 
     /**
      * When a item received click, follow it with the correct information

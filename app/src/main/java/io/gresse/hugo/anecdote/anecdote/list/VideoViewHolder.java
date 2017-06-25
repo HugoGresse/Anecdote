@@ -1,5 +1,6 @@
 package io.gresse.hugo.anecdote.anecdote.list;
 
+import android.support.v4.view.ViewCompat;
 import android.view.View;
 
 import butterknife.BindView;
@@ -38,6 +39,8 @@ public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClick
         if (mPlayerView != null && anecdote.media != null) {
             mPlayerView.setVideoUrl(anecdote.media);
         }
+
+        ViewCompat.setTransitionName(mPlayerView, String.valueOf(position) + "_video");
     }
 
     @Override

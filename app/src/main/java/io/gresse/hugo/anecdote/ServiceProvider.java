@@ -1,6 +1,6 @@
 package io.gresse.hugo.anecdote;
 
-import android.app.Activity;
+import android.content.Context;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -8,47 +8,67 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.gresse.hugo.anecdote.anecdote.social.SocialService;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+import io.gresse.hugo.anecdote.anecdote.like.FavoritesRepository;
 import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
+import io.gresse.hugo.anecdote.anecdote.service.OfflineAnecdoteService;
+import io.gresse.hugo.anecdote.anecdote.service.OnlineAnecdoteService;
+import io.gresse.hugo.anecdote.anecdote.social.SocialService;
 import io.gresse.hugo.anecdote.api.WebsiteApiService;
 import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.model.WebsitePage;
+import toothpick.Scope;
+import toothpick.Toothpick;
 
 /**
  * Provide different services (that explain a lot)
  * <p/>
  * Created by Hugo Gresse on 14/02/16.
  */
+@Singleton
 public class ServiceProvider {
 
-    protected List<Website>                mWebsites;
-    protected Map<String, AnecdoteService> mAnecdoteServices;
-    protected WebsiteApiService            mWebsiteApiService;
+    private   Map<String, AnecdoteService> mAnecdoteServices;
+    private   WebsiteApiService            mWebsiteApiService;
+    @Inject
     protected SocialService                mSocialService;
 
-    public ServiceProvider(Activity activity) {
+    ServiceProvider() {
         mAnecdoteServices = new HashMap<>();
         mWebsiteApiService = new WebsiteApiService();
-        mSocialService = new SocialService(activity);
     }
 
-    public void createAnecdoteService(List<Website> websites) {
-        mWebsites = websites;
+    public void createAnecdoteService(Context context, List<Website> websites) {
+        Scope scope = Toothpick.openScope(context.getApplicationContext());
 
-        for (Website website : mWebsites) {
+        OnlineAnecdoteService onlineAnecdoteService;
+
+        for (Website website : websites) {
             for (WebsitePage websitePage : website.pages) {
-                mAnecdoteServices.put(websitePage.slug, new AnecdoteService(website, websitePage));
+                onlineAnecdoteService = new OnlineAnecdoteService(website, websitePage);
+                Toothpick.inject(onlineAnecdoteService, scope);
+                mAnecdoteServices.put(websitePage.slug, onlineAnecdoteService);
             }
         }
+
+        // Add Favorites service
+        Website favoritesWebsite = FavoritesRepository.getFavoritesWebsite(context);
+        WebsitePage favoritesWebsitePage = favoritesWebsite.pages.get(0);
+        OfflineAnecdoteService offlineAnecdoteService = new OfflineAnecdoteService(
+                favoritesWebsite, favoritesWebsitePage);
+        Toothpick.inject(offlineAnecdoteService, scope);
+        mAnecdoteServices.put(favoritesWebsitePage.slug, offlineAnecdoteService);
     }
 
-    public void register(EventBus eventBus, Activity activity) {
+    public void register(EventBus eventBus) {
         for (Map.Entry<String, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
             eventBus.register(entry.getValue());
         }
         eventBus.register(mWebsiteApiService);
         eventBus.register(mSocialService);
-        mSocialService.register(activity);
+        mSocialService.register();
     }
 
     public void unregister(EventBus eventBus) {
@@ -67,9 +87,5 @@ public class ServiceProvider {
 
     public WebsiteApiService getWebsiteApiService() {
         return mWebsiteApiService;
-    }
-
-    public SocialService getSocialService() {
-        return mSocialService;
     }
 }

@@ -1,46 +1,63 @@
 buildscript {
+
     repositories {
+        jcenter()
+        mavenCentral()
         maven { url 'https://maven.fabric.io/public' }
+        maven { url "http://objectbox.net/beta-repo/" }
     }
 
     dependencies {
         classpath 'io.fabric.tools:gradle:1.+'
+        classpath 'io.objectbox:objectbox-gradle-plugin:0.9.12'
     }
 }
 apply plugin: 'com.android.application'
 apply plugin: 'io.fabric'
+apply plugin: 'io.objectbox'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
-    maven { url  "http://dl.bintray.com/countly/maven" }
+    maven { url "http://dl.bintray.com/countly/maven" }
     maven { url "https://jitpack.io" }
+    maven { url "http://objectbox.net/beta-repo/" }
 }
 
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.2"
+    compileSdkVersion 26
+    buildToolsVersion "26.0.0"
 
     defaultConfig {
         applicationId "io.gresse.hugo.anecdote"
         minSdkVersion 16
-        targetSdkVersion 25
+        targetSdkVersion 26
         versionCode 23
         versionName "1.1.5"
 
+        vectorDrawables.useSupportLibrary = true
+
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions.annotationProcessorOptions {
+            arguments = ['toothpick_registry_package_name': 'io.gresse.hugo.anecdote']
+        }
     }
 
     project.ext.set("archivesBaseName", "Anecdote");
 
     applicationVariants.all { variant ->
         variant.outputs.each { output ->
-            if(variant.buildType.name == "release"){
+            if (variant.buildType.name == "release") {
                 output.outputFile = new File(
                         output.outputFile.parent,
-                        output.outputFile.name.replace(".apk", "-"+variant.versionName + ".apk"))
+                        output.outputFile.name.replace(".apk", "-" + variant.versionName + ".apk"))
             }
         }
+    }
+
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.2'
     }
 
     signingConfigs {
@@ -101,38 +118,45 @@ dependencies {
     compile "com.android.support:design:${androidSupportLibraries}"
     compile "com.android.support:recyclerview-v7:${androidSupportLibraries}"
     compile "com.android.support:customtabs:${androidSupportLibraries}"
+    compile('io.gresse.hugo.simpleexoplayer:library:0.1.4@aar') {
+        transitive = true;
+    }
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
+
+    annotationProcessor 'com.github.stephanenicolas.toothpick:toothpick-compiler:1.0.6'
+    compile 'com.github.stephanenicolas.toothpick:toothpick-runtime:1.0.6'
+    compile 'com.github.stephanenicolas.toothpick:smoothie:1.0.6'
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.github.bumptech.glide:glide:3.7.0'
     compile 'com.github.bumptech.glide:okhttp3-integration:1.4.0@aar'
-    compile 'com.jakewharton:butterknife:8.5.1'
     annotationProcessor 'com.jakewharton:butterknife-compiler:8.5.1'
+    compile 'com.jakewharton:butterknife:8.5.1'
     compile 'com.github.chrisbanes:PhotoView:2.0.0'
-    compile ('io.gresse.hugo.simpleexoplayer:library:0.1.4@aar') {
-        transitive = true;
-    }
+    compile 'io.objectbox:objectbox-android:0.9.12'
 
     // Specific dependencies for flavors
     googleCompile('com.crashlytics.sdk.android:crashlytics:2.6.5@aar') {
         transitive = true;
     }
 
-    ossCompile('ly.count.android:sdk:16.06.04')
 
+    ossCompile 'ly.count.android:sdk:16.06.04'
 
-    testCompile 'junit:junit:4.12'
 
     androidTestCompile "com.android.support:support-annotations:${androidSupportLibraries}"
     androidTestCompile "com.android.support:appcompat-v7:${androidSupportLibraries}"
     androidTestCompile "com.android.support:design:${androidSupportLibraries}"
     androidTestCompile "com.android.support:recyclerview-v7:${androidSupportLibraries}"
     // Android JUnit Runner
-    androidTestCompile 'com.android.support.test:runner:0.5'
     // JUnit4 Rules
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2') {
+        exclude group: 'com.google.code.findbugs'
+    }
+    testCompile 'junit:junit:4.12'
+    androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile 'com.android.support.test:rules:0.5'
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.2'
     androidTestCompile 'com.android.support.test.espresso:espresso-contrib:2.2.2'
     androidTestCompile 'tools.fastlane:screengrab:0.3.2'
 }

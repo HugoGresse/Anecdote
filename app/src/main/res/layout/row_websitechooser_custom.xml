@@ -17,9 +17,10 @@
         android:layout_height="wrap_content"
         android:text="@string/action_website_add_custom"
         android:id="@+id/textView"
-        android:drawableLeft="@drawable/ic_action_content_add"
-        android:drawableStart="@drawable/ic_action_content_add"
+        android:drawableLeft="@drawable/ic_add_white_24dp"
+        android:drawableStart="@drawable/ic_add_white_24dp"
         android:drawablePadding="16dp"
+        android:layout_marginLeft="4dp"
         android:gravity="center_vertical"
         android:padding="16dp"/>
 </LinearLayout>

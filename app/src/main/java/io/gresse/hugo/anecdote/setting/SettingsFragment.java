@@ -44,7 +44,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Shared
     @Override
     public void onResume() {
         super.onResume();
-        EventBus.getDefault().post(new ChangeTitleEvent(getString(R.string.action_settings), null));
+        EventBus.getDefault().post(new ChangeTitleEvent(getString(R.string.action_settings)));
         EventTracker.trackFragmentView(this, null, EventTracker.CONTENT_TYPE_APP);
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
     }

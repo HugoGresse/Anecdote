@@ -112,4 +112,6 @@
         С открытым исходным кодом на GitHub: https://github.com/HugoGresse/Anecdote
         Контент, отображаемый в приложении не принадлежит Anecdote.
     </string>
+    <string name="action_favoris">Избранное</string>
+    <string name="error_nodata">Пусто</string>
 </resources>

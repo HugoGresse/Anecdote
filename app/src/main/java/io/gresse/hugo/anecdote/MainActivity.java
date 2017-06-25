@@ -2,9 +2,9 @@ package io.gresse.hugo.anecdote;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -15,15 +15,12 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.AppCompatSpinner;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
-import android.text.TextUtils;
-import android.transition.Fade;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,13 +30,13 @@ import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
 
-import com.google.gson.Gson;
-
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,12 +44,9 @@ import butterknife.OnItemSelected;
 import io.gresse.hugo.anecdote.about.AboutFragment;
 import io.gresse.hugo.anecdote.anecdote.ToolbarSpinnerAdapter;
 import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
-import io.gresse.hugo.anecdote.anecdote.fragment.WebsiteDialogFragment;
+import io.gresse.hugo.anecdote.anecdote.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.ChangeFullscreenEvent;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenEvent;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenFragment;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenImageFragment;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenVideoFragment;
+import io.gresse.hugo.anecdote.anecdote.like.FavoritesRepository;
 import io.gresse.hugo.anecdote.anecdote.list.AnecdoteFragment;
 import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.api.WebsiteApiService;
@@ -70,13 +64,13 @@ import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.setting.SettingsFragment;
 import io.gresse.hugo.anecdote.storage.SpStorage;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
+import io.gresse.hugo.anecdote.util.FragmentStackManager;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
-import io.gresse.hugo.anecdote.view.ImageTransitionSet;
+import toothpick.Scope;
+import toothpick.Toothpick;
 
 /**
- * TODO :
- * - favoris - WIP
- * - slide between images
+ * 
  */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NetworkConnectivityListener.ConnectivityListener {
@@ -104,6 +98,7 @@ public class MainActivity extends AppCompatActivity
     @BindView(R.id.fragment_container)
     public View mFragmentContainer;
 
+    @Inject
     protected ServiceProvider             mServiceProvider;
     protected NetworkConnectivityListener mNetworkConnectivityListener;
     protected List<Website>               mWebsites;
@@ -111,10 +106,13 @@ public class MainActivity extends AppCompatActivity
     protected ToolbarSpinnerAdapter       mToolbarSpinnerAdapter;
     protected int                         mToolbarScrollFlags;
     protected CoordinatorLayout.Behavior  mFragmentLayoutBehavior;
+    protected FragmentStackManager        mFragmentStackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Scope scope = Toothpick.openScopes(getApplication(), this);
         super.onCreate(savedInstanceState);
+        Toothpick.inject(this, scope);
         if (EventTracker.isEventEnable()) {
             new EventTracker(this);
         }
@@ -133,10 +131,9 @@ public class MainActivity extends AppCompatActivity
         // Process migration before getting anything else from shared preferences
         boolean openWebsiteChooserAddMode = SpStorage.migrate(this);
 
-        mServiceProvider = new ServiceProvider(this);
         mWebsites = SpStorage.getWebsites(this);
-        mServiceProvider.createAnecdoteService(mWebsites);
-        mServiceProvider.register(EventBus.getDefault(), this);
+        mServiceProvider.createAnecdoteService(this, mWebsites);
+        mServiceProvider.register(EventBus.getDefault());
 
         populateNavigationView(false);
 
@@ -145,6 +142,8 @@ public class MainActivity extends AppCompatActivity
 
         AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
         mToolbarScrollFlags = params.getScrollFlags();
+
+        mFragmentStackManager = new FragmentStackManager(mSnackbar);
 
         if (openWebsiteChooserAddMode) {
             changeFragment(WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_ADD), false, false);
@@ -163,9 +162,7 @@ public class MainActivity extends AppCompatActivity
         super.onResume();
 
         EventBus.getDefault().register(this);
-        if (!getWebsiteApiService().isWebsitesDownloaded()) {
-            EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
-        }
+        EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
     }
 
     @Override
@@ -189,6 +186,7 @@ public class MainActivity extends AppCompatActivity
 
     @Override
     protected void onDestroy() {
+        Toothpick.closeScope(this);
         mServiceProvider.unregister(EventBus.getDefault());
         mNetworkConnectivityListener.stopListening();
         super.onDestroy();
@@ -226,7 +224,7 @@ public class MainActivity extends AppCompatActivity
                 return true;
             case R.id.action_feedback:
                 Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto","hugo.gresse@gmail.com", null));
+                        "mailto", "hugo.gresse@gmail.com", null));
                 emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " feedback");
                 startActivity(Intent.createChooser(emailIntent, "Send email..."));
                 return true;
@@ -236,29 +234,18 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         switch (item.getGroupId()) {
             case R.id.drawer_group_content:
                 for (Website website : mWebsites) {
                     if (website.name.equals(item.getTitle())) {
-                        changeAnecdoteFragment(website, website.pages.get(0));
-
-                        // We redisplay the toolbar if it was scrollUp by removing the scrollFlags,
-                        // wait a litle and reset the last scrollFlags on it (doing it right after was not working
-                        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
-                        final int scrollFlags = layoutParams.getScrollFlags();
-                        layoutParams.setScrollFlags(0);
-
-                        new Handler().postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
-                                layoutParams.setScrollFlags(scrollFlags);
-                                mToolbar.setLayoutParams(layoutParams);
-                            }
-                        }, 100);
+                        goToWebsite(website);
                         break;
                     }
                 }
+                break;
+            case R.id.drawer_group_favorites:
+                goToWebsite(FavoritesRepository.getFavoritesWebsite(this));
                 break;
             case R.id.drawer_group_action:
                 changeFragment(
@@ -275,6 +262,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+
     @OnItemSelected(R.id.toolbarSpinner)
     public void onSpinnerSelected(AppCompatSpinner adapter, View v, int i, long lng) {
         if (mToolbarSpinnerAdapter.getWebsite() != null) {
@@ -282,10 +270,27 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    /***************************
+    /* **************************
      * inner methods
      ***************************/
 
+    private void goToWebsite(Website website){
+        changeAnecdoteFragment(website, website.pages.get(0));
+
+        // We redisplay the toolbar if it was scrollUp by removing the scrollFlags,
+        // wait a litle and reset the last scrollFlags on it (doing it right after was not working
+        final AppBarLayout.LayoutParams layoutParams = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
+        final int scrollFlags = layoutParams.getScrollFlags();
+        layoutParams.setScrollFlags(0);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                layoutParams.setScrollFlags(scrollFlags);
+                mToolbar.setLayoutParams(layoutParams);
+            }
+        }, 100);
+    }
 
     /**
      * Change tu current displayed fragment by a new one.
@@ -298,8 +303,6 @@ public class MainActivity extends AppCompatActivity
         changeFragment(frag, saveInBackstack, animate, null, null);
     }
 
-    /**
-     */
     /**
      * Change tu current displayed fragment by a new one.
      *
@@ -314,55 +317,13 @@ public class MainActivity extends AppCompatActivity
                                 boolean animate,
                                 @Nullable View sharedView,
                                 @Nullable String sharedName) {
-        String log = "changeFragment: ";
-        String backStateName = ((Object) frag).getClass().getName();
-
-        if (frag instanceof AnecdoteFragment) {
-            backStateName += frag.getArguments().getString(AnecdoteFragment.ARGS_WEBSITE_PAGE_SLUG);
-        }
-
-        try {
-            FragmentManager manager = getSupportFragmentManager();
-            boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
-
-            if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null) { //fragment not in back stack, create it.
-                FragmentTransaction transaction = manager.beginTransaction();
-
-                if (animate) {
-                    log += " animate";
-                    transaction.setCustomAnimations(R.anim.slide_in_right, R.anim.slide_out_left, R.anim.slide_in_left, R.anim.slide_out_right);
-                }
-                if (sharedView != null && !TextUtils.isEmpty(sharedName)) {
-                    ViewCompat.setTransitionName(sharedView, sharedName);
-                    transaction.addSharedElement(sharedView, sharedName);
-                }
-
-                transaction.replace(R.id.fragment_container, frag, backStateName);
-
-                if (saveInBackstack) {
-                    log += " addToBackTack(" + backStateName + ")";
-                    transaction.addToBackStack(backStateName);
-                } else {
-                    log += " NO addToBackTack(" + backStateName + ")";
-                }
-
-                transaction.commit();
-
-                // If some snackbar is display, hide it
-                if (mSnackbar != null && mSnackbar.isShownOrQueued()) {
-                    mSnackbar.dismiss();
-                }
-
-            } else if (!fragmentPopped && manager.findFragmentByTag(backStateName) != null) {
-                log += " fragment not popped but finded: " + backStateName;
-            } else {
-                log += " nothing to do : " + backStateName + " fragmentPopped: " + fragmentPopped;
-                // custom effect if fragment is already instanciated
-            }
-            Log.d(TAG, log);
-        } catch (IllegalStateException exception) {
-            Log.w(TAG, "Unable to commit fragment, could be activity as been killed in background. " + exception.toString());
-        }
+        mFragmentStackManager.changeFragment(
+                this,
+                frag,
+                saveInBackstack,
+                animate,
+                sharedView,
+                sharedName);
     }
 
     /**
@@ -371,21 +332,15 @@ public class MainActivity extends AppCompatActivity
      * @param website the website specification to be displayed in the fragment
      */
     private void changeAnecdoteFragment(Website website, WebsitePage websitePage) {
-        Fragment fragment = Fragment.instantiate(this, AnecdoteFragment.class.getName());
-        Bundle bundle = new Bundle();
-        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_PARENT_SLUG, website.slug);
-        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_PAGE_SLUG, websitePage.slug);
-        bundle.putString(AnecdoteFragment.ARGS_WEBSITE_NAME, website.name + " " + websitePage.name);
-        fragment.setArguments(bundle);
-        changeFragment(fragment, true, false);
+        changeFragment(AnecdoteFragment.newInstance(website, websitePage), true, false);
     }
 
     private void resetAnecdoteServices() {
         mWebsites = SpStorage.getWebsites(this);
 
         mServiceProvider.unregister(EventBus.getDefault());
-        mServiceProvider.createAnecdoteService(mWebsites);
-        mServiceProvider.register(EventBus.getDefault(), this);
+        mServiceProvider.createAnecdoteService(this, mWebsites);
+        mServiceProvider.register(EventBus.getDefault());
 
         if (!mWebsites.isEmpty()) {
             changeAnecdoteFragment(mWebsites.get(0), mWebsites.get(0).pages.get(0));
@@ -458,13 +413,17 @@ public class MainActivity extends AppCompatActivity
             });
         }
 
+        navigationViewMenu.add(R.id.drawer_group_favorites, Menu.NONE, Menu.NONE, R.string.action_favoris)
+                .setIcon(R.drawable.ic_favorite_white_24dp);
+        navigationViewMenu.setGroupCheckable(R.id.drawer_group_favorites, true, true);
+
         navigationViewMenu.add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_add)
-                .setIcon(R.drawable.ic_action_content_add);
+                .setIcon(R.drawable.ic_add_white_24dp);
 
         if (addNewNotification) {
             navigationViewMenu
                     .add(R.id.drawer_group_action, Menu.NONE, Menu.NONE, R.string.action_website_newwebsite)
-                    .setIcon(R.drawable.ic_action_info_outline);
+                    .setIcon(R.drawable.ic_info_outline_white_24dp);
         }
 
         navigationViewMenu.setGroupCheckable(R.id.drawer_group_content, true, true);
@@ -528,16 +487,15 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeTitle(ChangeTitleEvent event) {
-        if (event.websiteSlug != null) {
-
-            AnecdoteService anecdoteService = getAnecdoteService(event.websiteSlug);
+        if(event.spinnerEnable) {
+            AnecdoteService anecdoteService = getAnecdoteService(event.additionalTitle);
             if (anecdoteService != null) {
-                int selectedItem = mToolbarSpinnerAdapter.populate(anecdoteService.getWebsite(), event.websiteSlug);
+                int selectedItem = mToolbarSpinnerAdapter.populate(anecdoteService.getWebsite(), event.additionalTitle);
                 mToolbarSpinnerAdapter.notifyDataSetChanged();
                 mToolbarSpinner.setSelection(selectedItem);
             }
 
-            /**
+            /*
              * When the current toolbar is not displaying an AnecdoteFragment and that we want to display an
              * AnecdoteFragment now, we need to set back the scrollflags.
              */
@@ -546,15 +504,12 @@ public class MainActivity extends AppCompatActivity
                 params.setScrollFlags(mToolbarScrollFlags);
             }
 
-            mToolbar.setTitle("");
-            mToolbarSpinner.setVisibility(View.VISIBLE);
-
-            for (int i = 0; i < mWebsites.size(); i++) {
-                if (mWebsites.get(i).slug.equals(event.websiteSlug)) {
-                    //mToolbar.setTitle(mWebsites.get(i).name);
-                    mNavigationView.getMenu().getItem(i).setChecked(true);
-                    break;
-                }
+            if(anecdoteService != null && anecdoteService.getWebsite().pages.size() > 1){
+                mToolbar.setTitle("");
+                mToolbarSpinner.setVisibility(View.VISIBLE);
+            } else {
+                mToolbar.setTitle(event.title);
+                mToolbarSpinner.setVisibility(View.GONE);
             }
         } else {
             if (getSupportActionBar() != null) {
@@ -564,6 +519,15 @@ public class MainActivity extends AppCompatActivity
             mToolbar.setTitle(event.title);
             AppBarLayout.LayoutParams params = (AppBarLayout.LayoutParams) mToolbar.getLayoutParams();
             params.setScrollFlags(0);
+        }
+
+        Menu menu = mNavigationView.getMenu();
+        for (int i = 0; i < mNavigationView.getMenu().size(); i++) {
+            if (menu.getItem(i).getTitle().equals(event.title)) {
+                mNavigationView.getMenu().getItem(i).setChecked(true);
+            } else {
+                mNavigationView.getMenu().getItem(i).setChecked(false);
+            }
         }
     }
 
@@ -589,57 +553,6 @@ public class MainActivity extends AppCompatActivity
         resetAnecdoteServices();
         populateNavigationView(false);
         EventBus.getDefault().post(new UpdateAnecdoteFragmentEvent());
-    }
-
-    @Subscribe
-    public void onFullscreenEvent(FullscreenEvent event) {
-        Fragment fragment;
-        Bundle bundle = new Bundle();
-
-        bundle.putString(FullscreenFragment.BUNDLE_ANECDOTE, new Gson().toJson(event.anecdote));
-        bundle.putString(FullscreenFragment.BUNDLE_WEBSITENAME, event.websiteName);
-
-        switch (event.type) {
-            case FullscreenEvent.TYPE_IMAGE:
-                fragment = Fragment.instantiate(this, FullscreenImageFragment.class.getName());
-
-                // Note that we need the API version check here because the actual transition classes (e.g. Fade)
-                // are not in the support library and are only available in API 21+. The methods we are calling on the Fragment
-                // ARE available in the support library (though they don't do anything on API < 21)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    fragment.setSharedElementEnterTransition(new ImageTransitionSet());
-                    fragment.setEnterTransition(new Fade());
-                    event.currentFragment.setExitTransition(new Fade());
-                    fragment.setSharedElementReturnTransition(new ImageTransitionSet());
-                }
-
-                bundle.putString(FullscreenImageFragment.BUNDLE_IMAGEURL, event.anecdote.media);
-                fragment.setArguments(bundle);
-
-                changeFragment(fragment, true, false, event.transitionView, event.transitionName);
-                break;
-            case FullscreenEvent.TYPE_VIDEO:
-                fragment = Fragment.instantiate(this, FullscreenVideoFragment.class.getName());
-
-                // Note that we need the API version check here because the actual transition classes (e.g. Fade)
-                // are not in the support library and are only available in API 21+. The methods we are calling on the Fragment
-                // ARE available in the support library (though they don't do anything on API < 21)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                    fragment.setSharedElementEnterTransition(new ImageTransitionSet());
-                    fragment.setEnterTransition(new Fade());
-                    event.currentFragment.setExitTransition(new Fade());
-                    fragment.setSharedElementReturnTransition(new ImageTransitionSet());
-                }
-
-                bundle.putString(FullscreenVideoFragment.BUNDLE_VIDEOURL, event.anecdote.media);
-                fragment.setArguments(bundle);
-
-                changeFragment(fragment, true, false, event.transitionView, event.transitionName);
-                break;
-            default:
-                Log.d(TAG, "Not managed text type");
-                break;
-        }
     }
 
     @Subscribe
@@ -683,7 +596,7 @@ public class MainActivity extends AppCompatActivity
         if (!event.isSuccessful) return;
         if (mWebsites == null || mWebsites.isEmpty()) return;
 
-        /****
+        /*
          * Check remote website and local to update local configuration if needed
          */
         Website tempWebsite;
@@ -736,8 +649,8 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Subscribe
-    public void onDisplaySnackbarEvent(final DisplaySnackbarEvent event){
-        if(mSnackbar != null && mSnackbar.isShownOrQueued()){
+    public void onDisplaySnackbarEvent(final DisplaySnackbarEvent event) {
+        if (mSnackbar != null && mSnackbar.isShownOrQueued()) {
             mSnackbar.dismiss();
         }
 

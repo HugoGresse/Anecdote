@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 
 import butterknife.BindView;
@@ -31,7 +32,6 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
     private static final  String TAG         = ImageViewHolder.class.getSimpleName();
     private static final int    RETRY_COUNT = 2;
 
-    private String mWebsiteName;
     private int mRetried;
     @Nullable
     private String mImageUrl;
@@ -57,15 +57,12 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
     @Override
     public void setData(int position, boolean isExpanded, String websiteName, Anecdote anecdote) {
         super.setData(position, isExpanded, websiteName, anecdote);
-        String log = "setData: url:" + anecdote.media + " text:" + anecdote.text;
 
         ViewCompat.setTransitionName(mImageView, String.valueOf(position) + "_image");
 
         reset();
         mImageUrl = anecdote.media;
         loadImage();
-
-        Log.d(TAG, log);
     }
 
     @Override
@@ -104,12 +101,13 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
             return;
         }
 
+        GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(mImageView);
+
         Glide.with(mImageView.getContext())
                 .load(mImageUrl)
-                .fitCenter()
-                .error(R.drawable.ic_error_white_24dp)
                 .listener(this)
-                .into(mImageView);
+                .error(R.drawable.ic_error_white_24dp)
+                .into(imageViewTarget);
 
         mImageView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -139,7 +137,6 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
 
     @Override
     public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-        Log.d(TAG, "ResourceReady : " + mImageUrl + " isFromMemoryCache? " + isFromMemoryCache +" isFirstResource? " + isFirstResource);
         //reset();
         return false;
     }

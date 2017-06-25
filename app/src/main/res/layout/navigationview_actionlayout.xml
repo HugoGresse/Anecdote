@@ -5,5 +5,5 @@
     android:layout_width="wrap_content"
     android:layout_height="match_parent"
     android:background="@android:color/transparent"
-    android:src="@drawable/ic_action_navigation_more_vert"
+    android:src="@drawable/ic_more_vert_white_24dp"
     android:contentDescription="@string/action_website"/>

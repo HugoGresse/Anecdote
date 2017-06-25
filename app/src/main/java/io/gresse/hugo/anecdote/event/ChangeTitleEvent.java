@@ -2,6 +2,8 @@ package io.gresse.hugo.anecdote.event;
 
 import android.support.annotation.Nullable;
 
+import io.gresse.hugo.anecdote.util.TitledFragment;
+
 /**
  * Requested when we need ot change the Toolbar title
  * <p/>
@@ -9,24 +11,19 @@ import android.support.annotation.Nullable;
  */
 public class ChangeTitleEvent implements Event {
 
-    @Nullable
     public String  title;
     @Nullable
-    public String  className;
-    @Nullable
-    public String websiteSlug;
+    public String  additionalTitle;
+    public boolean spinnerEnable;
 
-    public ChangeTitleEvent(@Nullable String title, @Nullable String className) {
+    public ChangeTitleEvent(String title) {
         this.title = title;
-        this.className = className;
+        this.spinnerEnable = false;
     }
 
-    /**
-     * If it's a website (parent) related event
-     *
-     * @param websiteSlug the website (parent) displayed
-     */
-    public ChangeTitleEvent(@Nullable String websiteSlug) {
-        this.websiteSlug = websiteSlug;
+    public ChangeTitleEvent(TitledFragment fragment, String additionalSlug, boolean spinnerEnable) {
+        this.title = fragment.getTitle();
+        this.additionalTitle = additionalSlug;
+        this.spinnerEnable = spinnerEnable;
     }
 }

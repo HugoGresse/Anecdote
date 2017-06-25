@@ -30,7 +30,7 @@ import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.WebsiteViewHolderListener;
-import io.gresse.hugo.anecdote.anecdote.fragment.WebsiteDialogFragment;
+import io.gresse.hugo.anecdote.anecdote.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.api.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.api.event.OnRemoteWebsiteResponseEvent;
 import io.gresse.hugo.anecdote.api.model.Website;
@@ -115,9 +115,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
-        EventBus.getDefault().post(new ChangeTitleEvent(
-                getString(R.string.dialog_websitechooser_title),
-                this.getClass().getName()));
+        EventBus.getDefault().post(new ChangeTitleEvent(getString(R.string.dialog_websitechooser_title)));
 
         MainActivity mainActivity = ((MainActivity) getActivity());
         if (mainActivity.getWebsiteApiService().isWebsitesDownloaded()) {

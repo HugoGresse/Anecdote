@@ -8,11 +8,9 @@ package io.gresse.hugo.anecdote.anecdote.service.event;
 public class OnAnecdoteLoadedEvent extends AnecdoteEvent {
 
     public int numberOfItemLoaded;
-    public int page;
 
-    public OnAnecdoteLoadedEvent(String websitePageSlug, int numberOfItemLoaded, int page) {
+    public OnAnecdoteLoadedEvent(String websitePageSlug, int numberOfItemLoaded) {
         super(websitePageSlug);
         this.numberOfItemLoaded = numberOfItemLoaded;
-        this.page = page;
     }
 }

@@ -1,9 +1,13 @@
 package io.gresse.hugo.anecdote.anecdote.list;
 
+import android.graphics.Color;
 import android.os.Build;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -43,6 +47,9 @@ public class MixedBaseViewHolder
     @SuppressWarnings("WeakerAccess")
     @BindView(R.id.separator)
     public View mSeparatorView;
+
+    @BindView(R.id.favoritesButton)
+    public ImageButton mFavoriteButton;
 
     public MixedBaseViewHolder(View itemView,
                                AdapterListener adapterListener,
@@ -100,6 +107,15 @@ public class MixedBaseViewHolder
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 itemView.setElevation(8);
             }
+            if(mCurrentAnecdote.isFavorite()){
+                DrawableCompat.setTint(
+                        mFavoriteButton.getDrawable(),
+                        ContextCompat.getColor(mFavoriteButton.getContext(), R.color.favorite));
+            } else {
+                DrawableCompat.setTint(
+                        mFavoriteButton.getDrawable(),
+                        Color.WHITE);
+            }
         } else {
             mSeparatorView.setVisibility(View.GONE);
             mExpandLayout.setVisibility(View.GONE);
@@ -143,6 +159,16 @@ public class MixedBaseViewHolder
                     mAdapter.getItem(getAdapterPosition()),
                     itemView,
                     AdapterListener.ACTION_OPEN_IN_BROWSER);
+        }
+    }
+
+    @OnClick(R.id.favoritesButton)
+    public void onFavoriteClick(){
+        if (mAdapterListener != null) {
+            mAdapterListener.onClick(
+                    mAdapter.getItem(getAdapterPosition()),
+                    itemView,
+                    AdapterListener.ACTION_FAVORIS);
         }
     }
 }

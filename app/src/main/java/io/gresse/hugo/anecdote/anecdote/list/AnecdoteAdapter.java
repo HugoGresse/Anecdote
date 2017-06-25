@@ -31,6 +31,13 @@ public interface AnecdoteAdapter {
     void setData(List<Anecdote> anecdotes);
 
     /**
+     * Set if the loader as the last item should be displayed or not. Default true;
+     *
+     * @param displayLoader true if you want to display the loader
+     */
+    void setLoaderDisplay(boolean displayLoader);
+
+    /**
      * Set the text style options
      *
      * @param textSize                 size of text
