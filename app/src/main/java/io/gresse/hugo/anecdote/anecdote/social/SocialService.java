@@ -2,7 +2,7 @@ package io.gresse.hugo.anecdote.anecdote.social;
 
 import android.app.Application;
 import android.content.Intent;
-import android.net.Uri;
+import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -122,7 +122,7 @@ public class SocialService {
 
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(Uri.parse("file://" + file.getAbsolutePath()), "image/*");
+        intent.setDataAndType(FileProvider.getUriForFile(mApplication, mApplication.getPackageName() + ".provider", file), "image/*");
 
         EventBus.getDefault().post(
                 new DisplaySnackbarEvent(

@@ -29,9 +29,23 @@
         </activity>
 
         <activity
-            android:name=".anecdote.fullscreen.FullscreenActivity"
+            android:name=".anecdote.fullscreen.FullscreenImageActivity"
             android:theme="@style/AnecdoteTheme.NoActionBar">
         </activity>
+        <activity
+            android:name=".anecdote.fullscreen.FullscreenVideoActivity"
+            android:theme="@style/AnecdoteTheme.NoActionBar">
+        </activity>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
 
         <meta-data
             android:name="io.fabric.ApiKey"
