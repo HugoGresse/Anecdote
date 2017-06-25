@@ -7,7 +7,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.bumptech.glide.Glide;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -15,6 +18,7 @@ import java.net.URL;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import io.gresse.hugo.anecdote.Configuration;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
 
@@ -85,12 +89,14 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
 
         private Intent mAuthorIntent;
         private Intent mCommunityIntent;
+        private Intent mDonateIntent;
 
         @BindView(R.id.me_textview)
         public TextView authorTextView;
-
         @BindView(R.id.community_textview)
         public TextView communityTextView;
+        @BindView(R.id.donationImageView)
+        public ImageView donationImageView;
 
         public HeaderAboutViewHolder(View itemView) {
             super(itemView);
@@ -125,6 +131,12 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
             } catch (MalformedURLException e) {
                 // Do nothing
             }
+
+            mDonateIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(Configuration.DONATION_LINK));
+
+            Glide.with(donationImageView.getContext())
+                    .load("https://www.paypalobjects.com/webstatic/en_US/i/btn/png/silver-rect-paypal-60px.png")
+                    .into(donationImageView);
         }
 
         @OnClick(R.id.me_textview)
@@ -140,6 +152,14 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
             if (mOnClickListener != null) {
                 EventTracker.trackThirdPartiesClick(communityTextView.getText().toString());
                 mOnClickListener.onItemClick(mCommunityIntent);
+            }
+        }
+
+        @OnClick(R.id.donationImageView)
+        public void onDonateClick(){
+            if (mOnClickListener != null) {
+                EventTracker.trackThirdPartiesClick("Donation");
+                mOnClickListener.onItemClick(mDonateIntent);
             }
         }
     }
