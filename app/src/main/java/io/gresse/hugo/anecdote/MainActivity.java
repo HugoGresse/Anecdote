@@ -70,9 +70,7 @@ import toothpick.Scope;
 import toothpick.Toothpick;
 
 /**
- * TODO :
- * - fix Coadacy issue
- * - udpate readme with the new plan
+ * 
  */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NetworkConnectivityListener.ConnectivityListener {
