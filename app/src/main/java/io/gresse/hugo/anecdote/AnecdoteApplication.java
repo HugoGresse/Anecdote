@@ -28,12 +28,14 @@ public class AnecdoteApplication extends Application {
         MemberInjectorRegistryLocator.setRootRegistry(new io.gresse.hugo.anecdote.MemberInjectorRegistry());
         FactoryRegistryLocator.setRootRegistry(new io.gresse.hugo.anecdote.FactoryRegistry());
 
+        // Create BoxStore and supply to to Toothpick to DI
+        final BoxStore boxStore = MyObjectBox.builder().androidContext(this).build();
+
         // Open and attach smoothie module on Toothpick DI library
         Scope appScope = Toothpick.openScope(this);
         appScope.installModules(new SmoothieApplicationModule(this));
+        appScope.installModules();
 
-        // Create BoxStore and supply to to Toothpick to DI
-        final BoxStore boxStore = MyObjectBox.builder().androidContext(this).build();
         appScope.installModules(new Module() {{
             bind(BoxStore.class).toInstance(boxStore);
         }});

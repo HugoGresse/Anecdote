@@ -48,6 +48,19 @@ public abstract class FullscreenActivity extends AppCompatActivity {
     public static final  String INTENT_SERVICESLUG      = "intent_serviceslug";
     public static final  String INTENT_MEDIA_TRANSITION = "intent_mediatransition";
 
+    @Inject
+    public    ServiceProvider mServiceProvider;
+    private   String          mWebsitePageFullName;
+    protected Anecdote        mAnecdote;
+    protected String          mMediaTransitionName;
+
+    @BindView(R.id.gradientBottom)
+    public View         mGradientView;
+    @BindView(R.id.overlayLinearLayout)
+    public LinearLayout mOverlayLinearLayout;
+    @BindView(R.id.contentTextView)
+    public TextView     mContentTextView;
+
     public static Intent createIntent(Context context,
                                       int anecdoteNumber,
                                       Anecdote anecdote,
@@ -56,7 +69,7 @@ public abstract class FullscreenActivity extends AppCompatActivity {
         Intent intent;
 
         if (anecdote.type == null) {
-            throw new NullPointerException("Null anecdote type for this anecdote on " + serviceSlug);
+            throw new IllegalArgumentException("Null anecdote type for this anecdote on " + serviceSlug);
         }
 
         switch (anecdote.type) {
@@ -78,19 +91,6 @@ public abstract class FullscreenActivity extends AppCompatActivity {
 
         return intent;
     }
-
-    @Inject
-    public    ServiceProvider mServiceProvider;
-    private   String          mWebsitePageFullName;
-    protected Anecdote        mAnecdote;
-    protected String          mMediaTransitionName;
-
-    @BindView(R.id.gradientBottom)
-    public View         mGradientView;
-    @BindView(R.id.overlayLinearLayout)
-    public LinearLayout mOverlayLinearLayout;
-    @BindView(R.id.contentTextView)
-    public TextView     mContentTextView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -188,13 +188,11 @@ public abstract class FullscreenActivity extends AppCompatActivity {
     /**
      * To be implemented by child, should return a layout to be inflated.
      */
-    abstract
     @LayoutRes
-    int getLayoutRes();
-
+    protected abstract int getLayoutRes();
 
     @OnClick({R.id.shareButton, R.id.copyButton, R.id.openButton})
-    public void OnSocialClick(View v) {
+    public void onSocialClick(View v) {
         switch (v.getId()) {
             case R.id.shareButton:
                 EventBus.getDefault().post(

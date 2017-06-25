@@ -25,17 +25,16 @@ import io.objectbox.query.Query;
  * Created by Hugo Gresse on 15/06/2017.
  */
 @Singleton
-public class FavoritesRepository {
+public final class FavoritesRepository {
 
-    private static final String TAG          = FavoritesRepository.class.getSimpleName();
     public static final  int    OFFSET_QUERY = 50;
 
     private static Website sWebsite;
 
     @Inject
-    Application mApplication;
+    protected Application mApplication;
     @Inject
-    BoxStore    mBoxStore;
+    protected BoxStore    mBoxStore;
     private Box<Anecdote>   mAnecdoteBox;
     private Query<Anecdote> mAnecdoteManyQuery;
     private Query<Anecdote> mAnecdoteSingleQuery;

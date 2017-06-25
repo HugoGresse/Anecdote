@@ -31,13 +31,13 @@ import io.gresse.hugo.anecdote.event.RequestFailedEvent;
 
 public abstract class AnecdoteService {
 
-    String               mServiceName;
-    Website              mWebsite;
-    WebsitePage          mWebsitePage;
-    List<Anecdote>       mAnecdotes;
+    protected String               mServiceName;
+    protected Website              mWebsite;
+    protected WebsitePage          mWebsitePage;
+    protected List<Anecdote>       mAnecdotes;
 
     @Inject
-    FavoritesRepository mFavoritesRepository;
+    protected FavoritesRepository mFavoritesRepository;
 
     public AnecdoteService(Website website, WebsitePage websitePage) {
         mWebsite = website;
@@ -92,17 +92,17 @@ public abstract class AnecdoteService {
      * @param event      original event
      * @param pageNumber the page to download
      */
-    abstract void downloadLatest(@NonNull final Event event, final int pageNumber);
+    protected abstract void downloadLatest(@NonNull final Event event, final int pageNumber);
 
 
-    abstract void onFavoriteChange(boolean settedAsFavorite, Anecdote anecdote);
+    protected abstract void onFavoriteChange(boolean settedAsFavorite, Anecdote anecdote);
 
     /**
      * Post an Event ot UI Thread
      *
      * @param event the event to post on Bus
      */
-    void postOnUiThread(final Event event) {
+    protected void postOnUiThread(final Event event) {
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {

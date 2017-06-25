@@ -37,7 +37,7 @@ public class OfflineAnecdoteService extends AnecdoteService {
     }
 
     @Override
-    void onFavoriteChange(boolean settedAsFavorite, Anecdote anecdote) {
+    protected void onFavoriteChange(boolean settedAsFavorite, Anecdote anecdote) {
         if (!settedAsFavorite) {
             mAnecdotes.remove(anecdote);
         }

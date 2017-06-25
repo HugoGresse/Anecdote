@@ -71,8 +71,8 @@ import toothpick.Toothpick;
 
 /**
  * TODO :
- * - favoris - WIP Offline service websitePageSlug in Anecdote
- * - slide between images
+ * - fix Coadacy issue
+ * - udpate readme with the new plan
  */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NetworkConnectivityListener.ConnectivityListener {

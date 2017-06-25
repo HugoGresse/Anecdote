@@ -39,7 +39,7 @@ public class FullscreenVideoActivity extends FullscreenActivity {
     }
 
     @Override
-    int getLayoutRes() {
+    protected int getLayoutRes() {
         return R.layout.activity_fullscreen_video;
     }
 

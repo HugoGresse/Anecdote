@@ -127,7 +127,7 @@ public class OnlineAnecdoteService extends AnecdoteService {
     }
 
     @Override
-    void onFavoriteChange(boolean settedAsFavorite, Anecdote changedAnecdote) {
+    protected void onFavoriteChange(boolean settedAsFavorite, Anecdote changedAnecdote) {
         List<Anecdote> anecdoteList = new ArrayList<>();
         anecdoteList.addAll(mAnecdotes);
         int i;

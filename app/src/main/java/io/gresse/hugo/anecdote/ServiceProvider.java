@@ -40,7 +40,7 @@ public class ServiceProvider {
         mWebsiteApiService = new WebsiteApiService();
     }
 
-    void createAnecdoteService(Context context, List<Website> websites) {
+    public void createAnecdoteService(Context context, List<Website> websites) {
         Scope scope = Toothpick.openScope(context.getApplicationContext());
 
         OnlineAnecdoteService onlineAnecdoteService;
@@ -62,7 +62,7 @@ public class ServiceProvider {
         mAnecdoteServices.put(favoritesWebsitePage.slug, offlineAnecdoteService);
     }
 
-    void register(EventBus eventBus) {
+    public void register(EventBus eventBus) {
         for (Map.Entry<String, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
             eventBus.register(entry.getValue());
         }
@@ -71,7 +71,7 @@ public class ServiceProvider {
         mSocialService.register();
     }
 
-    void unregister(EventBus eventBus) {
+    public void unregister(EventBus eventBus) {
         for (Map.Entry<String, AnecdoteService> entry : mAnecdoteServices.entrySet()) {
             eventBus.unregister(entry.getValue());
         }
@@ -85,7 +85,7 @@ public class ServiceProvider {
         return mAnecdoteServices.get(websitePageSlug);
     }
 
-    WebsiteApiService getWebsiteApiService() {
+    public WebsiteApiService getWebsiteApiService() {
         return mWebsiteApiService;
     }
 }

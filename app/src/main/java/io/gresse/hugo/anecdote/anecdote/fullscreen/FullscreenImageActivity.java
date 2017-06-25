@@ -28,7 +28,7 @@ public class FullscreenImageActivity extends FullscreenActivity implements OnPho
     @BindView(R.id.imageView)
     public PhotoView mPhotoView;
 
-    RequestListener<String, GlideDrawable> mGlideRequestListener = new RequestListener<String, GlideDrawable>() {
+    private RequestListener<String, GlideDrawable> mGlideRequestListener = new RequestListener<String, GlideDrawable>() {
         @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
         @Override
         public boolean onException(Exception e, String model, Target<GlideDrawable> target,
@@ -72,7 +72,7 @@ public class FullscreenImageActivity extends FullscreenActivity implements OnPho
     }
 
     @Override
-    int getLayoutRes() {
+    protected int getLayoutRes() {
         return R.layout.activity_fullscreen_image;
     }
 
