@@ -17,6 +17,8 @@
     <string name="action_website_newwebsite">Доступны новые вебсайты</string>
     <string name="action_website_add_custom">Добавить настраив. вебсайт</string>
     <string name="copied">Скопировано в буфер</string>
+    <string name="notice_image_saved">Изображение сохранено!</string>
+
     <string name="not_implemented">Не реализовано</string>
     <string name="action_website_noteditable_toast">Нельзя править отдаленный вебсайт</string>
 
@@ -32,6 +34,7 @@
     <string name="action_share">Поделиться</string>
     <string name="action_copy">Копировать</string>
     <string name="action_open">Открыть</string>
+    <string name="action_favoris">Избранное</string>
     <string name="action_open_inbrowser">Открыть в браузере</string>
     <string name="action_retry">Повтор</string>
 
@@ -55,7 +58,7 @@
     <string name="dialog_website_page_name_hint">Имя страницы</string>
     <string name="dialog_website_url_hint">Адрес вебсайта</string>
     <string name="dialog_website_urlsuffix_hint">(опц.) Суффикс номера страницы</string>
-    <string name="dialog_website_selector_hint">DOM selector</string>
+    <string name="dialog_website_selector_hint">DOM-селектор</string>
     <string name="dialog_website_itemperpage_hint">Количество элементов на странице</string>
     <string name="dialog_website_firstpagezero_hint">Если номер первой страницы 0</string>
 
@@ -65,10 +68,11 @@
     <!-- About fragment -->
     <string name="about_title">О программе</string>
     <string name="about_made">Сделано с любовью</string>
+
     <string name="about_contentbelonging">Содержимое приложения не принадлежит Anecdote.</string>
     <string name="about_made_community">С помощью сообщества https://github.com/HugoGresse/Anecdote</string>
     <string name="using">Сторонние библиотеки</string>
-    <string name="error_server_unknown">Что-то не так с сервером</string>
+    <string name="error_server_unknown">Что-то не так с сервером :(</string>
 
     <!-- Strings related to Settings -->
     <string name="pref_cat_display">Отображение</string>
@@ -93,9 +97,11 @@
     <string name="error_processing">Что-то не так, пробуйте другие настройки вебсайта</string>
     <string name="error_responsefail">Не загружается вебсайт, ошибка %s</string>
     <string name="error_parsing">Нельзя разобрать %s вебсайт</string>
-    <string name="notice_image_saved">Изображение сохранено!</string>
+    <string name="error_nodata">Тут пусто :/</string>
 
 
+    <!-- Strings displayed only on Google Playstore. Optional, but good to have -->
+    <!-- Short description has to have less than 80 chars -->
     <string name="app_short_description">Новые цитаты (9GAG, FML, Bash.org, xkcd) каждый день в простом приложении.</string>
     <string name="app_long_description">
         Особенности:
@@ -110,8 +116,8 @@
         Anecdote - это простое и мощное приложение для чтения сайтов цитат. Очень легкое, быстрое и простое.
 
         С открытым исходным кодом на GitHub: https://github.com/HugoGresse/Anecdote
-        Контент, отображаемый в приложении не принадлежит Anecdote.
-    </string>
-    <string name="action_favoris">Избранное</string>
-    <string name="error_nodata">Пусто</string>
+        
+		Контент, отображаемый в приложении не принадлежит Anecdote.
+	</string>
+
 </resources>
