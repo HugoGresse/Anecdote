@@ -1,6 +1,7 @@
 package io.gresse.hugo.anecdote;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -10,6 +11,7 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,6 +34,7 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,8 +60,10 @@ import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.model.WebsitePage;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.DisplaySnackbarEvent;
+import io.gresse.hugo.anecdote.event.Event;
 import io.gresse.hugo.anecdote.event.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
+import io.gresse.hugo.anecdote.event.RequestPermissionEvent;
 import io.gresse.hugo.anecdote.event.ResetAppEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.setting.SettingsFragment;
@@ -70,7 +75,7 @@ import toothpick.Scope;
 import toothpick.Toothpick;
 
 /**
- * 
+ *
  */
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener, NetworkConnectivityListener.ConnectivityListener {
@@ -107,6 +112,7 @@ public class MainActivity extends AppCompatActivity
     protected int                         mToolbarScrollFlags;
     protected CoordinatorLayout.Behavior  mFragmentLayoutBehavior;
     protected FragmentStackManager        mFragmentStackManager;
+    protected Event                       mWaitingPermissionEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -262,6 +268,14 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (grantResults[0] == PackageManager.PERMISSION_GRANTED && mWaitingPermissionEvent != null) {
+            Log.v(TAG, "Permission: " + permissions[0] + " was " + grantResults[0]);
+            EventBus.getDefault().post(mWaitingPermissionEvent);
+        }
+    }
 
     @OnItemSelected(R.id.toolbarSpinner)
     public void onSpinnerSelected(AppCompatSpinner adapter, View v, int i, long lng) {
@@ -274,7 +288,7 @@ public class MainActivity extends AppCompatActivity
      * inner methods
      ***************************/
 
-    private void goToWebsite(Website website){
+    private void goToWebsite(Website website) {
         changeAnecdoteFragment(website, website.pages.get(0));
 
         // We redisplay the toolbar if it was scrollUp by removing the scrollFlags,
@@ -487,7 +501,7 @@ public class MainActivity extends AppCompatActivity
 
     @Subscribe
     public void changeTitle(ChangeTitleEvent event) {
-        if(event.spinnerEnable) {
+        if (event.spinnerEnable) {
             AnecdoteService anecdoteService = getAnecdoteService(event.additionalTitle);
             if (anecdoteService != null) {
                 int selectedItem = mToolbarSpinnerAdapter.populate(anecdoteService.getWebsite(), event.additionalTitle);
@@ -504,7 +518,7 @@ public class MainActivity extends AppCompatActivity
                 params.setScrollFlags(mToolbarScrollFlags);
             }
 
-            if(anecdoteService != null && anecdoteService.getWebsite().pages.size() > 1){
+            if (anecdoteService != null && anecdoteService.getWebsite().pages.size() > 1) {
                 mToolbar.setTitle("");
                 mToolbarSpinner.setVisibility(View.VISIBLE);
             } else {
@@ -648,8 +662,9 @@ public class MainActivity extends AppCompatActivity
                 true);
     }
 
-    @Subscribe
+    @Subscribe(sticky = true, threadMode = ThreadMode.MAIN)
     public void onDisplaySnackbarEvent(final DisplaySnackbarEvent event) {
+        EventBus.getDefault().removeStickyEvent(event);
         if (mSnackbar != null && mSnackbar.isShownOrQueued()) {
             mSnackbar.dismiss();
         }
@@ -665,6 +680,12 @@ public class MainActivity extends AppCompatActivity
                 })
                 .setDuration(event.duration)
                 .show();
+    }
+
+    @Subscribe
+    public void requestPermission(RequestPermissionEvent event) {
+        mWaitingPermissionEvent = event.callbackEvent;
+        ActivityCompat.requestPermissions(this, new String[]{event.permission}, 1);
     }
 
     /***************************

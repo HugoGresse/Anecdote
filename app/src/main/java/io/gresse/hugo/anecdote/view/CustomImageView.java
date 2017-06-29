@@ -48,7 +48,7 @@ public class CustomImageView extends android.support.v7.widget.AppCompatImageVie
         File output = new ImageSaver(getContext())
                 .setExternal(true)
                 .setDirectoryName(Configuration.DOWNLOAD_FOLDER)
-                .setFileName(getContext().getString(R.string.app_name) + "-" + System.currentTimeMillis())
+                .setFileName(getContext().getString(R.string.app_name) + "-" + System.currentTimeMillis() + ".jpg")
                 .save(bitmap);
 
         if(output != null){

@@ -1,6 +1,8 @@
 package io.gresse.hugo.anecdote.util;
 
+import android.app.Application;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
@@ -79,5 +81,19 @@ public class Utils {
         drawable.draw(canvas);
 
         return bitmap;
+    }
+
+    /**
+     * Chech if we have write permissions
+     */
+    public static boolean isStoragePermissionGranted(Application application) {
+        //noinspection SimplifiableIfStatement
+        if (Build.VERSION.SDK_INT >= 23) {
+            return application.checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED;
+        } else {
+            //permission is automatically granted on sdk<23 upon installation
+            return true;
+        }
     }
 }

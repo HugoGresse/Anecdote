@@ -52,7 +52,12 @@ public class ImageSaver {
         FileOutputStream fileOutputStream = null;
         File file = null;
         try {
-            fileOutputStream = new FileOutputStream(file = createFile());
+            file = createFile();
+            if(!file.createNewFile()){
+                Log.w(TAG, "Fail to create image file to " + file.getAbsolutePath());
+                return null;
+            }
+            fileOutputStream = new FileOutputStream(file);
             Log.d(TAG, "Saving image to " + file.getAbsolutePath());
             bitmapImage.compress(Bitmap.CompressFormat.PNG, 100, fileOutputStream);
 
@@ -63,6 +68,7 @@ public class ImageSaver {
                 mContext.getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values);
             }
         } catch (Exception e) {
+            Log.w(TAG, "Fail to save image " + ((file != null) ? file.getAbsolutePath() : ""));
             e.printStackTrace();
         } finally {
             mContext = null;
@@ -81,9 +87,13 @@ public class ImageSaver {
     private File createFile() {
         File directory;
         if (mExternal) {
-            directory = new File(Environment.getExternalStorageDirectory() + "/" + mDirectoryName);
+            directory = new File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                    mDirectoryName);
             if(!directory.exists()) {
-                directory.mkdir();
+                if(!directory.mkdirs()){
+                    Log.w(TAG, "Unable to make Anecdote picture folder " + directory.getAbsolutePath());
+                }
             }
         } else {
             directory = mContext.getDir(mDirectoryName, Context.MODE_PRIVATE);
