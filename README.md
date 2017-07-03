@@ -1,6 +1,6 @@
 # Anecdote 
 
-Android app that simply display videos, images and text from the best sources  (9GAG, XKCD, CommitStrip, VDM/FML (viedemerde.fr), DTC (danstonchat.com), Se couchez moins bête, Bash.org). 
+Android app that simply display videos, images and text from the best sources  (9GAG, XKCD, CommitStrip, DTC (danstonchat.com), Se couchez moins bête, Bash.org). 
 
 This is a Free and Open Source Software (FOSS).
 
@@ -32,7 +32,6 @@ Features
     - 9GAG, 
     - xkcd
     - CommitStrip (FR & EN)
-    - VDM/FML (viedemerde.fr), 
     - DTC (danstonchat.com), 
     - Se couchez moins bête, 
     - Bash.org,
