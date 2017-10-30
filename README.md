@@ -26,6 +26,10 @@ This is a Free and Open Source Software (FOSS).
 
 _The application content does not belong to the application._
 
+<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/GLNEizAHyYif3D2Sb46Vfx1q/HugoGresse/Anecdote'>
+  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/GLNEizAHyYif3D2Sb46Vfx1q/HugoGresse/Anecdote.svg' />
+</a>
+
 Features
 --------
 - Sources: 
