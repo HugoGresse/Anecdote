@@ -9,7 +9,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import butterknife.OnLongClick;
 import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.view.PlayerView;
+import io.gresse.hugo.anecdote.view.PlayerContainerView;
 
 /**
  * Display an a video in fullscreen.
@@ -21,8 +21,8 @@ import io.gresse.hugo.anecdote.view.PlayerView;
 
 public class FullscreenVideoActivity extends FullscreenActivity {
 
-    @BindView(R.id.playerView)
-    public PlayerView mPlayerView;
+    @BindView(R.id.playerContainer)
+    public PlayerContainerView mPlayerView;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -35,6 +35,7 @@ public class FullscreenVideoActivity extends FullscreenActivity {
 
         if (!TextUtils.isEmpty(mAnecdote.media)) {
             mPlayerView.setVideoUrl(mAnecdote.media);
+            mPlayerView.setControllerDisplay(true);
         }
     }
 
@@ -43,12 +44,12 @@ public class FullscreenVideoActivity extends FullscreenActivity {
         return R.layout.activity_fullscreen_video;
     }
 
-    @OnClick(R.id.playerView)
+    @OnClick(R.id.playerContainer)
     public void onClick(){
         super.toggleOverlayVisibility();
     }
 
-    @OnLongClick(R.id.playerView)
+    @OnLongClick(R.id.playerContainer)
     public boolean onLongClick(){
         super.onContentLongTouch(mAnecdote.media, null);
         return true;

@@ -3,6 +3,7 @@ package io.gresse.hugo.anecdote.anecdote.like;
 import android.app.Application;
 import android.content.Context;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import java.util.List;
 
@@ -74,10 +75,13 @@ public final class FavoritesRepository {
      */
     @Nullable
     public Anecdote isFavorite(Anecdote anecdote) {
-        return mAnecdoteSingleQuery
-                .setParameter(Anecdote_.text, anecdote.text)
-                .setParameter(Anecdote_.websitePageSlug, anecdote.websitePageSlug)
-                .findFirst();
+        mAnecdoteSingleQuery.setParameter(Anecdote_.websitePageSlug, anecdote.websitePageSlug);
+
+        if(!TextUtils.isEmpty(anecdote.text)){
+            mAnecdoteSingleQuery.setParameter(Anecdote_.text, anecdote.text);
+        }
+        
+        return mAnecdoteSingleQuery.findFirst();
     }
 
     /**

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<merge xmlns:android="http://schemas.android.com/apk/res/android">
+<merge xmlns:app="http://schemas.android.com/apk/res-auto"
+       xmlns:android="http://schemas.android.com/apk/res/android">
 
     <!--icon padding : 35%; button size : 32dp + 16dp padding-->
 
@@ -15,7 +16,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/action_share"
             style="@style/BottomActionButton"
-            android:src="@drawable/ic_share_white_24dp"/>
+            app:srcCompat="@drawable/ic_share_white_24dp"/>
 
         <ImageButton
             android:id="@+id/copyButton"
@@ -23,7 +24,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/action_copy"
             style="@style/BottomActionButton"
-            android:src="@drawable/ic_content_copy_white_24dp"/>
+            app:srcCompat="@drawable/ic_content_copy_white_24dp"/>
 
         <ImageButton
             android:id="@+id/openButton"
@@ -31,7 +32,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/action_open"
             style="@style/BottomActionButton"
-            android:src="@drawable/ic_open_in_browser_white_24dp"/>
+            app:srcCompat="@drawable/ic_open_in_browser_white_24dp"/>
 
         <ImageButton
             android:id="@+id/favoritesButton"
@@ -39,7 +40,7 @@
             android:layout_height="wrap_content"
             android:contentDescription="@string/action_open"
             style="@style/BottomActionButton"
-            android:src="@drawable/ic_favorite_white_24dp"/>
+            app:srcCompat="@drawable/ic_favorite_white_24dp"/>
 
     </LinearLayout>
 

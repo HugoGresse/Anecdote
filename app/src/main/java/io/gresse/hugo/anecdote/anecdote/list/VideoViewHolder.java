@@ -6,7 +6,7 @@ import android.view.View;
 import butterknife.BindView;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
-import io.gresse.hugo.anecdote.view.PlayerView;
+import io.gresse.hugo.anecdote.view.PlayerContainerView;
 
 /**
  * Display videos in a view to be used by RecyclerView as an ViewHolder
@@ -16,8 +16,8 @@ import io.gresse.hugo.anecdote.view.PlayerView;
 public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
 
     @SuppressWarnings("WeakerAccess")
-    @BindView(R.id.exoplayerView)
-    public PlayerView mPlayerView;
+    @BindView(R.id.playerContainer)
+    public PlayerContainerView mPlayerView;
 
     public VideoViewHolder(View itemView,
                            AdapterListener adapterListener,
@@ -38,6 +38,7 @@ public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClick
         super.setData(position, isExpanded, websiteName, anecdote);
         if (mPlayerView != null && anecdote.media != null) {
             mPlayerView.setVideoUrl(anecdote.media);
+            mPlayerView.setControllerDisplay(false);
         }
 
         ViewCompat.setTransitionName(mPlayerView, String.valueOf(position) + "_video");
@@ -45,7 +46,7 @@ public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClick
 
     @Override
     public void onClick(View v) {
-        if (!(v instanceof PlayerView)) {
+        if (!(v instanceof PlayerContainerView)) {
             super.onClick(v);
             return;
         }

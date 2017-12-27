@@ -2,6 +2,8 @@ package io.gresse.hugo.anecdote.anecdote.social;
 
 import android.app.Application;
 import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.support.v4.content.FileProvider;
 import android.text.TextUtils;
 import android.widget.Toast;
@@ -17,6 +19,7 @@ import javax.inject.Singleton;
 import io.gresse.hugo.anecdote.Configuration;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.event.DisplaySnackbarEvent;
+import io.gresse.hugo.anecdote.event.RequestPermissionEvent;
 import io.gresse.hugo.anecdote.tracking.EventTracker;
 import io.gresse.hugo.anecdote.util.Utils;
 import io.gresse.hugo.anecdote.util.chrome.ChromeCustomTabsManager;
@@ -113,6 +116,11 @@ public class SocialService {
     public void onSaveFileAnecdote(SaveAndShareAnecdoteEvent event) {
         if (mApplication == null) return;
 
+        if(!Utils.isStoragePermissionGranted(mApplication)){
+            EventBus.getDefault().post(new RequestPermissionEvent(android.Manifest.permission.WRITE_EXTERNAL_STORAGE, event));
+            return;
+        }
+
         File file = event.customImageView.saveImage();
 
         if (file == null) {
@@ -122,9 +130,15 @@ public class SocialService {
 
         Intent intent = new Intent();
         intent.setAction(Intent.ACTION_VIEW);
-        intent.setDataAndType(FileProvider.getUriForFile(mApplication, mApplication.getPackageName() + ".provider", file), "image/*");
+        intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.M){
+            intent.setDataAndType(FileProvider.getUriForFile(mApplication, mApplication.getPackageName() + ".provider", file), "image/*");
+        } else {
+            intent.setDataAndType(Uri.parse("file://" + file.getAbsolutePath()), "image/*");
 
-        EventBus.getDefault().post(
+        }
+
+        EventBus.getDefault().postSticky(
                 new DisplaySnackbarEvent(
                         mApplication.getString(R.string.notice_image_saved),
                         mApplication.getString(R.string.action_open),
