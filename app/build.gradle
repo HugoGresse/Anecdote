@@ -32,8 +32,8 @@ android {
         applicationId "io.gresse.hugo.anecdote"
         minSdkVersion 16
         targetSdkVersion 26
-        versionCode 24
-        versionName "1.2.0"
+        versionCode 25
+        versionName "1.2.1"
 
         vectorDrawables.useSupportLibrary = true
 
@@ -118,15 +118,13 @@ dependencies {
     compile "com.android.support:design:${androidSupportLibraries}"
     compile "com.android.support:recyclerview-v7:${androidSupportLibraries}"
     compile "com.android.support:customtabs:${androidSupportLibraries}"
-    compile('io.gresse.hugo.simpleexoplayer:library:0.1.4@aar') {
-        transitive = true;
-    }
     compile 'com.squareup.okhttp3:okhttp:3.4.1'
-
     annotationProcessor 'com.github.stephanenicolas.toothpick:toothpick-compiler:1.0.6'
     compile 'com.github.stephanenicolas.toothpick:toothpick-runtime:1.0.6'
     compile 'com.github.stephanenicolas.toothpick:smoothie:1.0.6'
     compile 'org.greenrobot:eventbus:3.0.0'
+    compile 'com.google.android.exoplayer:exoplayer-core:r2.4.2'
+    compile 'com.google.android.exoplayer:exoplayer-ui:r2.4.2'
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'org.jsoup:jsoup:1.8.3'
     compile 'com.github.bumptech.glide:glide:3.7.0'
