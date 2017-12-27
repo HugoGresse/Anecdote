@@ -1,0 +1,806 @@
+{
+  "v1" : {
+    "websites" : {
+      "9gag" : {
+        "additionalMixedContentItem" : {
+          "attribute" : "data-mp4",
+          "fallbackItem" : {
+            "attribute" : "src",
+            "selector" : ".badge-post-container > a > img",
+            "type" : 3
+          },
+          "selector" : ".badge-post-container > a > div",
+          "type" : 4
+        },
+        "contentItem" : {
+          "selector" : "header > h2 > a",
+          "type" : 0
+        },
+        "id" : 5,
+        "isFirstPageZero" : true,
+        "isSinglePage" : false,
+        "itemPerPage" : 10,
+        "like" : 10,
+        "name" : "9GAG Hot",
+        "paginationItem" : {
+          "attribute" : "href",
+          "prefix" : "http://9gag.com",
+          "selector" : ".badge-list-view-element > .loading > .badge-load-more-post",
+          "type" : 2
+        },
+        "selector" : ".badge-entry-collection > article",
+        "slug" : "api-9gag",
+        "source" : "remote",
+        "url" : "http://9gag.com/",
+        "urlItem" : {
+          "attribute" : "href",
+          "prefix" : "http://9gag.com",
+          "selector" : "header > h2 > a",
+          "type" : 1
+        },
+        "version" : 1
+      },
+      "9gagtrending" : {
+        "additionalMixedContentItem" : {
+          "attribute" : "data-mp4",
+          "fallbackItem" : {
+            "attribute" : "src",
+            "selector" : ".badge-post-container > a > img",
+            "type" : 3
+          },
+          "selector" : ".badge-post-container > a > div",
+          "type" : 4
+        },
+        "contentItem" : {
+          "selector" : "header > h2 > a",
+          "type" : 0
+        },
+        "id" : 9,
+        "isFirstPageZero" : true,
+        "isSinglePage" : false,
+        "itemPerPage" : 10,
+        "like" : 10,
+        "name" : "9GAG Trending",
+        "paginationItem" : {
+          "attribute" : "href",
+          "prefix" : "http://9gag.com",
+          "selector" : ".badge-list-view-element > .loading > .badge-load-more-post",
+          "type" : 2
+        },
+        "selector" : ".badge-entry-collection > article",
+        "slug" : "api-9gag-trending",
+        "source" : "remote",
+        "url" : "http://9gag.com/trending",
+        "urlItem" : {
+          "attribute" : "href",
+          "prefix" : "http://9gag.com",
+          "selector" : "header > h2 > a",
+          "type" : 1
+        },
+        "version" : 1
+      },
+      "Dans ton chat" : {
+        "contentItem" : {
+          "replaceMap" : {
+            "<%2Fspan>" : "</font><%2Fb>",
+            "<span class=\"decoration\">" : "<b><font color='#FF9800'>"
+          }
+        },
+        "id" : 1,
+        "isSinglePage" : false,
+        "itemPerPage" : 25,
+        "like" : 2,
+        "name" : "Dans ton chat",
+        "selector" : "div > div > div > p > a",
+        "slug" : "api-dtc",
+        "source" : "remote",
+        "url" : "http://danstonchat.com/latest/",
+        "urlItem" : {
+          "attribute" : "href"
+        },
+        "urlSuffix" : ".html",
+        "version" : 5
+      },
+      "FML" : {
+        "contentItem" : {
+          "selector" : "p.content > a"
+        },
+        "id" : 4,
+        "isFirstPageZero" : true,
+        "isSinglePage" : false,
+        "itemPerPage" : 13,
+        "name" : "Fuck my life",
+        "selector" : "#wrapper_content > div > .post.article",
+        "slug" : "api-fml",
+        "source" : "remote",
+        "url" : "http://fmylife.com/?page=",
+        "urlItem" : {
+          "attribute" : "href",
+          "prefix" : "http://fmylife.com/",
+          "replaceMap" : {
+            "fml-" : ""
+          },
+          "selector" : "p.content > a"
+        },
+        "version" : 1
+      },
+      "SCMB" : {
+        "contentItem" : {
+          "replaceMap" : {
+            "En savoir plus" : ""
+          }
+        },
+        "id" : 3,
+        "isSinglePage" : false,
+        "itemPerPage" : 20,
+        "like" : 0,
+        "name" : "Se coucher moins bête",
+        "selector" : "#anecdote-list > article > div > p > a",
+        "slug" : "api-scmb",
+        "source" : "remote",
+        "url" : "http://mobile.secouchermoinsbete.fr/?page=",
+        "urlItem" : {
+          "attribute" : "href",
+          "prefix" : "http://mobile.secouchermoinsbete.fr"
+        },
+        "version" : 2
+      },
+      "Vie de merde" : {
+        "contentItem" : {
+          "selector" : "p.content > a"
+        },
+        "id" : 2,
+        "isFirstPageZero" : true,
+        "isSinglePage" : false,
+        "itemPerPage" : 13,
+        "like" : 3,
+        "name" : "Vie de merde",
+        "selector" : "#wrapper_content > div > .post.article",
+        "slug" : "api-vdm",
+        "source" : "remote",
+        "url" : "http://viedemerde.fr/?page=",
+        "urlItem" : {
+          "attribute" : "href",
+          "prefix" : "http://viedemerde.fr",
+          "selector" : "p.content > a"
+        },
+        "version" : 1
+      },
+      "bashorg" : {
+        "contentItem" : {
+          "replaceMap" : {
+            "&gt;" : "&gt;</font></b>",
+            "&lt;" : "<b><font color='#FF9800'>&lt; "
+          }
+        },
+        "id" : 7,
+        "isFirstPageZero" : false,
+        "isSinglePage" : true,
+        "itemPerPage" : 50,
+        "like" : 1,
+        "name" : "Bash.org",
+        "selector" : ".qt",
+        "slug" : "api-bashorg",
+        "source" : "remote",
+        "url" : "http://bash.org/?latest",
+        "version" : 1
+      },
+      "expressionalacon" : {
+        "contentItem" : {
+          "selector" : "a"
+        },
+        "id" : 11,
+        "isFirstPageZero" : true,
+        "like" : 0,
+        "name" : "Expressions à la con",
+        "selector" : ".expression_block .expression_item .expression_text",
+        "slug" : "api-expressionalacon",
+        "source" : "remote",
+        "url" : "http://www.expressionsalacon.com/expressions.php?action=accueil&p=",
+        "urlItem" : {
+          "attribute" : "href",
+          "selector" : "a"
+        },
+        "version" : 1
+      }
+    }
+  },
+  "v2" : {
+    "websites" : {
+      "9gag" : {
+        "like" : 10,
+        "name" : "9GAG",
+        "pages" : [ {
+          "content" : {
+            "items" : [ {
+              "selector" : "header > h2 > a",
+              "type" : "text"
+            }, {
+              "attribute" : "data-mp4",
+              "priority" : 1,
+              "selector" : ".badge-post-container > a > div",
+              "type" : "video"
+            }, {
+              "attribute" : "src",
+              "priority" : 2,
+              "selector" : ".badge-post-container > a > img",
+              "type" : "image"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://9gag.com",
+              "selector" : "header > h2 > a"
+            }
+          },
+          "isFirstPageZero" : true,
+          "isSinglePage" : false,
+          "name" : "Hot",
+          "pagination" : {
+            "attribute" : "href",
+            "prefix" : "http://9gag.com",
+            "selector" : ".badge-list-view-element > .loading > .badge-load-more-post"
+          },
+          "selector" : ".badge-entry-collection > article",
+          "slug" : "api-9gag-hot",
+          "url" : "http://9gag.com/"
+        }, {
+          "content" : {
+            "items" : [ {
+              "selector" : "header > h2 > a",
+              "type" : "text"
+            }, {
+              "attribute" : "data-mp4",
+              "priority" : 1,
+              "selector" : ".badge-post-container > a > div",
+              "type" : "video"
+            }, {
+              "attribute" : "src",
+              "priority" : 2,
+              "selector" : ".badge-post-container > a > img",
+              "type" : "image"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://9gag.com",
+              "selector" : "header > h2 > a"
+            }
+          },
+          "isFirstPageZero" : true,
+          "isSinglePage" : false,
+          "name" : "Trending",
+          "pagination" : {
+            "attribute" : "href",
+            "prefix" : "http://9gag.com",
+            "selector" : ".badge-list-view-element > .loading > .badge-load-more-post"
+          },
+          "selector" : ".badge-entry-collection > article",
+          "slug" : "api-9gag-trending",
+          "url" : "http://9gag.com/trending"
+        }, {
+          "content" : {
+            "items" : [ {
+              "selector" : "header > h2 > a",
+              "type" : "text"
+            }, {
+              "attribute" : "data-mp4",
+              "priority" : 1,
+              "selector" : ".badge-post-container > a > div",
+              "type" : "video"
+            }, {
+              "attribute" : "src",
+              "priority" : 2,
+              "selector" : ".badge-post-container > a > img",
+              "type" : "image"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://9gag.com",
+              "selector" : "header > h2 > a"
+            }
+          },
+          "isFirstPageZero" : true,
+          "isSinglePage" : false,
+          "name" : "Fresh",
+          "pagination" : {
+            "attribute" : "href",
+            "prefix" : "http://9gag.com",
+            "selector" : ".badge-list-view-element > .loading > .badge-load-more-post"
+          },
+          "selector" : ".badge-entry-collection > article",
+          "slug" : "api-9gag-fresh",
+          "url" : "http://9gag.com/fresh"
+        } ],
+        "slug" : "api-group-9gag",
+        "source" : "remote",
+        "version" : 2
+      },
+      "Dans ton chat" : {
+        "like" : 2,
+        "name" : "Dans ton chat",
+        "pages" : [ {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "<%2Fspan>" : "</font><%2Fb>",
+                "<span class=\"decoration\">" : "<b><font color='#FF9800'>"
+              },
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href"
+            }
+          },
+          "isSinglePage" : false,
+          "name" : "Latest",
+          "selector" : "div > div > div > p > a",
+          "slug" : "api-dtc-latest",
+          "url" : "http://danstonchat.com/latest/",
+          "urlSuffix" : ".html"
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "<%2Fspan>" : "</font><%2Fb>",
+                "<span class=\"decoration\">" : "<b><font color='#FF9800'>"
+              },
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href"
+            }
+          },
+          "isSinglePage" : true,
+          "name" : "Top 50",
+          "selector" : "div > div > div > p > a",
+          "slug" : "api-dtc-top50",
+          "url" : "http://danstonchat.com/top50/",
+          "urlSuffix" : ".html"
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "<%2Fspan>" : "</font><%2Fb>",
+                "<span class=\"decoration\">" : "<b><font color='#FF9800'>"
+              },
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href"
+            }
+          },
+          "isSinglePage" : true,
+          "name" : "Flop 50",
+          "selector" : "div > div > div > p > a",
+          "slug" : "api-dtc-flop50",
+          "url" : "http://danstonchat.com/flop50/",
+          "urlSuffix" : ".html"
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "<%2Fspan>" : "</font><%2Fb>",
+                "<span class=\"decoration\">" : "<b><font color='#FF9800'>"
+              },
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href"
+            }
+          },
+          "isSinglePage" : true,
+          "name" : "Random",
+          "selector" : "div > div > div > p > a",
+          "slug" : "api-dtc-random",
+          "url" : "http://danstonchat.com/random/",
+          "urlSuffix" : ".html"
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "<%2Fspan>" : "</font><%2Fb>",
+                "<span class=\"decoration\">" : "<b><font color='#FF9800'>"
+              },
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href"
+            }
+          },
+          "isSinglePage" : true,
+          "name" : "Random > 0",
+          "selector" : "div > div > div > p > a",
+          "slug" : "api-dtc-random0",
+          "url" : "http://danstonchat.com/random0/",
+          "urlSuffix" : ".html"
+        } ],
+        "slug" : "api-group-dtc",
+        "source" : "remote",
+        "version" : 6
+      },
+      "Nuitsansfolie" : {
+        "like" : 2,
+        "name" : "Nuit Sans Folie",
+        "pages" : [ {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "<br><br>" : "<br>"
+              },
+              "selector" : ".anecdote-excerpt > p",
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://nuitsansfolie.com",
+              "selector" : ".anecdote-title > a"
+            }
+          },
+          "isSinglePage" : false,
+          "name" : "Latest",
+          "selector" : "article.post #anecdote-content",
+          "slug" : "api-nsf-latest",
+          "url" : "http://nuitsansfolie.com/?page="
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "<br><br>" : "<br>"
+              },
+              "selector" : ".anecdote-excerpt > p",
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://nuitsansfolie.com",
+              "selector" : ".anecdote-title > a"
+            }
+          },
+          "isSinglePage" : false,
+          "name" : "Top",
+          "selector" : "article.post #anecdote-content",
+          "slug" : "api-nsf-top",
+          "url" : "http://nuitsansfolie.com/nsf?page="
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "<br><br>" : "<br>"
+              },
+              "selector" : ".anecdote-excerpt > p",
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://nuitsansfolie.com",
+              "selector" : ".anecdote-title > a"
+            }
+          },
+          "isSinglePage" : false,
+          "name" : "Worst",
+          "selector" : "article.post #anecdote-content",
+          "slug" : "api-nsf-worst",
+          "url" : "http://nuitsansfolie.com/nsf/worst?page="
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "<br><br>" : "<br>"
+              },
+              "selector" : ".anecdote-excerpt > p",
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://nuitsansfolie.com",
+              "selector" : ".anecdote-title > a"
+            }
+          },
+          "isSinglePage" : false,
+          "name" : "First",
+          "selector" : "article.post #anecdote-content",
+          "slug" : "api-nsf-first",
+          "url" : "http://nuitsansfolie.com/nsf/first?page="
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "<br><br>" : "<br>"
+              },
+              "selector" : ".anecdote-excerpt > p",
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://nuitsansfolie.com",
+              "selector" : ".anecdote-title > a"
+            }
+          },
+          "isSinglePage" : false,
+          "name" : "Fake",
+          "selector" : "article.post #anecdote-content",
+          "slug" : "api-nsf-fake",
+          "url" : "http://nuitsansfolie.com/nsf/fake?page="
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "<br><br>" : "<br>"
+              },
+              "selector" : ".anecdote-excerpt > p",
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://nuitsansfolie.com",
+              "selector" : ".anecdote-title > a"
+            }
+          },
+          "isSinglePage" : false,
+          "name" : "Random",
+          "selector" : "article.post #anecdote-content",
+          "slug" : "api-nsf-random",
+          "url" : "http://nuitsansfolie.com/nsf/random?page="
+        } ],
+        "slug" : "api-group-nsf",
+        "source" : "remote",
+        "version" : 8
+      },
+      "SCMB" : {
+        "like" : 0,
+        "name" : "Se coucher moins bête",
+        "pages" : [ {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "En savoir plus" : ""
+              },
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://mobile.secouchermoinsbete.fr"
+            }
+          },
+          "isSinglePage" : false,
+          "name" : "Latest",
+          "selector" : "#anecdote-list > article > div > p > a",
+          "slug" : "api-scmb-latest",
+          "url" : "http://mobile.secouchermoinsbete.fr/?page="
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "En savoir plus" : ""
+              },
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://mobile.secouchermoinsbete.fr"
+            }
+          },
+          "isSinglePage" : false,
+          "name" : "Top",
+          "selector" : "#anecdote-list > article > div > p > a",
+          "slug" : "api-scmb-top",
+          "url" : "http://mobile.secouchermoinsbete.fr/top?page="
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "En savoir plus" : ""
+              },
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "prefix" : "http://mobile.secouchermoinsbete.fr"
+            }
+          },
+          "isSinglePage" : false,
+          "name" : "Random",
+          "selector" : "#anecdote-list > article > div > p > a",
+          "slug" : "api-scmb-random",
+          "url" : "http://mobile.secouchermoinsbete.fr/random?page="
+        } ],
+        "slug" : "api-group-scmb",
+        "source" : "remote",
+        "version" : 2
+      },
+      "bashorg" : {
+        "like" : 1,
+        "name" : "Bash.org",
+        "pages" : [ {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "&gt;" : "&gt;</font></b>",
+                "&lt;" : "<b><font color='#FF9800'>&lt; "
+              },
+              "type" : "text"
+            } ]
+          },
+          "isFirstPageZero" : false,
+          "isSinglePage" : true,
+          "name" : "Latest",
+          "selector" : ".qt",
+          "slug" : "api-bashorg-latest",
+          "url" : "http://bash.org/?latest"
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "&gt;" : "&gt;</font></b>",
+                "&lt;" : "<b><font color='#FF9800'>&lt; "
+              },
+              "type" : "text"
+            } ]
+          },
+          "isFirstPageZero" : false,
+          "isSinglePage" : true,
+          "name" : "Top 100",
+          "selector" : ".qt",
+          "slug" : "api-bashorg-top",
+          "url" : "http://bash.org/?top"
+        }, {
+          "content" : {
+            "items" : [ {
+              "replaceMap" : {
+                "&gt;" : "&gt;</font></b>",
+                "&lt;" : "<b><font color='#FF9800'>&lt; "
+              },
+              "type" : "text"
+            } ]
+          },
+          "isFirstPageZero" : false,
+          "isSinglePage" : true,
+          "name" : "Top 200",
+          "selector" : ".qt",
+          "slug" : "api-bashorg-top2",
+          "url" : "http://bash.org/?top2"
+        } ],
+        "slug" : "api-group-bashorg",
+        "source" : "remote",
+        "version" : 1
+      },
+      "commitstripen" : {
+        "like" : 1,
+        "name" : "CommitStrip en",
+        "pages" : [ {
+          "content" : {
+            "items" : [ {
+              "selector" : ".post h1.entry-title",
+              "type" : "text"
+            }, {
+              "attribute" : "src",
+              "priority" : 1,
+              "selector" : ".post .entry-content img",
+              "type" : "image"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "selector" : ".post .entry-meta a[rel=bookmark]"
+            }
+          },
+          "isFirstPageZero" : true,
+          "isSinglePage" : false,
+          "name" : "Latest",
+          "pagination" : {
+            "attribute" : "href",
+            "selector" : "#content .excerpt:nth-child(1) a, .nav-single .nav-previous [rel=prev]"
+          },
+          "selector" : "#content",
+          "slug" : "api-commitstripen-latest",
+          "url" : "https://www.commitstrip.com/en/?"
+        } ],
+        "slug" : "api-group-commitstripen",
+        "source" : "remote",
+        "version" : 1
+      },
+      "commitstripfr" : {
+        "like" : 1,
+        "name" : "CommitStrip fr",
+        "pages" : [ {
+          "content" : {
+            "items" : [ {
+              "selector" : ".post h1.entry-title",
+              "type" : "text"
+            }, {
+              "attribute" : "src",
+              "priority" : 1,
+              "selector" : ".post .entry-content img",
+              "type" : "image"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "selector" : ".post .entry-meta a[rel=bookmark]"
+            }
+          },
+          "isFirstPageZero" : true,
+          "isSinglePage" : false,
+          "name" : "Dernières",
+          "pagination" : {
+            "attribute" : "href",
+            "selector" : "#content .excerpt:nth-child(1) a, .nav-single .nav-previous [rel=prev]"
+          },
+          "selector" : "#content",
+          "slug" : "api-commitstripfr-latest",
+          "url" : "https://www.commitstrip.com/fr/?"
+        } ],
+        "slug" : "api-group-commitstripfr",
+        "source" : "remote",
+        "version" : 1
+      },
+      "expressionalacon" : {
+        "like" : 0,
+        "name" : "Expressions à la con",
+        "pages" : [ {
+          "content" : {
+            "items" : [ {
+              "selector" : "a",
+              "type" : "text"
+            } ],
+            "url" : {
+              "attribute" : "href",
+              "selector" : "a"
+            }
+          },
+          "isFirstPageZero" : true,
+          "name" : "Latest",
+          "selector" : ".expression_block .expression_item .expression_text",
+          "slug" : "api-expressionalacon-latest",
+          "url" : "http://www.expressionsalacon.com/expressions.php?action=accueil&p="
+        } ],
+        "slug" : "api-group-expressionalacon",
+        "source" : "remote",
+        "version" : 1
+      },
+      "xkcd" : {
+        "like" : 1,
+        "name" : "xkcd",
+        "pages" : [ {
+          "content" : {
+            "items" : [ {
+              "selector" : "#ctitle",
+              "type" : "text"
+            }, {
+              "attribute" : "src",
+              "prefix" : "https:",
+              "priority" : 1,
+              "selector" : "#comic img",
+              "type" : "image"
+            }, {
+              "attribute" : "srcset",
+              "prefix" : "https:",
+              "priority" : 2,
+              "replaceMap" : {
+                "%202x" : ""
+              },
+              "selector" : "#comic img",
+              "type" : "image"
+            } ],
+            "url" : {
+              "attribute" : "src",
+              "prefix" : "https:",
+              "selector" : "#comic img"
+            }
+          },
+          "isFirstPageZero" : true,
+          "isSinglePage" : false,
+          "name" : "Latest",
+          "pagination" : {
+            "attribute" : "href",
+            "prefix" : "http://xkcd.com",
+            "selector" : ".comicNav [rel=prev]"
+          },
+          "selector" : "#middleContainer",
+          "slug" : "api-xkcd-latest",
+          "url" : "http://xkcd.com/"
+        } ],
+        "slug" : "api-group-xkcd",
+        "source" : "remote",
+        "version" : 7
+      }
+    }
+  }
+}
