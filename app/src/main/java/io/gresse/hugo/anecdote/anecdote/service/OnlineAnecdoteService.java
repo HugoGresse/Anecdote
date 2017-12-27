@@ -76,6 +76,7 @@ public class OnlineAnecdoteService extends AnecdoteService {
                     .url(url)
                     .header("User-Agent", Utils.getUserAgent(mWebsite))
                     .header("Cache-Control", " no-transform")
+                    .header("Accept", "*/*")
                     .build();
         } catch (IllegalArgumentException exception) {
             mFailEvents.add(event);
