@@ -26,54 +26,7 @@ This is a Free and Open Source Software (FOSS).
 
 _The application content does not belong to the application._
 
-<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/GLNEizAHyYif3D2Sb46Vfx1q/HugoGresse/Anecdote'>
-  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/GLNEizAHyYif3D2Sb46Vfx1q/HugoGresse/Anecdote.svg' />
-</a>
 
-Features
---------
-- Sources: 
-    - 9GAG, 
-    - xkcd
-    - CommitStrip (FR & EN)
-    - DTC (danstonchat.com), 
-    - Se couchez moins bête, 
-    - Bash.org,
-    - Expressions à la con,
-    - Nuit sans folie
-- Infinite scroll
-- Pull to refresh
-- Manually adding websites (for expert) via HTML parsing (to be improved)
-- Remote websites configuration update (no need to udpate the app when a website is no more working, the app will be updated on startup when ready)
-- No strange permissions, no ads
-
-TODO (by priority)
---------
-- Improved video preview (with controls)
-- Guide to add a website (a follow through user step)
-- Filter by country
-- Website to manage Anecdote websites
-- Offline management by task to download data at a given time
-
-
-Contribution
-------------
-Feel free to contribute to this application (fork and make a pull request). 
-
-Donations
----------
-
-This project needs you! If you would like to support this project's further development, the creator of this project or the continuous maintenance of this project, feel free to donate. Your donation is highly appreciated (and I love food, rhum and 🍻). Thank you!
-
-**PayPal**
-
-* **[Donate $5]**: Thank's for creating this project, here's a beer for you!
-* **[Donate $10]**: Keep up the good work, I love it!
-* **[Donate $50]**: I really really want to support this project, great job!
-
-or... 
-
-<a href='https://ko-fi.com/A513OEI' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://az743702.vo.msecnd.net/cdn/kofi5.png?v=0' border='0' alt='Buy Me a beer at ko-fi.com' /></a>
 
 Author
 ------
