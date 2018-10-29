@@ -1,0 +1,146 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <string name="app_name" translatable="false">Anecdote</string>
+
+    <string name="app_migration_1_0_0">Gemigreerd naar nieuwe Anecdote-versie</string>
+
+    <string name="navigation_drawer_open">Navigatiemenu openen</string>
+    <string name="navigation_drawer_close">Navigatiemenu sluiten</string>
+
+    <string name="action_settings">Instellingen</string>
+    <string name="action_feedback">Feedback versturen</string>
+    <string name="action_about">Over</string>
+    <string name="action_restore">Standaardwaarden</string>
+    <string name="action_restore_summary">Verwijdert alle websites uit de app. Kan handig zijn als sommige websites niet werken.</string>
+    <string name="action_edit">Bewerken</string>
+    <string name="action_delete">Verwijderen</string>
+    <string name="action_default">Standaard</string>
+    <string name="action_website_add">Website toevoegen</string>
+    <string name="action_website_newwebsite">Nieuwe websites beschikbaar!</string>
+    <string name="action_website_add_custom">Aangepaste website toevoegen</string>
+    <string name="copied">Gekopieerd naar klembord</string>
+    <string name="notice_image_saved">Afbeelding opgeslagen!</string>
+
+    <string name="not_implemented">Niet geïmplementeerd</string>
+    <string name="action_website_noteditable_toast">Je kunt externe websites niet bewerken.</string>
+
+    <string name="app_share_credits"> - via Anecdote http://bit.ly/anecdoteapp </string>
+
+    <string name="anecdote_share_title">Gedeeld via</string>
+    <string-array name="anecdote_content_dialog">
+        <item>Link kopiëren</item>
+        <item>Downloaden</item>
+    </string-array>
+
+
+    <string name="action_share">Delen</string>
+    <string name="action_copy">Kopiëren</string>
+    <string name="action_open">Openen</string>
+    <string name="action_favoris">Favorieten</string>
+    <string name="action_open_inbrowser">Openen in webbrowser</string>
+    <string name="action_retry">Opnieuw proberen</string>
+
+    <string name="open_intent_browser">Bezig met openen van webbrowser…</string>
+    <string name="open_intent_browser_error">De details kunnen niet worden opgehaald; controleer de URL-configuratie.</string>
+
+    <string name="action_website">Website-acties</string>
+
+    <string name="word_by">door</string>
+
+    <string name="dialog_website_new_title">Nieuwe website</string>
+    <string name="dialog_website_edit_title">Bewerken</string>
+    <string name="dialog_website_add">Toevoegen</string>
+    <string name="dialog_website_error_itemperpage">Het aantal items per pagina moet meer dan 0 zijn.</string>
+    <string name="dialog_website_error_name">Wil je geen naam opgeven?</string>
+    <string name="dialog_website_error_pagename">Paginanaam toevoegen</string>
+    <string name="dialog_website_error_url">Ontbrekende pagina-URL :(</string>
+    <string name="dialog_website_error_selector">Ontbrekende tekstselectie</string>
+    <string name="dialog_website_save">Opslaan</string>
+    <string name="dialog_website_name_hint">Websitenaam</string>
+    <string name="dialog_website_page_name_hint">Paginanaam</string>
+    <string name="dialog_website_url_hint">Website-URL</string>
+    <string name="dialog_website_urlsuffix_hint">(optioneel) Paginanummer-achtervoegsel</string>
+    <string name="dialog_website_selector_hint">DOM-selectie</string>
+    <string name="dialog_website_itemperpage_hint">Aantal elementen per pagina</string>
+    <string name="dialog_website_firstpagezero_hint">Als het eerste paginanummer 0 is</string>
+
+    <string name="dialog_websitechooser_title">Selecteer je favoriete sites</string>
+
+
+    <!-- About fragment -->
+    <string name="about_title">Over</string>
+    <string name="about_made">Met liefde gemaakt door</string>
+    <string name="about_made_person" translatable="false">Hugo Gresse http://hugo.gresse.io/</string>
+    <string name="about_contentbelonging">De applicatie-inhoud is niet afkomstig van Anecdote.</string>
+    <string name="about_made_community">Met hulp van de gemeenschap https://github.com/HugoGresse/Anecdote</string>
+    <string name="using">Bibliotheken van derde partijen</string>
+    <string name="error_server_unknown">Er is misgegaan op de server :(</string>
+    <string-array name="about_libraries" translatable="false">
+        <item>OkHttp %1$s Square http://square.github.io/okhttp/</item>
+        <item>Otto %1$s Square http://square.github.io/otto/</item>
+        <item>Gson %1$s Google http://github.com/google/gson</item>
+        <item>Jsoup %1$s Jonathan Hedley http://jsoup.org/</item>
+        <item>ButterKnife %1$s Jake Wharton http://jakewharton.github.io/butterknife/</item>
+        <item>Glide %1$s Bumptech http://github.com/bumptech/glide</item>
+        <item>PhotoView %1$s Chris Banes http://github.com/chrisbanes/PhotoView</item>
+        <item>SimpleExoPlayer %1$s Hugo Gresse http://github.com/HugoGresse/SimpleExoPlayer</item>
+    </string-array>
+
+    <!-- Strings related to Settings -->
+    <string name="pref_cat_display">Weergave</string>
+    <string name="pref_cat_advanced">Geavanceerde instellingen</string>
+    <string name="pref_rowstriping_title">Anecdote-rij-inkleuring</string>
+    <string name="pref_rowstriping_summary">Voeg een achtergrondkleur toe om citaten te kunnen onderscheiden.</string>
+    <string name="pref_textsize_title">Tekstgrootte</string>
+    <string-array name="pref_textsize_title">
+        <item>Kleinst</item>
+        <item>Klein</item>
+        <item>Normaal</item>
+        <item>Groot</item>
+        <item>Grootst</item>
+    </string-array>
+    <string name="pref_rowstriping_key" translatable="false">rowStriping</string>
+    <string name="pref_textsize_key" translatable="false">textSize</string>
+    <string name="pref_reset_key" translatable="false">reset</string>
+    <string-array name="pref_textsize_values" translatable="false">
+        <item>10</item>
+        <item>12</item>
+        <item>14</item>
+        <item>18</item>
+        <item>24</item>
+    </string-array>
+
+    <string name="anecdote_image_transition_name" translatable="false">imageTransitionName</string>
+    <string name="anecdote_video_transition_name" translatable="false">videoTransitionName</string>
+
+    <string name="error_general">Onbekende fout… </string>
+    <string name="error_nointernet">Geen internetverbinding</string>
+    <string name="error_server">Serverfout</string>
+    <string name="error_wrongconfig">Onjuiste websiteconfiguratie</string>
+    <string name="error_loadfail">%s kan niet worden geladen</string>
+    <string name="error_processing">Er is iets misgegaan; probeer een andere website-instelling.</string>
+    <string name="error_responsefail">De website kan niet worden geladen: fout %s</string>
+    <string name="error_parsing">De website %s kan niet worden verwerkt.</string>
+    <string name="error_nodata">Het is leeg :/</string>
+
+
+    <!-- Strings displayed only on Google Playstore. Optional, but good to have -->
+    <!-- Short description has to have less than 80 chars -->
+    <string name="app_short_description">Elke dag nieuwe citaten van o.a. 9GAG, FML, Bash en xkcd in een eenvoudige app</string>
+    <string name="app_long_description">
+        Mogelijkheden:
+            - 9GAG-feed (afbeeldingen en video's) met 9GAG Hot, Trending en Fresh
+            - xkcd
+            - citeert feeds van fmylife.com (FML), Bash.org, viedemerde.fr (VDM), danstonchat.com (DTC) en meer
+            - eenvoudig en effectief te gebruiken
+            - oneindig scrollen en trekken om te verversen
+            - geen dubieuze machtigingen, geen achtergrondtaken
+            - voeg, met een beetje HTML-kennis, je eigen website toe
+
+        Anecdote is een eenvoudige en krachtige applicatie om je favoriete citaatwebsites te lezen. De app is licht, niet opdringerig, snel en eenvoudig.
+
+        De broncode is te vinden op GitHub: https://github.com/HugoGresse/Anecdote
+
+        De inhoud die wordt getoond in de applicatie is niet afkomstig van Anecdote.
+    </string>
+
+</resources>
