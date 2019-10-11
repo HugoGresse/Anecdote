@@ -7,8 +7,8 @@ import android.support.annotation.NonNull;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.inject.Inject;
 
@@ -44,7 +44,7 @@ public abstract class AnecdoteService {
         mWebsitePage = websitePage;
         mServiceName = mWebsite.name.replaceAll("\\s", "") + websitePage.name + this.getClass().getSimpleName();
 
-        mAnecdotes = new ArrayList<>();
+        mAnecdotes = new CopyOnWriteArrayList<>();
     }
 
     /**
