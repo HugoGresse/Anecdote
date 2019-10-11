@@ -1,6 +1,4 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <string name="app_name" translatable="false">Anecdote</string>
-
     <string name="app_migration_1_0_0">Gemigreerd naar nieuwe Anecdote-versie</string>
 
     <string name="navigation_drawer_open">Navigatiemenu openen</string>
@@ -69,21 +67,10 @@
     <!-- About fragment -->
     <string name="about_title">Over</string>
     <string name="about_made">Met liefde gemaakt door</string>
-    <string name="about_made_person" translatable="false">Hugo Gresse http://hugo.gresse.io/</string>
     <string name="about_contentbelonging">De applicatie-inhoud is niet afkomstig van Anecdote.</string>
     <string name="about_made_community">Met hulp van de gemeenschap https://github.com/HugoGresse/Anecdote</string>
     <string name="using">Bibliotheken van derde partijen</string>
     <string name="error_server_unknown">Er is misgegaan op de server :(</string>
-    <string-array name="about_libraries" translatable="false">
-        <item>OkHttp %1$s Square http://square.github.io/okhttp/</item>
-        <item>Otto %1$s Square http://square.github.io/otto/</item>
-        <item>Gson %1$s Google http://github.com/google/gson</item>
-        <item>Jsoup %1$s Jonathan Hedley http://jsoup.org/</item>
-        <item>ButterKnife %1$s Jake Wharton http://jakewharton.github.io/butterknife/</item>
-        <item>Glide %1$s Bumptech http://github.com/bumptech/glide</item>
-        <item>PhotoView %1$s Chris Banes http://github.com/chrisbanes/PhotoView</item>
-        <item>SimpleExoPlayer %1$s Hugo Gresse http://github.com/HugoGresse/SimpleExoPlayer</item>
-    </string-array>
 
     <!-- Strings related to Settings -->
     <string name="pref_cat_display">Weergave</string>
@@ -98,19 +85,6 @@
         <item>Groot</item>
         <item>Grootst</item>
     </string-array>
-    <string name="pref_rowstriping_key" translatable="false">rowStriping</string>
-    <string name="pref_textsize_key" translatable="false">textSize</string>
-    <string name="pref_reset_key" translatable="false">reset</string>
-    <string-array name="pref_textsize_values" translatable="false">
-        <item>10</item>
-        <item>12</item>
-        <item>14</item>
-        <item>18</item>
-        <item>24</item>
-    </string-array>
-
-    <string name="anecdote_image_transition_name" translatable="false">imageTransitionName</string>
-    <string name="anecdote_video_transition_name" translatable="false">videoTransitionName</string>
 
     <string name="error_general">Onbekende fout… </string>
     <string name="error_nointernet">Geen internetverbinding</string>
@@ -128,7 +102,7 @@
     <string name="app_short_description">Elke dag nieuwe citaten van o.a. 9GAG, FML, Bash en xkcd in een eenvoudige app</string>
     <string name="app_long_description">
         Mogelijkheden:
-            - 9GAG-feed (afbeeldingen en video's) met 9GAG Hot, Trending en Fresh
+            - 9GAG-feed (afbeeldingen en video\'s) met 9GAG Hot, Trending en Fresh
             - xkcd
             - citeert feeds van fmylife.com (FML), Bash.org, viedemerde.fr (VDM), danstonchat.com (DTC) en meer
             - eenvoudig en effectief te gebruiken
