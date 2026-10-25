@@ -1,6 +1,6 @@
 package io.gresse.hugo.anecdote.anecdote.service;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import org.greenrobot.eventbus.EventBus;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import io.gresse.hugo.anecdote.anecdote.like.FavoritesRepository;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.anecdote.service.event.OnAnecdoteLoadedEvent;
 import io.gresse.hugo.anecdote.api.model.Website;
@@ -25,7 +26,6 @@ import io.gresse.hugo.anecdote.api.model.WebsitePage;
 import io.gresse.hugo.anecdote.event.Event;
 import io.gresse.hugo.anecdote.event.NetworkConnectivityChangeEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
-import io.gresse.hugo.anecdote.tracking.EventTracker;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
 import io.gresse.hugo.anecdote.util.Utils;
 import okhttp3.Call;
@@ -46,8 +46,8 @@ public class OnlineAnecdoteService extends AnecdoteService {
     private List<Event>          mFailEvents;
     private Map<Integer, String> mPaginationMap;
 
-    public OnlineAnecdoteService(Website website, WebsitePage websitePage) {
-        super(website, websitePage);
+    public OnlineAnecdoteService(Website website, WebsitePage websitePage, FavoritesRepository favoritesRepository) {
+        super(website, websitePage, favoritesRepository);
         mOkHttpClient = new OkHttpClient();
         mFailEvents = new CopyOnWriteArrayList<>();
         mPaginationMap = new HashMap<>();
@@ -198,9 +198,6 @@ public class OnlineAnecdoteService extends AnecdoteService {
                     RequestFailedEvent.ERROR_PARSING,
                     mWebsitePage.name,
                     null));
-            if (mWebsite.source.equals(Website.SOURCE_REMOTE)) {
-                EventTracker.trackWebsiteWrongConfiguration(mWebsite.name + " " + mWebsitePage.name);
-            }
         }
     }
 

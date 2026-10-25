@@ -3,8 +3,7 @@ package io.gresse.hugo.anecdote.anecdote.list;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import butterknife.BindView;
-import io.gresse.hugo.anecdote.R;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteUnknownBinding;
 
 /**
  * Display ? in a view to be used by RecyclerView as an ViewHolder
@@ -13,19 +12,13 @@ import io.gresse.hugo.anecdote.R;
  */
 public class UnknownViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
 
-    @BindView(R.id.openLinearLayout)
-    public LinearLayout mContainerLayout;
-
-    public UnknownViewHolder(View itemView,
+    public UnknownViewHolder(RowAnecdoteUnknownBinding binding,
                              AdapterListener adapterListener,
                              MixedContentAdapter adapter,
-                             int textSize,
-                             boolean rowStriping,
-                             int rowBackground,
-                             int rawStripingBackground) {
-        super(itemView, adapterListener, adapter, textSize, rowStriping, rowBackground, rawStripingBackground);
+                             RowStyle rowStyle) {
+        super(binding.getRoot(), binding.contentTextView, null, null, adapterListener, adapter, rowStyle);
 
-        mContainerLayout.setOnClickListener(this);
+        binding.openLinearLayout.setOnClickListener(this);
     }
 
     @Override
@@ -36,7 +29,7 @@ public class UnknownViewHolder extends MixedBaseViewHolder implements View.OnCli
         }
         if (mAdapterListener != null) {
             mAdapterListener.onClick(
-                    mAdapter.getItem(getAdapterPosition()),
+                    mAdapter.getItem(getBindingAdapterPosition()),
                     null, 0);
         }
     }

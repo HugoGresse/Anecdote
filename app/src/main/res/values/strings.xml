@@ -75,14 +75,14 @@
     <string name="using">Third-party libraries</string>
     <string name="error_server_unknown">Something went wrong with the server :(</string>
     <string-array name="about_libraries" translatable="false">
-        <item>OkHttp %1$s Square http://square.github.io/okhttp/</item>
-        <item>Otto %1$s Square http://square.github.io/otto/</item>
-        <item>Gson %1$s Google http://github.com/google/gson</item>
-        <item>Jsoup %1$s Jonathan Hedley http://jsoup.org/</item>
-        <item>ButterKnife %1$s Jake Wharton http://jakewharton.github.io/butterknife/</item>
-        <item>Glide %1$s Bumptech http://github.com/bumptech/glide</item>
-        <item>PhotoView %1$s Chris Banes http://github.com/chrisbanes/PhotoView</item>
-        <item>SimpleExoPlayer %1$s Hugo Gresse http://github.com/HugoGresse/SimpleExoPlayer</item>
+        <item>OkHttp %1$s Square https://square.github.io/okhttp/</item>
+        <item>EventBus %1$s greenrobot https://github.com/greenrobot/EventBus</item>
+        <item>ObjectBox %1$s ObjectBox https://objectbox.io/</item>
+        <item>Gson %1$s Google https://github.com/google/gson</item>
+        <item>Jsoup %1$s Jonathan Hedley https://jsoup.org/</item>
+        <item>Glide %1$s Bumptech https://github.com/bumptech/glide</item>
+        <item>PhotoView %1$s Chris Banes https://github.com/Baseflow/PhotoView</item>
+        <item>Media3 ExoPlayer %1$s Google https://developer.android.com/media/media3</item>
     </string-array>
 
     <!-- Strings related to Settings -->

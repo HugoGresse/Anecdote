@@ -10,44 +10,59 @@
       "properties": [
         {
           "id": "1:8524563441052311755",
-          "name": "id"
+          "name": "id",
+          "type": 6,
+          "flags": 1
         },
         {
           "id": "2:2669680598643876",
+          "name": "type",
           "indexId": "1:8322595256631981443",
-          "name": "type"
+          "type": 9,
+          "flags": 2048
         },
         {
           "id": "3:2010036673193219517",
-          "name": "text"
+          "name": "text",
+          "type": 9
         },
         {
           "id": "4:550184921709423481",
+          "name": "permalink",
           "indexId": "3:8146891815469587762",
-          "name": "permalink"
+          "type": 9,
+          "flags": 2048
         },
         {
           "id": "5:716798358658566251",
-          "name": "media"
+          "name": "media",
+          "type": 9
         },
         {
           "id": "6:135265734784455782",
+          "name": "websitePageSlug",
           "indexId": "2:8032137642762143824",
-          "name": "websitePageSlug"
+          "type": 9,
+          "flags": 2048
         },
         {
           "id": "7:627688364503299237",
-          "name": "favoritesTimestamp"
+          "name": "favoritesTimestamp",
+          "type": 6
         }
-      ]
+      ],
+      "relations": []
     }
   ],
   "lastEntityId": "1:1537627604191684808",
   "lastIndexId": "3:8146891815469587762",
+  "lastRelationId": "0:0",
   "lastSequenceId": "0:0",
-  "modelVersion": 2,
+  "modelVersion": 5,
+  "modelVersionParserMinimum": 5,
   "retiredEntityUids": [],
   "retiredIndexUids": [],
   "retiredPropertyUids": [],
+  "retiredRelationUids": [],
   "version": 1
 }

@@ -1,6 +1,6 @@
 package io.gresse.hugo.anecdote.event;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import io.gresse.hugo.anecdote.util.TitledFragment;
 

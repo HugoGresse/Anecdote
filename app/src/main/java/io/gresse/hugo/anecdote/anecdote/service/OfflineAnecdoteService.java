@@ -1,9 +1,7 @@
 package io.gresse.hugo.anecdote.anecdote.service;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
-
-import javax.inject.Inject;
 
 import io.gresse.hugo.anecdote.anecdote.like.FavoritesRepository;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
@@ -21,12 +19,8 @@ public class OfflineAnecdoteService extends AnecdoteService {
 
     private static final String TAG = OfflineAnecdoteService.class.getSimpleName();
 
-    @Inject
-    public FavoritesRepository mFavoritesRepository;
-
-    @Inject
-    public OfflineAnecdoteService(Website website, WebsitePage websitePage) {
-        super(website, websitePage);
+    public OfflineAnecdoteService(Website website, WebsitePage websitePage, FavoritesRepository favoritesRepository) {
+        super(website, websitePage, favoritesRepository);
     }
 
     @Override

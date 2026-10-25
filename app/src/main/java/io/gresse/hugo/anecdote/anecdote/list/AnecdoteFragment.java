@@ -3,19 +3,24 @@ package io.gresse.hugo.anecdote.anecdote.list;
 import android.app.ActivityOptions;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.preference.PreferenceManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.view.MenuProvider;
+import androidx.lifecycle.Lifecycle;
+import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -23,16 +28,10 @@ import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.anecdote.fullscreen.FullscreenActivity;
-import io.gresse.hugo.anecdote.anecdote.like.FavoritesRepository;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.anecdote.service.event.FavoritesEvent;
@@ -44,13 +43,12 @@ import io.gresse.hugo.anecdote.anecdote.social.OpenAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.social.ShareAnecdoteEvent;
 import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.model.WebsitePage;
+import io.gresse.hugo.anecdote.databinding.FragmentAnecdoteBinding;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.RequestFailedEvent;
-import io.gresse.hugo.anecdote.tracking.EventTracker;
 import io.gresse.hugo.anecdote.util.TitledFragment;
+import io.gresse.hugo.anecdote.util.Utils;
 import io.gresse.hugo.anecdote.view.EnhancedFrameLayout;
-import toothpick.Scope;
-import toothpick.Toothpick;
 
 /**
  * A generic anecdote fragment
@@ -72,12 +70,9 @@ public class AnecdoteFragment extends TitledFragment implements
      */
     public static final int PREFETECH_THRESHOLD = 4;
 
-    @BindView(R.id.swipeRefreshLayout)
-    public SwipeRefreshLayout  mSwipeRefreshLayout;
-    @BindView(R.id.recyclerViewContainer)
-    public EnhancedFrameLayout mRecyclerViewContainer;
-    @BindView(R.id.recyclerView)
-    public RecyclerView        mRecyclerView;
+    private SwipeRefreshLayout  mSwipeRefreshLayout;
+    private EnhancedFrameLayout mRecyclerViewContainer;
+    private RecyclerView        mRecyclerView;
 
     private   String              mWebsiteName;
     protected String              mWebsiteSlug;
@@ -86,15 +81,12 @@ public class AnecdoteFragment extends TitledFragment implements
     protected AnecdoteAdapter     mAdapter;
     @Nullable
     protected AnecdoteService     mAnecdoteService;
-    @Inject
-    protected FavoritesRepository mFavoritesRepository;
 
     private LinearLayoutManager mLayoutManager;
     private boolean             mIsLoadingNewItems;
     private boolean             mNoData;
     private boolean             mEverythingLoaded;
     private int                 mNextPageNumber;
-    private Unbinder            mUnbinder;
 
     public static AnecdoteFragment newInstance(Website website, WebsitePage page) {
         AnecdoteFragment fragment = new AnecdoteFragment();
@@ -108,32 +100,30 @@ public class AnecdoteFragment extends TitledFragment implements
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-    }
-
-    // Inflate the view for the fragment based on layout XML
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
-        View view = inflater.inflate(R.layout.fragment_anecdote, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
-        return view;
+        FragmentAnecdoteBinding binding = FragmentAnecdoteBinding.inflate(inflater, container, false);
+        mSwipeRefreshLayout = binding.swipeRefreshLayout;
+        mRecyclerViewContainer = binding.recyclerViewContainer;
+        mRecyclerView = binding.recyclerView;
+        mRecyclerView.setClipToPadding(false);
+        Utils.applyNavigationBarPadding(mRecyclerView);
+        return binding.getRoot();
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
-    }
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        requireActivity().addMenuProvider(new MenuProvider() {
+            @Override
+            public void onCreateMenu(@NonNull Menu menu, @NonNull MenuInflater menuInflater) {
+                menuInflater.inflate(R.menu.main, menu);
+            }
 
-    @Override
-    public void onViewCreated(View view, Bundle savedInstanceState) {
-        Scope scope = Toothpick.openScopes(getActivity().getApplicationContext(), this);
-        Toothpick.inject(this, scope);
-        mFavoritesRepository.setup();
+            @Override
+            public boolean onMenuItemSelected(@NonNull MenuItem menuItem) {
+                return false;
+            }
+        }, getViewLifecycleOwner(), Lifecycle.State.RESUMED);
 
         mLayoutManager = new LinearLayoutManager(getActivity());
 
@@ -146,18 +136,12 @@ public class AnecdoteFragment extends TitledFragment implements
     }
 
     @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main, menu);
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
 
         EventBus.getDefault().register(this);
         EventBus.getDefault().post(new ChangeTitleEvent(this, mPageSlug, true));
 
-        EventTracker.trackFragmentView(this, mWebsiteAndPageName, EventTracker.CONTENT_TYPE_ANECDOTE);
     }
 
     @Override
@@ -205,17 +189,8 @@ public class AnecdoteFragment extends TitledFragment implements
         // Set default values
         mIsLoadingNewItems = false;
 
-        int colorBackground;
-        int colorBackgroundStripping;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            colorBackground = getResources().getColor(R.color.rowColorBackground, null);
-            colorBackgroundStripping = getResources().getColor(R.color.rowColorBackgroundStripping, null);
-        } else {
-            // noinspection deprecation
-            colorBackground = getResources().getColor(R.color.rowColorBackground);
-            // noinspection deprecation
-            colorBackgroundStripping = getResources().getColor(R.color.rowColorBackgroundStripping);
-        }
+        int colorBackground = ContextCompat.getColor(requireContext(), R.color.rowColorBackground);
+        int colorBackgroundStripping = ContextCompat.getColor(requireContext(), R.color.rowColorBackgroundStripping);
         mAdapter.setTextStyle(textSize, rowStripping, colorBackground, colorBackgroundStripping);
     }
 
@@ -248,7 +223,8 @@ public class AnecdoteFragment extends TitledFragment implements
 
         mRecyclerViewContainer.hideOverlay();
 
-        if (shouldLoadNewAnecdote()) {
+        // A failed request must not chain another one, else a broken website is requested in a tight loop.
+        if (dataChanged && shouldLoadNewAnecdote()) {
             Log.d(TAG, "afterRequestFinished, load new anecdotes");
             loadNewAnecdotes(mNextPageNumber);
         }
@@ -290,23 +266,19 @@ public class AnecdoteFragment extends TitledFragment implements
                 view);
 
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            startActivity(
-                    intent,
-                    ActivityOptions.makeSceneTransitionAnimation(
-                            getActivity(),
-                            view,
-                            view.getTransitionName()).toBundle()
-            );
-        } else {
-            startActivity(intent);
-        }
+        startActivity(
+                intent,
+                ActivityOptions.makeSceneTransitionAnimation(
+                        getActivity(),
+                        view,
+                        view.getTransitionName()).toBundle()
+        );
     }
 
 
     private RecyclerView.OnScrollListener mOnScrollListener = new RecyclerView.OnScrollListener() {
         @Override
-        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
             super.onScrolled(recyclerView, dx, dy);
 
             // Scrolled to bottom. Do something here.

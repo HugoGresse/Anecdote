@@ -1,6 +1,6 @@
 package io.gresse.hugo.anecdote.util.chrome;
 
-import android.support.customtabs.CustomTabsClient;
+import androidx.browser.customtabs.CustomTabsClient;
 
 /**
  * Callbacks when connection/disconnection Chrome custom tabs service.

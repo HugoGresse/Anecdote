@@ -1,6 +1,6 @@
 package io.gresse.hugo.anecdote.anecdote.list;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.view.View;
 
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;

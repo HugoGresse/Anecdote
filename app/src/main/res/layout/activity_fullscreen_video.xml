@@ -12,7 +12,7 @@
         android:layout_gravity="center"
         android:id="@+id/playerContainer">
 
-        <com.google.android.exoplayer2.ui.SimpleExoPlayerView
+        <androidx.media3.ui.PlayerView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:layout_gravity="center"

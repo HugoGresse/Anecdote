@@ -2,8 +2,9 @@ package io.gresse.hugo.anecdote.about;
 
 import android.content.Intent;
 import android.net.Uri;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +16,9 @@ import com.bumptech.glide.Glide;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
 import io.gresse.hugo.anecdote.Configuration;
-import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.tracking.EventTracker;
+import io.gresse.hugo.anecdote.databinding.RowAboutBinding;
+import io.gresse.hugo.anecdote.databinding.RowAboutHeaderBinding;
 
 /**
  * About adapter
@@ -41,22 +39,18 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
         mData = data;
     }
 
+    @NonNull
     @Override
-    public BaseAboutViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v;
-        switch (viewType) {
-            default:
-            case VIEW_TYPE_HEADER:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_about_header, parent, false);
-                return new HeaderAboutViewHolder(v);
-            case VIEW_TYPE_NORMAL:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_about, parent, false);
-                return new LibAboutViewHolder(v);
+    public BaseAboutViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        if (viewType == VIEW_TYPE_NORMAL) {
+            return new LibAboutViewHolder(RowAboutBinding.inflate(inflater, parent, false));
         }
+        return new HeaderAboutViewHolder(RowAboutHeaderBinding.inflate(inflater, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(BaseAboutViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BaseAboutViewHolder holder, int position) {
         if (holder instanceof LibAboutViewHolder) {
             holder.setData(mData[position - 1]);
         } else {
@@ -91,17 +85,19 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
         private Intent mCommunityIntent;
         private Intent mDonateIntent;
 
-        @BindView(R.id.me_textview)
-        public TextView authorTextView;
-        @BindView(R.id.community_textview)
-        public TextView communityTextView;
-        @BindView(R.id.donationImageView)
-        public ImageView donationImageView;
+        private final TextView  authorTextView;
+        private final TextView  communityTextView;
+        private final ImageView donationImageView;
 
-        public HeaderAboutViewHolder(View itemView) {
-            super(itemView);
+        public HeaderAboutViewHolder(RowAboutHeaderBinding binding) {
+            super(binding.getRoot());
+            authorTextView = binding.meTextview;
+            communityTextView = binding.communityTextview;
+            donationImageView = binding.donationImageView;
 
-            ButterKnife.bind(this, itemView);
+            authorTextView.setOnClickListener(v -> onItemClick(mAuthorIntent));
+            communityTextView.setOnClickListener(v -> onItemClick(mCommunityIntent));
+            donationImageView.setOnClickListener(v -> onItemClick(mDonateIntent));
         }
 
         @Override
@@ -139,46 +135,26 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
                     .into(donationImageView);
         }
 
-        @OnClick(R.id.me_textview)
-        public void onAuthorClick(View v) {
-            if (mOnClickListener != null) {
-                EventTracker.trackThirdPartiesClick(authorTextView.getText().toString());
-                mOnClickListener.onItemClick(mAuthorIntent);
-            }
-        }
-
-        @OnClick(R.id.community_textview)
-        public void onCommunityClick(View v) {
-            if (mOnClickListener != null) {
-                EventTracker.trackThirdPartiesClick(communityTextView.getText().toString());
-                mOnClickListener.onItemClick(mCommunityIntent);
-            }
-        }
-
-        @OnClick(R.id.donationImageView)
-        public void onDonateClick(){
-            if (mOnClickListener != null) {
-                EventTracker.trackThirdPartiesClick("Donation");
-                mOnClickListener.onItemClick(mDonateIntent);
+        private void onItemClick(@Nullable Intent intent) {
+            if (mOnClickListener != null && intent != null) {
+                mOnClickListener.onItemClick(intent);
             }
         }
     }
 
     public class LibAboutViewHolder extends BaseAboutViewHolder implements View.OnClickListener {
 
-        @BindView(R.id.libTextView)
-        public TextView textView;
+        private final TextView textView;
 
-        public LibAboutViewHolder(View itemView) {
-            super(itemView);
-
-            ButterKnife.bind(this, itemView);
+        public LibAboutViewHolder(RowAboutBinding binding) {
+            super(binding.getRoot());
+            textView = binding.libTextView;
             itemView.setOnClickListener(this);
         }
 
         @Override
         public void setData(String text) {
-            int lastUrl = text.lastIndexOf("http://");
+            int lastUrl = urlStartIndex(text);
             if (lastUrl == -1) {
                 textView.setText(text);
             } else {
@@ -189,8 +165,8 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
         @Override
         public void onClick(View v) {
             // When clicked, we try to open the page in the default browser
-            String textData = mData[getAdapterPosition() - 1];
-            int lastUrl = textData.lastIndexOf("http://");
+            String textData = mData[getBindingAdapterPosition() - 1];
+            int lastUrl = urlStartIndex(textData);
             if (lastUrl > -1) try {
                 URL url = new URL(textData.substring(lastUrl));
 
@@ -203,6 +179,14 @@ public class AboutAdapter extends RecyclerView.Adapter<AboutAdapter.BaseAboutVie
                 // Do nothing
             }
         }
+    }
+
+    /**
+     * @return the index where the trailing url of the given text starts, -1 if it does not end with one
+     */
+    static int urlStartIndex(String text) {
+        int lastTokenStart = text.lastIndexOf(' ') + 1;
+        return text.startsWith("http", lastTokenStart) ? lastTokenStart : -1;
     }
 
     public interface OnClickListener {

@@ -1,6 +1,6 @@
 package io.gresse.hugo.anecdote.util;
 
-import android.support.v4.app.Fragment;
+import androidx.fragment.app.Fragment;
 
 /**
  * Abstract framgent having a title to it

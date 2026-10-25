@@ -4,30 +4,29 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.design.widget.AppBarLayout;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.AppCompatSpinner;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.Toolbar;
+import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.appbar.AppBarLayout;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.appcompat.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.Toast;
@@ -39,16 +38,10 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnItemSelected;
 import io.gresse.hugo.anecdote.about.AboutFragment;
 import io.gresse.hugo.anecdote.anecdote.ToolbarSpinnerAdapter;
 import io.gresse.hugo.anecdote.anecdote.UpdateAnecdoteFragmentEvent;
 import io.gresse.hugo.anecdote.anecdote.WebsiteDialogFragment;
-import io.gresse.hugo.anecdote.anecdote.fullscreen.ChangeFullscreenEvent;
 import io.gresse.hugo.anecdote.anecdote.like.FavoritesRepository;
 import io.gresse.hugo.anecdote.anecdote.list.AnecdoteFragment;
 import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
@@ -58,6 +51,7 @@ import io.gresse.hugo.anecdote.api.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.api.event.OnRemoteWebsiteResponseEvent;
 import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.model.WebsitePage;
+import io.gresse.hugo.anecdote.databinding.ActivityMainBinding;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.DisplaySnackbarEvent;
 import io.gresse.hugo.anecdote.event.Event;
@@ -68,11 +62,8 @@ import io.gresse.hugo.anecdote.event.ResetAppEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.setting.SettingsFragment;
 import io.gresse.hugo.anecdote.storage.SpStorage;
-import io.gresse.hugo.anecdote.tracking.EventTracker;
 import io.gresse.hugo.anecdote.util.FragmentStackManager;
 import io.gresse.hugo.anecdote.util.NetworkConnectivityListener;
-import toothpick.Scope;
-import toothpick.Toothpick;
 
 /**
  *
@@ -82,48 +73,32 @@ public class MainActivity extends AppCompatActivity
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    @BindView(R.id.coordinatorLayout)
-    public CoordinatorLayout mCoordinatorLayout;
+    private CoordinatorLayout mCoordinatorLayout;
+    private Toolbar           mToolbar;
+    private DrawerLayout      mDrawerLayout;
+    private NavigationView    mNavigationView;
+    private Spinner           mToolbarSpinner;
 
-    @BindView(R.id.app_bar_layout)
-    public AppBarLayout mAppBarLayout;
-
-    @BindView(R.id.toolbar)
-    public Toolbar mToolbar;
-
-    @BindView(R.id.drawer_layout)
-    public DrawerLayout mDrawerLayout;
-
-    @BindView(R.id.nav_view)
-    public NavigationView mNavigationView;
-
-    @BindView(R.id.toolbarSpinner)
-    public Spinner mToolbarSpinner;
-
-    @BindView(R.id.fragment_container)
-    public View mFragmentContainer;
-
-    @Inject
     protected ServiceProvider             mServiceProvider;
     protected NetworkConnectivityListener mNetworkConnectivityListener;
     protected List<Website>               mWebsites;
     protected Snackbar                    mSnackbar;
     protected ToolbarSpinnerAdapter       mToolbarSpinnerAdapter;
     protected int                         mToolbarScrollFlags;
-    protected CoordinatorLayout.Behavior  mFragmentLayoutBehavior;
     protected FragmentStackManager        mFragmentStackManager;
     protected Event                       mWaitingPermissionEvent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Scope scope = Toothpick.openScopes(getApplication(), this);
         super.onCreate(savedInstanceState);
-        Toothpick.inject(this, scope);
-        if (EventTracker.isEventEnable()) {
-            new EventTracker(this);
-        }
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        mServiceProvider = AnecdoteApplication.from(this).getServiceProvider();
+        ActivityMainBinding binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+        mCoordinatorLayout = binding.appBarMain.coordinatorLayout;
+        mToolbar = binding.appBarMain.toolbar;
+        mDrawerLayout = binding.drawerLayout;
+        mNavigationView = binding.navView;
+        mToolbarSpinner = binding.appBarMain.toolbarSpinner;
 
         setSupportActionBar(mToolbar);
 
@@ -133,6 +108,7 @@ public class MainActivity extends AppCompatActivity
         toggle.syncState();
 
         mNavigationView.setNavigationItemSelectedListener(this);
+        registerBackHandler();
 
         // Process migration before getting anything else from shared preferences
         boolean openWebsiteChooserAddMode = SpStorage.migrate(this);
@@ -154,13 +130,23 @@ public class MainActivity extends AppCompatActivity
         if (openWebsiteChooserAddMode) {
             changeFragment(WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_ADD), false, false);
         } else if (SpStorage.isFirstLaunch(this) || mWebsites.isEmpty()) {
-            changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
+            changeFragment(new WebsiteChooserFragment(), false, false);
         } else {
             changeAnecdoteFragment(mWebsites.get(0), mWebsites.get(0).pages.get(0));
         }
 
         mToolbarSpinnerAdapter = new ToolbarSpinnerAdapter(getApplicationContext(), "test", new ArrayList<String>());
         mToolbarSpinner.setAdapter(mToolbarSpinnerAdapter);
+        mToolbarSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                onSpinnerSelected(position);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
+        });
     }
 
     @Override
@@ -179,89 +165,66 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        EventTracker.onStart(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventTracker.onStop();
-    }
-
-    @Override
     protected void onDestroy() {
-        Toothpick.closeScope(this);
         mServiceProvider.unregister(EventBus.getDefault());
         mNetworkConnectivityListener.stopListening();
         super.onDestroy();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
-            mDrawerLayout.closeDrawer(GravityCompat.START);
-        } else {
-            int fragmentCount = getSupportFragmentManager().getBackStackEntryCount();
-            if (fragmentCount == 1) {
-                finish();
-                return;
+    private void registerBackHandler() {
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+                    mDrawerLayout.closeDrawer(GravityCompat.START);
+                } else if (getSupportFragmentManager().getBackStackEntryCount() <= 1) {
+                    finish();
+                } else {
+                    getSupportFragmentManager().popBackStack();
+                }
             }
-            super.onBackPressed();
-        }
+        });
     }
 
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_about:
-                changeFragment(
-                        Fragment.instantiate(this, AboutFragment.class.getName()),
-                        true,
-                        true);
-                return true;
-            case R.id.action_settings:
-                changeFragment(
-                        Fragment.instantiate(this, SettingsFragment.class.getName()),
-                        true,
-                        true);
-                return true;
-            case R.id.action_feedback:
-                Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
-                        "mailto", "hugo.gresse@gmail.com", null));
-                emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " feedback");
-                startActivity(Intent.createChooser(emailIntent, "Send email..."));
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_about) {
+            changeFragment(new AboutFragment(), true, true);
+            return true;
+        } else if (itemId == R.id.action_settings) {
+            changeFragment(new SettingsFragment(), true, true);
+            return true;
+        } else if (itemId == R.id.action_feedback) {
+            Intent emailIntent = new Intent(Intent.ACTION_SENDTO, Uri.fromParts(
+                    "mailto", "hugo.gresse@gmail.com", null));
+            emailIntent.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.app_name) + " feedback");
+            startActivity(Intent.createChooser(emailIntent, "Send email..."));
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getGroupId()) {
-            case R.id.drawer_group_content:
-                for (Website website : mWebsites) {
-                    if (website.name.equals(item.getTitle())) {
-                        goToWebsite(website);
-                        break;
-                    }
+        int groupId = item.getGroupId();
+        if (groupId == R.id.drawer_group_content) {
+            for (Website website : mWebsites) {
+                if (website.name.equals(item.getTitle())) {
+                    goToWebsite(website);
+                    break;
                 }
-                break;
-            case R.id.drawer_group_favorites:
-                goToWebsite(FavoritesRepository.getFavoritesWebsite(this));
-                break;
-            case R.id.drawer_group_action:
-                changeFragment(
-                        WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_ADD),
-                        true,
-                        true);
-                break;
-            default:
-                Toast.makeText(this, "NavigationGroup not managed", Toast.LENGTH_SHORT).show();
-                break;
+            }
+        } else if (groupId == R.id.drawer_group_favorites) {
+            goToWebsite(FavoritesRepository.getFavoritesWebsite(this));
+        } else if (groupId == R.id.drawer_group_action) {
+            changeFragment(
+                    WebsiteChooserFragment.newInstance(WebsiteChooserFragment.BUNDLE_MODE_ADD),
+                    true,
+                    true);
+        } else {
+            Toast.makeText(this, "NavigationGroup not managed", Toast.LENGTH_SHORT).show();
         }
 
         mDrawerLayout.closeDrawer(GravityCompat.START);
@@ -277,8 +240,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @OnItemSelected(R.id.toolbarSpinner)
-    public void onSpinnerSelected(AppCompatSpinner adapter, View v, int i, long lng) {
+    private void onSpinnerSelected(int i) {
         if (mToolbarSpinnerAdapter.getWebsite() != null) {
             changeAnecdoteFragment(mToolbarSpinnerAdapter.getWebsite(), mToolbarSpinnerAdapter.getWebsite().pages.get(i));
         }
@@ -297,12 +259,9 @@ public class MainActivity extends AppCompatActivity
         final int scrollFlags = layoutParams.getScrollFlags();
         layoutParams.setScrollFlags(0);
 
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                layoutParams.setScrollFlags(scrollFlags);
-                mToolbar.setLayoutParams(layoutParams);
-            }
+        mToolbar.postDelayed(() -> {
+            layoutParams.setScrollFlags(scrollFlags);
+            mToolbar.setLayoutParams(layoutParams);
         }, 100);
     }
 
@@ -359,7 +318,7 @@ public class MainActivity extends AppCompatActivity
         if (!mWebsites.isEmpty()) {
             changeAnecdoteFragment(mWebsites.get(0), mWebsites.get(0).pages.get(0));
         } else {
-            changeFragment(Fragment.instantiate(this, WebsiteChooserFragment.class.getName()), false, false);
+            changeFragment(new WebsiteChooserFragment(), false, false);
         }
     }
 
@@ -374,56 +333,11 @@ public class MainActivity extends AppCompatActivity
                     .setActionView(R.layout.navigationview_actionlayout)
                     .getActionView();
 
-            imageButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    PopupMenu popup = new PopupMenu(MainActivity.this, imageButton);
-                    //Inflating the Popup using xml file
-                    popup.getMenuInflater()
-                            .inflate(R.menu.website_popup, popup.getMenu());
-
-                    //registering popup with OnMenuItemClickListener
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        public boolean onMenuItemClick(MenuItem item) {
-
-                            switch (item.getItemId()) {
-                                case R.id.action_edit:
-                                    // Remove edit button for remote website
-                                    if (!website.isEditable()) {
-                                        Toast.makeText(
-                                                MainActivity.this,
-                                                R.string.action_website_noteditable_toast,
-                                                Toast.LENGTH_SHORT)
-                                                .show();
-                                        return false;
-                                    }
-
-                                    openWebsiteDialog(website);
-                                    break;
-                                case R.id.action_delete:
-                                    SpStorage.deleteWebsite(MainActivity.this, website);
-                                    EventBus.getDefault().post(new WebsitesChangeEvent());
-                                    EventTracker.trackWebsiteDelete(website.name);
-                                    break;
-                                case R.id.action_default:
-                                    SpStorage.setDefaultWebsite(MainActivity.this, website);
-                                    EventBus.getDefault().post(new WebsitesChangeEvent());
-                                    EventTracker.trackWebsiteDefault(website.name);
-                                    break;
-                                default:
-                                    Toast.makeText(
-                                            MainActivity.this,
-                                            R.string.not_implemented,
-                                            Toast.LENGTH_SHORT)
-                                            .show();
-                                    break;
-                            }
-                            return true;
-                        }
-                    });
-
-                    popup.show();
-                }
+            imageButton.setOnClickListener(v -> {
+                PopupMenu popup = new PopupMenu(MainActivity.this, imageButton);
+                popup.getMenuInflater().inflate(R.menu.website_popup, popup.getMenu());
+                popup.setOnMenuItemClickListener(menuItem -> onWebsiteMenuItemClick(menuItem, website));
+                popup.show();
             });
         }
 
@@ -444,17 +358,32 @@ public class MainActivity extends AppCompatActivity
         navigationViewMenu.getItem(0).setChecked(true);
     }
 
+    private boolean onWebsiteMenuItemClick(MenuItem item, Website website) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_edit) {
+            if (!website.isEditable()) {
+                Toast.makeText(this, R.string.action_website_noteditable_toast, Toast.LENGTH_SHORT).show();
+                return false;
+            }
+            openWebsiteDialog(website);
+        } else if (itemId == R.id.action_delete) {
+            SpStorage.deleteWebsite(this, website);
+            EventBus.getDefault().post(new WebsitesChangeEvent());
+        } else if (itemId == R.id.action_default) {
+            SpStorage.setDefaultWebsite(this, website);
+            EventBus.getDefault().post(new WebsitesChangeEvent());
+        } else {
+            Toast.makeText(this, R.string.not_implemented, Toast.LENGTH_SHORT).show();
+        }
+        return true;
+    }
+
     /**
      * Open a dialog to edit given website or create a new one. One save/add, will fire {@link WebsitesChangeEvent}
      *
      * @param website website to edit
      */
     private void openWebsiteDialog(@Nullable Website website) {
-        if (website == null) {
-            EventTracker.trackWebsiteEdit("", false);
-        } else {
-            EventTracker.trackWebsiteEdit(website.name, false);
-        }
         FragmentManager fm = getSupportFragmentManager();
         DialogFragment dialogFragment = WebsiteDialogFragment.newInstance(website);
         dialogFragment.show(fm, dialogFragment.getClass().getSimpleName());
@@ -567,42 +496,6 @@ public class MainActivity extends AppCompatActivity
         resetAnecdoteServices();
         populateNavigationView(false);
         EventBus.getDefault().post(new UpdateAnecdoteFragmentEvent());
-    }
-
-    @Subscribe
-    public void changeFullscreenVisibilityEvent(ChangeFullscreenEvent event) {
-        if (event.toFullscreen && getSupportActionBar() != null) {
-            getSupportActionBar().hide();
-            // mAppBarLayout.animate().translationY(-mAppBarLayout.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
-        } else if (getSupportActionBar() != null) {
-            getSupportActionBar().show();
-            // mAppBarLayout.animate().translationY(0).setInterpolator(new AccelerateInterpolator()).start();
-        }
-
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mAppBarLayout.getParent().requestLayout();
-            }
-        }, 600);
-
-        if (event.toFullscreen) {
-            // Hide status bar
-            this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-            // Remove the layout behavior on fragment container to prevent issue with the fullscreen
-            CoordinatorLayout.LayoutParams fragmentContainerLayoutParams =
-                    (CoordinatorLayout.LayoutParams) mFragmentContainer.getLayoutParams();
-            mFragmentLayoutBehavior = fragmentContainerLayoutParams.getBehavior();
-            fragmentContainerLayoutParams.setBehavior(null);
-        } else {
-            // Show status bar
-            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-            // Set back the layout behavior on fragment container
-            ((CoordinatorLayout.LayoutParams) mFragmentContainer.getLayoutParams())
-                    .setBehavior(new AppBarLayout.ScrollingViewBehavior());
-        }
     }
 
     @Subscribe

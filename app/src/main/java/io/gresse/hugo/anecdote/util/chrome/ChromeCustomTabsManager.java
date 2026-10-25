@@ -7,16 +7,16 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
-import android.support.customtabs.CustomTabsCallback;
-import android.support.customtabs.CustomTabsClient;
-import android.support.customtabs.CustomTabsIntent;
-import android.support.customtabs.CustomTabsServiceConnection;
-import android.support.customtabs.CustomTabsSession;
-import android.support.v4.content.ContextCompat;
+import androidx.browser.customtabs.CustomTabsCallback;
+import androidx.browser.customtabs.CustomTabColorSchemeParams;
+import androidx.browser.customtabs.CustomTabsClient;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.browser.customtabs.CustomTabsServiceConnection;
+import androidx.browser.customtabs.CustomTabsSession;
+import androidx.core.content.ContextCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import javax.inject.Inject;
 
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
@@ -40,7 +40,6 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
     // Configuration
     private int      mToolbarBackgroundColor;
 
-    @Inject
     public ChromeCustomTabsManager(Application application) {
         mToolbarBackgroundColor = ContextCompat.getColor(application, R.color.colorAccent);
     }
@@ -128,10 +127,11 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
         setIntentAction(context, builder, anecdote);
 
         builder.setShowTitle(true);
-        builder.enableUrlBarHiding();
-        builder.setToolbarColor(mToolbarBackgroundColor);
-
-        builder.setSecondaryToolbarColor(Color.WHITE);
+        builder.setUrlBarHidingEnabled(true);
+        builder.setDefaultColorSchemeParams(new CustomTabColorSchemeParams.Builder()
+                .setToolbarColor(mToolbarBackgroundColor)
+                .setSecondaryToolbarColor(Color.WHITE)
+                .build());
         builder.setStartAnimations(context, R.anim.slide_in_right, R.anim.hold);
         builder.setExitAnimations(context, R.anim.hold, R.anim.slide_out_left);
         builder.setCloseButtonIcon(
@@ -156,7 +156,7 @@ public class ChromeCustomTabsManager implements ChromeCustomTabsConnectionCallba
         builder.setActionButton(
                 Utils.getBitmapFromVectorDrawable(context, R.drawable.ic_share_white_24dp),
                 anecdote.getPlainTextContent() + " " + context.getString(R.string.app_share_credits),
-                PendingIntent.getActivity(context, 0, sharingIntent, 0),
+                PendingIntent.getActivity(context, 0, sharingIntent, PendingIntent.FLAG_IMMUTABLE),
                 false);
     }
 }

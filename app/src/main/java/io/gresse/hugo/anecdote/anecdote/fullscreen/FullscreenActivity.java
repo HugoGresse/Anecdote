@@ -2,27 +2,19 @@ package io.gresse.hugo.anecdote.anecdote.fullscreen;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import org.greenrobot.eventbus.EventBus;
 
-import javax.inject.Inject;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import io.gresse.hugo.anecdote.R;
-import io.gresse.hugo.anecdote.ServiceProvider;
+import io.gresse.hugo.anecdote.AnecdoteApplication;
 import io.gresse.hugo.anecdote.anecdote.MediaContextDialog;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.anecdote.model.MediaType;
@@ -30,10 +22,9 @@ import io.gresse.hugo.anecdote.anecdote.service.AnecdoteService;
 import io.gresse.hugo.anecdote.anecdote.social.CopyAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.social.OpenAnecdoteEvent;
 import io.gresse.hugo.anecdote.anecdote.social.ShareAnecdoteEvent;
-import io.gresse.hugo.anecdote.tracking.EventTracker;
-import toothpick.Scope;
-import toothpick.Toothpick;
-import toothpick.smoothie.module.SmoothieActivityModule;
+import io.gresse.hugo.anecdote.databinding.ActivityFullscreenBaseBinding;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteExpandBinding;
+import io.gresse.hugo.anecdote.util.Utils;
 
 /**
  * Fullscreen activity base class.
@@ -48,18 +39,13 @@ public abstract class FullscreenActivity extends AppCompatActivity {
     public static final  String INTENT_SERVICESLUG      = "intent_serviceslug";
     public static final  String INTENT_MEDIA_TRANSITION = "intent_mediatransition";
 
-    @Inject
-    public    ServiceProvider mServiceProvider;
     private   String          mWebsitePageFullName;
     protected Anecdote        mAnecdote;
     protected String          mMediaTransitionName;
 
-    @BindView(R.id.gradientBottom)
-    public View         mGradientView;
-    @BindView(R.id.overlayLinearLayout)
-    public LinearLayout mOverlayLinearLayout;
-    @BindView(R.id.contentTextView)
-    public TextView     mContentTextView;
+    private View         mGradientView;
+    private LinearLayout mOverlayLinearLayout;
+    private TextView     mContentTextView;
 
     public static Intent createIntent(Context context,
                                       int anecdoteNumber,
@@ -85,22 +71,14 @@ public abstract class FullscreenActivity extends AppCompatActivity {
 
         intent.putExtra(INTENT_ANECDOTE_ID, anecdoteNumber);
         intent.putExtra(INTENT_SERVICESLUG, serviceSlug);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            intent.putExtra(INTENT_MEDIA_TRANSITION, mediaView.getTransitionName());
-        }
+        intent.putExtra(INTENT_MEDIA_TRANSITION, mediaView.getTransitionName());
 
         return intent;
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        Scope scope = Toothpick.openScopes(getApplication(), this);
-        scope.installModules(new SmoothieActivityModule(this));
         super.onCreate(savedInstanceState);
-
-        if (EventTracker.isEventEnable()) {
-            new EventTracker(this);
-        }
 
         mMediaTransitionName = getIntent().getStringExtra(INTENT_MEDIA_TRANSITION);
         String serviceSlug = getIntent().getStringExtra(INTENT_SERVICESLUG);
@@ -111,14 +89,14 @@ public abstract class FullscreenActivity extends AppCompatActivity {
             return;
         }
 
-        setContentView(getLayoutRes());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            postponeEnterTransition();
-        }
-        ButterKnife.bind(this);
-        Toothpick.inject(this, scope);
+        View contentView = inflateContentView();
+        setContentView(contentView);
+        postponeEnterTransition();
+        bindOverlay(contentView);
 
-        AnecdoteService anecdoteService = mServiceProvider.getAnecdoteService(serviceSlug);
+        AnecdoteService anecdoteService = AnecdoteApplication.from(this)
+                .getServiceProvider()
+                .getAnecdoteService(serviceSlug);
 
         mWebsitePageFullName = anecdoteService.getPageFullName();
         mAnecdote = anecdoteService.getAnecdotes().get(anecoteId);
@@ -127,22 +105,10 @@ public abstract class FullscreenActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        EventTracker.onStart(this);
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         // Preload the website page
         EventBus.getDefault().post(new OpenAnecdoteEvent(mWebsitePageFullName, mAnecdote, true));
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        EventTracker.onStop();
     }
 
     @Override
@@ -156,8 +122,7 @@ public abstract class FullscreenActivity extends AppCompatActivity {
      * Toggle the  Overlay/UI above the fullscreen content. This should be called by child fragment
      */
     protected void toggleOverlayVisibility() {
-        // sometime mContentTextView is null, cf http://crashes.to/s/42615391f2d
-        if (mContentTextView != null && mContentTextView.isShown()) {
+        if (mContentTextView.isShown()) {
             mOverlayLinearLayout.setVisibility(View.GONE);
             mGradientView.setVisibility(View.GONE);
         } else {
@@ -166,7 +131,6 @@ public abstract class FullscreenActivity extends AppCompatActivity {
         }
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     protected void startPostponedEnterTransition(final View view) {
         view.getViewTreeObserver().addOnPreDrawListener(new ViewTreeObserver.OnPreDrawListener() {
             @Override
@@ -186,38 +150,30 @@ public abstract class FullscreenActivity extends AppCompatActivity {
     }
 
     /**
-     * To be implemented by child, should return a layout to be inflated.
+     * To be implemented by child: inflate its view binding and return the root view to display.
      */
-    @LayoutRes
-    protected abstract int getLayoutRes();
+    protected abstract View inflateContentView();
 
-    @OnClick({R.id.shareButton, R.id.copyButton, R.id.openButton})
-    public void onSocialClick(View v) {
-        switch (v.getId()) {
-            case R.id.shareButton:
-                EventBus.getDefault().post(
-                        new ShareAnecdoteEvent(
-                                mWebsitePageFullName,
-                                mAnecdote,
-                                mAnecdote.getShareString(getApplicationContext())));
-                break;
-            case R.id.copyButton:
-                EventBus.getDefault().post(
-                        new CopyAnecdoteEvent(
-                                mWebsitePageFullName,
-                                mAnecdote,
-                                CopyAnecdoteEvent.TYPE_ANECDOTE,
-                                mAnecdote.getShareString(getApplicationContext())));
-                break;
-            case R.id.openButton:
-                EventBus.getDefault().post(
-                        new OpenAnecdoteEvent(
-                                mWebsitePageFullName,
-                                mAnecdote,
-                                false));
-                break;
-            default:
-                throw new IllegalArgumentException("This social share action should be implemented here...");
-        }
+    private void bindOverlay(View contentView) {
+        ActivityFullscreenBaseBinding overlayBinding = ActivityFullscreenBaseBinding.bind(contentView);
+        mGradientView = overlayBinding.gradientBottom;
+        mOverlayLinearLayout = overlayBinding.overlayLinearLayout;
+        mContentTextView = overlayBinding.contentTextView;
+        Utils.applyNavigationBarPadding(mOverlayLinearLayout);
+
+        RowAnecdoteExpandBinding expandBinding = RowAnecdoteExpandBinding.bind(contentView);
+        expandBinding.shareButton.setOnClickListener(v -> EventBus.getDefault().post(
+                new ShareAnecdoteEvent(
+                        mWebsitePageFullName,
+                        mAnecdote,
+                        mAnecdote.getShareString(getApplicationContext()))));
+        expandBinding.copyButton.setOnClickListener(v -> EventBus.getDefault().post(
+                new CopyAnecdoteEvent(
+                        mWebsitePageFullName,
+                        mAnecdote,
+                        CopyAnecdoteEvent.TYPE_ANECDOTE,
+                        mAnecdote.getShareString(getApplicationContext()))));
+        expandBinding.openButton.setOnClickListener(v -> EventBus.getDefault().post(
+                new OpenAnecdoteEvent(mWebsitePageFullName, mAnecdote, false)));
     }
 }

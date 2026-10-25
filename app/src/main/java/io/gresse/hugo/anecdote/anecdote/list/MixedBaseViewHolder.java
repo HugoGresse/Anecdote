@@ -1,9 +1,6 @@
 package io.gresse.hugo.anecdote.anecdote.list;
 
 import android.graphics.Color;
-import android.os.Build;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.text.Html;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,11 +8,14 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
+
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteBinding;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteExpandBinding;
 
 /***************************
  * ViewHolder
@@ -27,48 +27,59 @@ public class MixedBaseViewHolder
 
     protected final AdapterListener     mAdapterListener;
     protected final MixedContentAdapter mAdapter;
-    private final   int                 mTextSize;
-    private final   boolean             mRowStriping;
-    private final   int                 mRowBackground;
-    private final   int                 mRowStripingBackground;
+    private final   RowStyle            mRowStyle;
 
-    private View mItemView;
-    protected String mWebsiteName = "";
+    protected String   mWebsiteName = "";
     protected Anecdote mCurrentAnecdote;
 
-    @SuppressWarnings("WeakerAccess")
-    @BindView(R.id.contentTextView)
-    public TextView mTextView;
+    private final TextView     mTextView;
+    @Nullable
+    private final LinearLayout mExpandLayout;
+    @Nullable
+    private final View         mSeparatorView;
+    @Nullable
+    private final ImageButton  mFavoriteButton;
 
-    @SuppressWarnings("WeakerAccess")
-    @BindView(R.id.expandLayout)
-    public LinearLayout mExpandLayout;
-
-    @SuppressWarnings("WeakerAccess")
-    @BindView(R.id.separator)
-    public View mSeparatorView;
-
-    @BindView(R.id.favoritesButton)
-    public ImageButton mFavoriteButton;
-
-    public MixedBaseViewHolder(View itemView,
+    public MixedBaseViewHolder(RowAnecdoteBinding binding,
                                AdapterListener adapterListener,
                                MixedContentAdapter adapter,
-                               int textSize,
-                               boolean rowStriping,
-                               int rowBackground,
-                               int rawStripingBackground) {
+                               RowStyle rowStyle) {
+        this(binding.getRoot(),
+                binding.contentTextView,
+                binding.separator,
+                RowAnecdoteExpandBinding.bind(binding.getRoot()),
+                adapterListener,
+                adapter,
+                rowStyle);
+    }
+
+    protected MixedBaseViewHolder(View itemView,
+                                  TextView contentTextView,
+                                  @Nullable View separatorView,
+                                  @Nullable RowAnecdoteExpandBinding expandBinding,
+                                  AdapterListener adapterListener,
+                                  MixedContentAdapter adapter,
+                                  RowStyle rowStyle) {
         super(itemView);
 
         mAdapterListener = adapterListener;
         mAdapter = adapter;
-        mTextSize = textSize;
-        mItemView = itemView;
-        mRowStriping = rowStriping;
-        mRowBackground = rowBackground;
-        mRowStripingBackground = rawStripingBackground;
-        ButterKnife.bind(this, itemView);
+        mRowStyle = rowStyle;
+        mTextView = contentTextView;
+        mSeparatorView = separatorView;
         itemView.setOnClickListener(this);
+
+        if (expandBinding == null) {
+            mExpandLayout = null;
+            mFavoriteButton = null;
+            return;
+        }
+        mExpandLayout = expandBinding.expandLayout;
+        mFavoriteButton = expandBinding.favoritesButton;
+        expandBinding.shareButton.setOnClickListener(v -> notifyAction(AdapterListener.ACTION_SHARE));
+        expandBinding.copyButton.setOnClickListener(v -> notifyAction(AdapterListener.ACTION_COPY));
+        expandBinding.openButton.setOnClickListener(v -> notifyAction(AdapterListener.ACTION_OPEN_IN_BROWSER));
+        expandBinding.favoritesButton.setOnClickListener(v -> notifyAction(AdapterListener.ACTION_FAVORIS));
     }
 
     @Override
@@ -76,26 +87,17 @@ public class MixedBaseViewHolder
         mWebsiteName = websiteName;
         mCurrentAnecdote = anecdote;
         try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                mTextView.setText(Html.fromHtml(mCurrentAnecdote.text, Html.FROM_HTML_MODE_LEGACY));
-            } else {
-                //noinspection deprecation
-                mTextView.setText(Html.fromHtml(mCurrentAnecdote.text));
-            }
+            mTextView.setText(Html.fromHtml(mCurrentAnecdote.text, Html.FROM_HTML_MODE_LEGACY));
         } catch (Throwable error) {
             mTextView.setText(mCurrentAnecdote.text);
         }
-        mTextView.setTextSize(mTextSize);
+        mTextView.setTextSize(mRowStyle.textSize());
 
-        if (mRowStriping) {
-            if (position % 2 == 0) {
-                mItemView.setBackgroundColor(mRowStripingBackground);
-            } else {
-                mItemView.setBackgroundColor(mRowBackground);
-            }
+        if (mRowStyle.rowStriping()) {
+            itemView.setBackgroundColor(mRowStyle.backgroundForPosition(position));
         }
 
-        if (mExpandLayout == null) {
+        if (mExpandLayout == null || mSeparatorView == null || mFavoriteButton == null) {
             return;
         }
 
@@ -104,9 +106,7 @@ public class MixedBaseViewHolder
             mExpandLayout.setVisibility(View.VISIBLE);
             ((ViewGroup.MarginLayoutParams) itemView.getLayoutParams()).topMargin = 50;
             ((ViewGroup.MarginLayoutParams) itemView.getLayoutParams()).bottomMargin = 50;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                itemView.setElevation(8);
-            }
+            itemView.setElevation(8);
             if(mCurrentAnecdote.isFavorite()){
                 DrawableCompat.setTint(
                         mFavoriteButton.getDrawable(),
@@ -121,54 +121,21 @@ public class MixedBaseViewHolder
             mExpandLayout.setVisibility(View.GONE);
             ((ViewGroup.MarginLayoutParams) itemView.getLayoutParams()).topMargin = 0;
             ((ViewGroup.MarginLayoutParams) itemView.getLayoutParams()).bottomMargin = 0;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                itemView.setElevation(0);
-            }
+            itemView.setElevation(0);
         }
     }
 
     @Override
     public void onClick(View v) {
-        mAdapter.toggleExpanded(getAdapterPosition());
+        mAdapter.toggleExpanded(getBindingAdapterPosition());
     }
 
-    @OnClick(R.id.shareButton)
-    public void onShareClick() {
+    private void notifyAction(int action) {
         if (mAdapterListener != null) {
             mAdapterListener.onClick(
-                    mAdapter.getItem(getAdapterPosition()),
+                    mAdapter.getItem(getBindingAdapterPosition()),
                     itemView,
-                    AdapterListener.ACTION_SHARE);
-        }
-    }
-
-    @OnClick(R.id.copyButton)
-    public void onCopyClick() {
-        if (mAdapterListener != null) {
-            mAdapterListener.onClick(
-                    mAdapter.getItem(getAdapterPosition()),
-                    itemView,
-                    AdapterListener.ACTION_COPY);
-        }
-    }
-
-    @OnClick(R.id.openButton)
-    public void onOpenClick() {
-        if (mAdapterListener != null) {
-            mAdapterListener.onClick(
-                    mAdapter.getItem(getAdapterPosition()),
-                    itemView,
-                    AdapterListener.ACTION_OPEN_IN_BROWSER);
-        }
-    }
-
-    @OnClick(R.id.favoritesButton)
-    public void onFavoriteClick(){
-        if (mAdapterListener != null) {
-            mAdapterListener.onClick(
-                    mAdapter.getItem(getAdapterPosition()),
-                    itemView,
-                    AdapterListener.ACTION_FAVORIS);
+                    action);
         }
     }
 }

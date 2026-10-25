@@ -1,7 +1,7 @@
 package io.gresse.hugo.anecdote.event;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import io.gresse.hugo.anecdote.R;
 

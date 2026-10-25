@@ -1,11 +1,11 @@
 package io.gresse.hugo.anecdote.anecdote.list;
 
-import android.support.v4.view.ViewCompat;
+import androidx.core.view.ViewCompat;
 import android.view.View;
 
-import butterknife.BindView;
-import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteExpandBinding;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteVideoBinding;
 import io.gresse.hugo.anecdote.view.PlayerContainerView;
 
 /**
@@ -15,33 +15,33 @@ import io.gresse.hugo.anecdote.view.PlayerContainerView;
  */
 public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClickListener {
 
-    @SuppressWarnings("WeakerAccess")
-    @BindView(R.id.playerContainer)
-    public PlayerContainerView mPlayerView;
+    private final PlayerContainerView mPlayerView;
 
-    public VideoViewHolder(View itemView,
+    public VideoViewHolder(RowAnecdoteVideoBinding binding,
                            AdapterListener adapterListener,
                            MixedContentAdapter adapter,
-                           int textSize,
-                           boolean rowStriping,
-                           int rowBackground,
-                           int rawStripingBackground) {
-        super(itemView, adapterListener, adapter, textSize, rowStriping, rowBackground, rawStripingBackground);
+                           RowStyle rowStyle) {
+        super(binding.getRoot(),
+                binding.contentTextView,
+                binding.separator,
+                RowAnecdoteExpandBinding.bind(binding.getRoot()),
+                adapterListener,
+                adapter,
+                rowStyle);
 
-        if (mPlayerView != null) {
-            mPlayerView.setOnClickListener(this);
-        }
+        mPlayerView = binding.playerContainer;
+        mPlayerView.setOnClickListener(this);
     }
 
     @Override
     public void setData(int position, boolean isExpanded, String websiteName, Anecdote anecdote) {
         super.setData(position, isExpanded, websiteName, anecdote);
-        if (mPlayerView != null && anecdote.media != null) {
+        if (anecdote.media != null) {
             mPlayerView.setVideoUrl(anecdote.media);
             mPlayerView.setControllerDisplay(false);
         }
 
-        ViewCompat.setTransitionName(mPlayerView, String.valueOf(position) + "_video");
+        ViewCompat.setTransitionName(mPlayerView, position + "_video");
     }
 
     @Override
@@ -52,7 +52,7 @@ public class VideoViewHolder extends MixedBaseViewHolder implements View.OnClick
         }
         if (mAdapterListener != null) {
             mAdapterListener.onClick(
-                    mAdapter.getItem(getAdapterPosition()),
+                    mAdapter.getItem(getBindingAdapterPosition()),
                     mPlayerView,
                     AdapterListener.ACTION_FULLSCREEN);
         }
