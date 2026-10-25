@@ -1,10 +1,11 @@
 package io.gresse.hugo.anecdote.anecdote;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.app.AppCompatDialogFragment;
-import android.support.v7.widget.SwitchCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import com.google.android.material.textfield.TextInputLayout;
+import androidx.appcompat.app.AppCompatDialogFragment;
+import androidx.appcompat.widget.SwitchCompat;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,18 +18,15 @@ import com.google.gson.reflect.TypeToken;
 
 import org.greenrobot.eventbus.EventBus;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.MediaType;
 import io.gresse.hugo.anecdote.api.model.Content;
 import io.gresse.hugo.anecdote.api.model.ContentItem;
 import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.model.WebsitePage;
+import io.gresse.hugo.anecdote.databinding.FragmentDialogWebsiteBinding;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.storage.SpStorage;
-import io.gresse.hugo.anecdote.tracking.EventTracker;
 
 /**
  * FialogFragment to edit or add wesites
@@ -39,33 +37,21 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
 
     public static final String ARGS_WEBSITE = "args_website";
 
-    @BindView(R.id.nameContainer)
-    public TextInputLayout mNameTextInputLayout;
-    @BindView(R.id.nameEditText)
-    public EditText        mNameEditText;
-    @BindView(R.id.pageNameContainer)
-    public TextInputLayout mPageNameTextInputLayout;
-    @BindView(R.id.pageNameEditText)
-    public EditText        mPageNameEditText;
-    @BindView(R.id.urlContainer)
-    public TextInputLayout mUrlTextInputLayout;
-    @BindView(R.id.urlEditText)
-    public EditText        mUrlEditText;
-    @BindView(R.id.urlSuffixEditText)
-    public EditText        mUrlSuffixEditText;
-    @BindView(R.id.selectorContainer)
-    public TextInputLayout mSelectorTextInputLayout;
-    @BindView(R.id.selectorEditText)
-    public EditText        mSelectorEditText;
-    @BindView(R.id.firstPageZeroSwitchCompat)
-    public SwitchCompat    mFirstPageZeroSwitchCompat;
-    @BindView(R.id.saveButton)
-    public Button          mSaveButton;
+    private TextInputLayout mNameTextInputLayout;
+    private EditText        mNameEditText;
+    private TextInputLayout mPageNameTextInputLayout;
+    private EditText        mPageNameEditText;
+    private TextInputLayout mUrlTextInputLayout;
+    private EditText        mUrlEditText;
+    private EditText        mUrlSuffixEditText;
+    private TextInputLayout mSelectorTextInputLayout;
+    private EditText        mSelectorEditText;
+    private SwitchCompat    mFirstPageZeroSwitchCompat;
+    private Button          mSaveButton;
 
     protected Website     mWebsite;
     protected WebsitePage mWebsitePage;
     protected boolean     mEditMode;
-    private   Unbinder    mUnbinder;
 
     public static WebsiteDialogFragment newInstance(@Nullable Website website) {
         WebsiteDialogFragment frag = new WebsiteDialogFragment();
@@ -78,11 +64,21 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_dialog_website, container);
-        mUnbinder = ButterKnife.bind(this, view);
-        return view;
+        FragmentDialogWebsiteBinding binding = FragmentDialogWebsiteBinding.inflate(inflater, container, false);
+        mNameTextInputLayout = binding.nameContainer;
+        mNameEditText = binding.nameEditText;
+        mPageNameTextInputLayout = binding.pageNameContainer;
+        mPageNameEditText = binding.pageNameEditText;
+        mUrlTextInputLayout = binding.urlContainer;
+        mUrlEditText = binding.urlEditText;
+        mUrlSuffixEditText = binding.urlSuffixEditText;
+        mSelectorTextInputLayout = binding.selectorContainer;
+        mSelectorEditText = binding.selectorEditText;
+        mFirstPageZeroSwitchCompat = binding.firstPageZeroSwitchCompat;
+        mSaveButton = binding.saveButton;
+        return binding.getRoot();
     }
 
     @Override
@@ -95,7 +91,7 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         if (getArguments() != null && !TextUtils.isEmpty(getArguments().getString(ARGS_WEBSITE))) {
@@ -137,22 +133,10 @@ public class WebsiteDialogFragment extends AppCompatDialogFragment {
 
                 SpStorage.saveWebsite(getContext(), mWebsite);
 
-                if (mEditMode) {
-                    EventTracker.trackWebsiteEdit(mWebsite.name, true);
-                } else {
-                    EventTracker.trackCustomWebsiteAdded();
-                }
-
                 EventBus.getDefault().post(new WebsitesChangeEvent());
                 WebsiteDialogFragment.this.getDialog().dismiss();
             }
         });
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
     }
 
     protected void initAdd() {

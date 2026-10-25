@@ -1,7 +1,7 @@
 package io.gresse.hugo.anecdote.view;
 
 import android.content.Context;
-import android.support.v4.widget.DrawerLayout;
+import androidx.drawerlayout.widget.DrawerLayout;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;

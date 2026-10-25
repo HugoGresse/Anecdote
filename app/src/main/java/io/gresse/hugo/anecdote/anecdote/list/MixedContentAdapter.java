@@ -2,23 +2,27 @@ package io.gresse.hugo.anecdote.anecdote.list;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.Nullable;
-import android.support.v7.util.DiffUtil;
-import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.ButterKnife;
-import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.anecdote.model.MediaType;
-import io.gresse.hugo.anecdote.tracking.EventTracker;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteBinding;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteImageBinding;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteUnknownBinding;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteVideoBinding;
+import io.gresse.hugo.anecdote.databinding.RowLoaderBinding;
 
 /**
  * A generic adapters for all anecdotes
@@ -43,10 +47,7 @@ class MixedContentAdapter
     private boolean         mDisplayLoader;
     @Nullable
     private AdapterListener mAdapterListener;
-    private int             mTextSize;
-    private boolean         mRowStriping;
-    private int             mRowBackground;
-    private int             mRowStripingBackground;
+    private RowStyle        mRowStyle = new RowStyle(0, false, 0, 0);
     private int mExpandedPosition = -1;
 
     MixedContentAdapter(@Nullable AdapterListener adapterListener, String websiteName) {
@@ -78,14 +79,7 @@ class MixedContentAdapter
 
         } else {
             // Run this on main thread
-            Handler mainHandler = new Handler(Looper.getMainLooper());
-            Runnable runnable = new Runnable() {
-                @Override
-                public void run() {
-                    MixedContentAdapter.this.setData(quotes);
-                }
-            };
-            mainHandler.post(runnable);
+            new Handler(Looper.getMainLooper()).post(() -> setData(quotes));
         }
     }
 
@@ -96,49 +90,42 @@ class MixedContentAdapter
     }
 
     @Override
-    public void onViewDetachedFromWindow(BaseAnecdoteViewHolder holder) {
+    public void onViewDetachedFromWindow(@NonNull BaseAnecdoteViewHolder holder) {
         holder.onViewDetached();
         super.onViewDetachedFromWindow(holder);
     }
 
     @Override
     public void setTextStyle(int textSize, boolean rowStriping, int colorBackground, int colorBackgroundStripping) {
-        mTextSize = textSize;
-        mRowStriping = rowStriping;
-        mRowBackground = colorBackground;
-        mRowStripingBackground = colorBackgroundStripping;
+        mRowStyle = new RowStyle(textSize, rowStriping, colorBackground, colorBackgroundStripping);
         notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
-    public BaseAnecdoteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v;
-        switch (viewType) {
-            default:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote_unknown, parent, false);
-                return new UnknownViewHolder(v, mAdapterListener, this, mTextSize, mRowStriping, mRowBackground, mRowStripingBackground);
-            case VIEW_TYPE_TEXT:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote, parent, false);
-                return new MixedBaseViewHolder(v, mAdapterListener, this, mTextSize, mRowStriping, mRowBackground, mRowStripingBackground);
-            case VIEW_TYPE_IMAGE:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote_image, parent, false);
-                return new ImageViewHolder(v, mAdapterListener, this, mTextSize, mRowStriping, mRowBackground, mRowStripingBackground);
-            case VIEW_TYPE_VIDEO:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_anecdote_video, parent, false);
-                return new VideoViewHolder(v, mAdapterListener, this, mTextSize, mRowStriping, mRowBackground, mRowStripingBackground);
-            case VIEW_TYPE_LOAD:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_loader, parent, false);
-                return new LoadViewHolder(v);
-        }
+    public BaseAnecdoteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        return switch (viewType) {
+            case VIEW_TYPE_TEXT -> new MixedBaseViewHolder(
+                    RowAnecdoteBinding.inflate(inflater, parent, false), mAdapterListener, this, mRowStyle);
+            case VIEW_TYPE_IMAGE -> new ImageViewHolder(
+                    RowAnecdoteImageBinding.inflate(inflater, parent, false), mAdapterListener, this, mRowStyle);
+            case VIEW_TYPE_VIDEO -> new VideoViewHolder(
+                    RowAnecdoteVideoBinding.inflate(inflater, parent, false), mAdapterListener, this, mRowStyle);
+            case VIEW_TYPE_LOAD -> new LoadViewHolder(
+                    RowLoaderBinding.inflate(inflater, parent, false).getRoot());
+            default -> new UnknownViewHolder(
+                    RowAnecdoteUnknownBinding.inflate(inflater, parent, false), mAdapterListener, this, mRowStyle);
+        };
     }
 
     @Override
-    public void onBindViewHolder(BaseAnecdoteViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BaseAnecdoteViewHolder holder, int position) {
         // already done in method below
     }
 
     @Override
-    public void onBindViewHolder(BaseAnecdoteViewHolder holder, int position, List<Object> payloads) {
+    public void onBindViewHolder(@NonNull BaseAnecdoteViewHolder holder, int position, @NonNull List<Object> payloads) {
         if (position < mAnecdotes.size()) {
             holder.setData(position, mExpandedPosition == position, mWebsiteName, mAnecdotes.get(position));
         }
@@ -173,7 +160,6 @@ class MixedContentAdapter
         if (position < mAnecdotes.size()) {
             Anecdote anecdote = mAnecdotes.get(position);
             if (TextUtils.isEmpty(anecdote.type)) {
-                EventTracker.trackError("MixedContentAdapter", "Unknow type, using TEXT: " + anecdote.type);
                 Log.e(TAG, "Unknow type, using TEXT: " + anecdote.type);
                 return VIEW_TYPE_TEXT;
             }
@@ -185,7 +171,6 @@ class MixedContentAdapter
                 case MediaType.VIDEO:
                     return VIEW_TYPE_VIDEO;
                 default:
-                    EventTracker.trackError("MixedContentAdapter", "Unknow type: " + anecdote.type);
                     Log.e(TAG, "Unknow type: " + anecdote.type);
                     return VIEW_TYPE_UNKNOWN;
             }
@@ -226,8 +211,6 @@ class MixedContentAdapter
 
         LoadViewHolder(View itemView) {
             super(itemView);
-
-            ButterKnife.bind(this, itemView);
         }
 
         @Override

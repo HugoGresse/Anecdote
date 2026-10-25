@@ -2,9 +2,10 @@ package io.gresse.hugo.anecdote.about;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,13 +13,10 @@ import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.R;
+import io.gresse.hugo.anecdote.databinding.FragmentAboutBinding;
 import io.gresse.hugo.anecdote.util.TitledFragment;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
-import io.gresse.hugo.anecdote.tracking.EventTracker;
 
 /**
  * About fragment
@@ -29,21 +27,18 @@ public class AboutFragment extends TitledFragment implements AboutAdapter.OnClic
 
     public static final String TAG = AboutFragment.class.getSimpleName();
 
-    @BindView(R.id.recyclerView)
-    public RecyclerView mRecyclerView;
-
-    private Unbinder mUnbinder;
+    private RecyclerView mRecyclerView;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View v = inflater.inflate(R.layout.fragment_about, container, false);
-        mUnbinder = ButterKnife.bind(this, v);
-        return v;
+        FragmentAboutBinding binding = FragmentAboutBinding.inflate(inflater, container, false);
+        mRecyclerView = binding.recyclerView;
+        return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
 
@@ -61,17 +56,11 @@ public class AboutFragment extends TitledFragment implements AboutAdapter.OnClic
         mRecyclerView.setAdapter(adapter);
     }
 
-    @Override public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
-    }
-
     @Override
     public void onResume() {
         super.onResume();
         EventBus.getDefault().post(new ChangeTitleEvent(getTitle()));
 
-        EventTracker.trackFragmentView(this, null, EventTracker.CONTENT_TYPE_APP);
     }
 
     @Override

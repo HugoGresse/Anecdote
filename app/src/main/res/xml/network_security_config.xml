@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
+    <!-- Website configurations (remote and user-defined) and their media still use plain http urls -->
+    <base-config cleartextTrafficPermitted="true" />
     <debug-overrides>
         <trust-anchors>
             <!-- Trust user added CAs while debuggable only -->

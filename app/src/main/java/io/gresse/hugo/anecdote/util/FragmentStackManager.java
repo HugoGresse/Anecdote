@@ -1,11 +1,11 @@
 package io.gresse.hugo.anecdote.util;
 
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewCompat;
-import android.support.v7.app.AppCompatActivity;
+import androidx.annotation.Nullable;
+import com.google.android.material.snackbar.Snackbar;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.core.view.ViewCompat;
+import androidx.appcompat.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -54,7 +54,7 @@ public class FragmentStackManager {
         }
 
         try {
-            android.support.v4.app.FragmentManager manager = activity.getSupportFragmentManager();
+            androidx.fragment.app.FragmentManager manager = activity.getSupportFragmentManager();
             boolean fragmentPopped = manager.popBackStackImmediate(backStateName, 0);
 
             if (!fragmentPopped && manager.findFragmentByTag(backStateName) == null) { //fragment not in back stack, create it.

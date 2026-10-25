@@ -16,3 +16,4 @@
 captures/
 app/fabric.properties
 signing.properties
+app/objectbox-models/default.json.bak

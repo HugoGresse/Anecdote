@@ -1,62 +1,48 @@
 package io.gresse.hugo.anecdote.anecdote.like;
 
-import android.app.Application;
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.util.List;
-
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote_;
 import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.model.WebsitePage;
-import io.gresse.hugo.anecdote.tracking.EventTracker;
 import io.objectbox.Box;
 import io.objectbox.BoxStore;
 import io.objectbox.query.Query;
+import io.objectbox.query.QueryBuilder;
 
 /**
  * Provide access to the list of favorited anecdote.
  * <p>
  * Created by Hugo Gresse on 15/06/2017.
  */
-@Singleton
 public final class FavoritesRepository {
 
     public static final  int    OFFSET_QUERY = 50;
 
     private static Website sWebsite;
 
-    @Inject
-    protected Application mApplication;
-    @Inject
-    protected BoxStore    mBoxStore;
-    private Box<Anecdote>   mAnecdoteBox;
-    private Query<Anecdote> mAnecdoteManyQuery;
-    private Query<Anecdote> mAnecdoteSingleQuery;
+    private final Box<Anecdote>   mAnecdoteBox;
+    private final Query<Anecdote> mAnecdoteManyQuery;
+    private final Query<Anecdote> mAnecdoteSingleQuery;
 
-    /**
-     * Setup the singleton. This is not done on Singleton creation because the DI is made afterward.
-     */
-    public void setup() {
-        if (mAnecdoteBox == null) {
-            mAnecdoteBox = mBoxStore.boxFor(Anecdote.class);
-            mAnecdoteManyQuery = mAnecdoteBox
-                    .query()
-                    .orderDesc(Anecdote_.favoritesTimestamp)
-                    .build();
+    public FavoritesRepository(BoxStore boxStore) {
+        mAnecdoteBox = boxStore.boxFor(Anecdote.class);
+        mAnecdoteManyQuery = mAnecdoteBox
+                .query()
+                .orderDesc(Anecdote_.favoritesTimestamp)
+                .build();
 
-            mAnecdoteSingleQuery = mAnecdoteBox
-                    .query()
-                    .equal(Anecdote_.text, "")
-                    .equal(Anecdote_.websitePageSlug, "")
-                    .build();
-        }
+        mAnecdoteSingleQuery = mAnecdoteBox
+                .query()
+                .equal(Anecdote_.text, "", QueryBuilder.StringOrder.CASE_SENSITIVE)
+                .equal(Anecdote_.websitePageSlug, "", QueryBuilder.StringOrder.CASE_SENSITIVE)
+                .build();
     }
 
 
@@ -101,7 +87,6 @@ public final class FavoritesRepository {
         }
         modifiedAnecdote.favoritesTimestamp = System.currentTimeMillis() / 1000;
         mAnecdoteBox.put(modifiedAnecdote);
-        EventTracker.trackFavorite(websiteNamePageSlug);
         return modifiedAnecdote;
     }
 

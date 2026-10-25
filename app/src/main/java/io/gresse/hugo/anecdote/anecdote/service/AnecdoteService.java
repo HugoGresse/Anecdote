@@ -2,15 +2,13 @@ package io.gresse.hugo.anecdote.anecdote.service;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-
-import javax.inject.Inject;
 
 import io.gresse.hugo.anecdote.anecdote.like.FavoritesRepository;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
@@ -36,10 +34,10 @@ public abstract class AnecdoteService {
     protected WebsitePage          mWebsitePage;
     protected List<Anecdote>       mAnecdotes;
 
-    @Inject
-    protected FavoritesRepository mFavoritesRepository;
+    protected final FavoritesRepository mFavoritesRepository;
 
-    public AnecdoteService(Website website, WebsitePage websitePage) {
+    public AnecdoteService(Website website, WebsitePage websitePage, FavoritesRepository favoritesRepository) {
+        mFavoritesRepository = favoritesRepository;
         mWebsite = website;
         mWebsitePage = websitePage;
         mServiceName = mWebsite.name.replaceAll("\\s", "") + websitePage.name + this.getClass().getSimpleName();

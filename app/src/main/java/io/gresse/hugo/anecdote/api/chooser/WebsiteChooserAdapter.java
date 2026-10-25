@@ -1,20 +1,22 @@
 package io.gresse.hugo.anecdote.api.chooser;
 
-import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.WebsiteViewHolderListener;
 import io.gresse.hugo.anecdote.api.model.Website;
+import io.gresse.hugo.anecdote.databinding.RowLoaderBinding;
+import io.gresse.hugo.anecdote.databinding.RowWebsitechooserBinding;
+import io.gresse.hugo.anecdote.databinding.RowWebsitechooserCustomBinding;
 
 /**
  * Display a list of website
@@ -47,25 +49,20 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
         notifyDataSetChanged();
     }
 
+    @NonNull
     @Override
-    public BaseWebsiteViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v;
-        switch (viewType) {
-            default:
-            case VIEW_TYPE_WEBSITE:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_websitechooser, parent, false);
-                return new WebsiteViewHolder(v);
-            case VIEW_TYPE_CUSTOM:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_websitechooser_custom, parent, false);
-                return new CustomAddViewHolder(v);
-            case VIEW_TYPE_LOAD:
-                v = LayoutInflater.from(parent.getContext()).inflate(R.layout.row_loader, parent, false);
-                return new LoadViewHolder(v);
-        }
+    public BaseWebsiteViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        return switch (viewType) {
+            case VIEW_TYPE_CUSTOM -> new CustomAddViewHolder(
+                    RowWebsitechooserCustomBinding.inflate(inflater, parent, false).getRoot());
+            case VIEW_TYPE_LOAD -> new LoadViewHolder(RowLoaderBinding.inflate(inflater, parent, false).getRoot());
+            default -> new WebsiteViewHolder(RowWebsitechooserBinding.inflate(inflater, parent, false));
+        };
     }
 
     @Override
-    public void onBindViewHolder(BaseWebsiteViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull BaseWebsiteViewHolder holder, int position) {
         if (mWebsites != null && position < mWebsites.size()) {
             holder.setData(mWebsites.get(position));
         }
@@ -107,13 +104,11 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
 
     public class WebsiteViewHolder extends BaseWebsiteViewHolder implements CompoundButton.OnCheckedChangeListener {
 
-        @BindView(R.id.checkBox)
-        protected CheckBox checkBox;
+        private final CheckBox checkBox;
 
-        public WebsiteViewHolder(View itemView) {
-            super(itemView);
-
-            ButterKnife.bind(this, itemView);
+        public WebsiteViewHolder(RowWebsitechooserBinding binding) {
+            super(binding.getRoot());
+            checkBox = binding.checkBox;
             checkBox.setOnCheckedChangeListener(this);
         }
 
@@ -125,7 +120,7 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
             if (mViewHolderListener != null && mWebsites != null) {
-                mViewHolderListener.onClick(mWebsites.get(getAdapterPosition()));
+                mViewHolderListener.onClick(mWebsites.get(getBindingAdapterPosition()));
             }
         }
     }
@@ -134,8 +129,6 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
 
         public CustomAddViewHolder(View itemView) {
             super(itemView);
-
-            ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
         }
 
@@ -147,7 +140,7 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
         @Override
         public void onClick(View v) {
             if (mViewHolderListener != null) {
-                mViewHolderListener.onClick(getAdapterPosition());
+                mViewHolderListener.onClick(getBindingAdapterPosition());
             }
         }
     }
@@ -156,8 +149,6 @@ public class WebsiteChooserAdapter extends RecyclerView.Adapter<WebsiteChooserAd
 
         public LoadViewHolder(View itemView) {
             super(itemView);
-
-            ButterKnife.bind(this, itemView);
         }
 
         @Override

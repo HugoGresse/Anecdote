@@ -1,23 +1,26 @@
 package io.gresse.hugo.anecdote.anecdote.list;
 
-import android.support.annotation.Nullable;
-import android.support.v4.view.ViewCompat;
+import android.graphics.drawable.Drawable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
+
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
 import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.GlideDrawableImageViewTarget;
 import com.bumptech.glide.request.target.Target;
 
-import butterknife.BindView;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.MediaContextDialog;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
-import io.gresse.hugo.anecdote.tracking.EventTracker;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteExpandBinding;
+import io.gresse.hugo.anecdote.databinding.RowAnecdoteImageBinding;
 import io.gresse.hugo.anecdote.view.CustomImageView;
 
 /**
@@ -27,7 +30,7 @@ import io.gresse.hugo.anecdote.view.CustomImageView;
  *
  * Created by Hugo Gresse on 08/11/2016.
  */
-public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClickListener, RequestListener<String, GlideDrawable>, View.OnLongClickListener {
+public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClickListener, RequestListener<Drawable>, View.OnLongClickListener {
 
     private static final  String TAG         = ImageViewHolder.class.getSimpleName();
     private static final int    RETRY_COUNT = 2;
@@ -36,29 +39,30 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
     @Nullable
     private String mImageUrl;
 
-    @BindView(R.id.imageView)
-    CustomImageView mImageView;
+    private final CustomImageView mImageView;
 
-    public ImageViewHolder(View itemView,
+    public ImageViewHolder(RowAnecdoteImageBinding binding,
                            AdapterListener adapterListener,
                            MixedContentAdapter adapter,
-                           int textSize,
-                           boolean rowStriping,
-                           int rowBackground,
-                           int rawStripingBackground) {
-        super(itemView, adapterListener, adapter, textSize, rowStriping, rowBackground, rawStripingBackground);
+                           RowStyle rowStyle) {
+        super(binding.getRoot(),
+                binding.contentTextView,
+                binding.separator,
+                RowAnecdoteExpandBinding.bind(binding.getRoot()),
+                adapterListener,
+                adapter,
+                rowStyle);
 
-        if (mImageView != null) {
-            mImageView.setOnClickListener(this);
-            mImageView.setOnLongClickListener(this);
-        }
+        mImageView = binding.imageView;
+        mImageView.setOnClickListener(this);
+        mImageView.setOnLongClickListener(this);
     }
 
     @Override
     public void setData(int position, boolean isExpanded, String websiteName, Anecdote anecdote) {
         super.setData(position, isExpanded, websiteName, anecdote);
 
-        ViewCompat.setTransitionName(mImageView, String.valueOf(position) + "_image");
+        ViewCompat.setTransitionName(mImageView, position + "_image");
 
         reset();
         mImageUrl = anecdote.media;
@@ -77,9 +81,9 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
             super.onClick(v);
             return;
         }
-        if (mAdapterListener != null && mImageView != null) {
+        if (mAdapterListener != null) {
             mAdapterListener.onClick(
-                    mAdapter.getItem(getAdapterPosition()),
+                    mAdapter.getItem(getBindingAdapterPosition()),
                     mImageView,
                     AdapterListener.ACTION_FULLSCREEN);
         }
@@ -90,7 +94,7 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
      */
     private void reset(){
         mRetried = 0;
-        Glide.clear(mImageView);
+        Glide.with(mImageView).clear(mImageView);
     }
 
     /**
@@ -101,20 +105,15 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
             return;
         }
 
-        GlideDrawableImageViewTarget imageViewTarget = new GlideDrawableImageViewTarget(mImageView);
-
-        Glide.with(mImageView.getContext())
+        Glide.with(mImageView)
                 .load(mImageUrl)
                 .listener(this)
                 .error(R.drawable.ic_error_white_24dp)
-                .into(imageViewTarget);
+                .into(mImageView);
 
-        mImageView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                MediaContextDialog.openDialog(mImageView.getContext(), mWebsiteName, mCurrentAnecdote, mImageUrl, mImageView);
-                return true;
-            }
+        mImageView.setOnLongClickListener(view -> {
+            MediaContextDialog.openDialog(mImageView.getContext(), mWebsiteName, mCurrentAnecdote, mImageUrl, mImageView);
+            return true;
         });
     }
 
@@ -123,7 +122,8 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
      */
 
     @Override
-    public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+    public boolean onLoadFailed(@Nullable GlideException e, @Nullable Object model,
+                                @NonNull Target<Drawable> target, boolean isFirstResource) {
         if(mRetried < RETRY_COUNT && mImageUrl != null){
             mRetried ++;
             Log.d(TAG, "Retry " + mImageUrl + " retried?" + mRetried);
@@ -131,13 +131,12 @@ public class ImageViewHolder extends MixedBaseViewHolder implements View.OnClick
             return true;
         }
 
-        EventTracker.trackError("Image download: " + mImageUrl, e.toString());
         return false;
     }
 
     @Override
-    public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
-        //reset();
+    public boolean onResourceReady(@NonNull Drawable resource, @NonNull Object model, Target<Drawable> target,
+                                   @NonNull DataSource dataSource, boolean isFirstResource) {
         return false;
     }
 

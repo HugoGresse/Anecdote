@@ -1,7 +1,7 @@
 package io.gresse.hugo.anecdote.api.model;
 
-import android.support.annotation.Nullable;
-import android.support.v4.util.Pair;
+import androidx.annotation.Nullable;
+import androidx.core.util.Pair;
 import android.text.TextUtils;
 
 import org.jsoup.nodes.Element;

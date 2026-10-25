@@ -1,12 +1,13 @@
 package io.gresse.hugo.anecdote.api.chooser;
 
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,14 +20,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
-import butterknife.Unbinder;
 import io.gresse.hugo.anecdote.MainActivity;
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.WebsiteViewHolderListener;
@@ -34,10 +29,10 @@ import io.gresse.hugo.anecdote.anecdote.WebsiteDialogFragment;
 import io.gresse.hugo.anecdote.api.event.LoadRemoteWebsiteEvent;
 import io.gresse.hugo.anecdote.api.event.OnRemoteWebsiteResponseEvent;
 import io.gresse.hugo.anecdote.api.model.Website;
+import io.gresse.hugo.anecdote.databinding.FragmentWebsitechooserBinding;
 import io.gresse.hugo.anecdote.event.ChangeTitleEvent;
 import io.gresse.hugo.anecdote.event.WebsitesChangeEvent;
 import io.gresse.hugo.anecdote.storage.SpStorage;
-import io.gresse.hugo.anecdote.tracking.EventTracker;
 
 /**
  * Display a list of website from Firebase so the user can choose which website he want to load after initial
@@ -54,17 +49,13 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
     public static final String BUNDLE_MODE_RESTORE = "restore";
     public static final String BUNDLE_MODE_ADD     = "add";
 
-    @BindView(R.id.recyclerView)
-    public RecyclerView mRecyclerView;
-
-    @BindView(R.id.saveButton)
-    public Button mSaveButton;
+    private RecyclerView mRecyclerView;
+    private Button       mSaveButton;
 
     @Nullable
     protected String                mMode;
     private   WebsiteChooserAdapter mAdapter;
     private   List<Website>         mSelectedWebsites;
-    private   Unbinder              mUnbinder;
 
     public static WebsiteChooserFragment newInstance(String mode) {
         WebsiteChooserFragment fragment = new WebsiteChooserFragment();
@@ -75,20 +66,17 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
     }
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_websitechooser, container, false);
-        mUnbinder = ButterKnife.bind(this, view);
-        return view;
+        FragmentWebsitechooserBinding binding = FragmentWebsitechooserBinding.inflate(inflater, container, false);
+        mRecyclerView = binding.recyclerView;
+        mSaveButton = binding.saveButton;
+        mSaveButton.setOnClickListener(v -> onSaveButtonClicked());
+        return binding.getRoot();
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
         if (getArguments() != null) {
@@ -106,12 +94,6 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
     }
 
     @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mUnbinder.unbind();
-    }
-
-    @Override
     public void onResume() {
         super.onResume();
         EventBus.getDefault().register(this);
@@ -124,7 +106,6 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
             EventBus.getDefault().post(new LoadRemoteWebsiteEvent());
         }
 
-        EventTracker.trackFragmentView(this, null, EventTracker.CONTENT_TYPE_APP);
     }
 
     @Override
@@ -133,8 +114,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
         EventBus.getDefault().unregister(this);
     }
 
-    @OnClick(R.id.saveButton)
-    public void onSaveButtonClicked() {
+    private void onSaveButtonClicked() {
         // If we are on the first launch, we assume the user didn't have any Websites, so we override it.
         // Else, we add the selected one
         if (TextUtils.isEmpty(mMode)) {
@@ -143,7 +123,6 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
             EventBus.getDefault().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_RESTORE)) {
             SpStorage.saveWebsites(getActivity(), mSelectedWebsites);
-            EventTracker.trackWebsitesRestored();
             EventBus.getDefault().post(new WebsitesChangeEvent(true));
         } else if (mMode.equals(BUNDLE_MODE_ADD)) {
             for (Website website : mSelectedWebsites) {
@@ -160,8 +139,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
      * @param websites data to display
      */
     private void setAdapterData(List<Website> websites) {
-        List<Website> websites1 = new ArrayList<>();
-        websites1.addAll(websites);
+        List<Website> websites1 = new ArrayList<>(websites);
         if (!websites1.isEmpty()) {
             if (!TextUtils.isEmpty(mMode) && !mMode.equals(BUNDLE_MODE_RESTORE)) {
                 // We want to add some websites : remove duplicates or already added ones
@@ -175,17 +153,7 @@ public class WebsiteChooserFragment extends Fragment implements WebsiteViewHolde
                 }
             }
 
-            Collections.sort(websites1, new Comparator<Website>() {
-                @Override
-                public int compare(Website website, Website website2) {
-                    if (website.like > website2.like) {
-                        return -1;
-                    } else if (website.like < website2.like) {
-                        return 1;
-                    }
-                    return 0;
-                }
-            });
+            websites1.sort((website, website2) -> Integer.compare(website2.like, website.like));
 
             mAdapter.setData(websites1);
         }
