@@ -6,10 +6,12 @@ import android.text.TextUtils;
 
 import org.jsoup.Jsoup;
 
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.Index;
+import androidx.room.PrimaryKey;
+
 import io.gresse.hugo.anecdote.R;
-import io.objectbox.annotation.Entity;
-import io.objectbox.annotation.Id;
-import io.objectbox.annotation.Index;
 
 /**
  * A single anecdote, composed of:
@@ -19,44 +21,36 @@ import io.objectbox.annotation.Index;
  * <p/>
  * Created by Hugo Gresse on 13/02/16.
  */
-@Entity
+@Entity(indices = {
+        @Index("type"),
+        @Index("permalink"),
+        @Index({"websitePageSlug", "text"})
+})
 public class Anecdote implements Cloneable {
 
-    @Id
+    @PrimaryKey(autoGenerate = true)
     public long id;
-    @Index
     @Nullable
     public String type;
     public String text;
     @Nullable
-    @Index
     public String permalink;
     @Nullable
     public String media;
-    @Index
     public String websitePageSlug;
     public long favoritesTimestamp; // Favorites date, if not favorite: 0L
 
+    @Ignore
     public Anecdote(String text, String permalink) {
         this(MediaType.TEXT, text, permalink, null);
     }
 
+    @Ignore
     public Anecdote(@Nullable String type, String text, @Nullable String permalink, @Nullable String media) {
         this.type = type;
         this.text = text;
         this.permalink = permalink;
         this.media = media;
-    }
-
-    public Anecdote(long id, String type, String text, String permalink, String media, String websitePageSlug,
-            long favoritesTimestamp) {
-        this.id = id;
-        this.type = type;
-        this.text = text;
-        this.permalink = permalink;
-        this.media = media;
-        this.websitePageSlug = websitePageSlug;
-        this.favoritesTimestamp = favoritesTimestamp;
     }
 
     public Anecdote() {

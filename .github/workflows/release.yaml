@@ -35,7 +35,7 @@ jobs:
             echo "Tag $GITHUB_REF_NAME does not match versionName ($expected)" >&2
             exit 1
           fi
-      - name: build the signed release APK
+      - name: build the signed release APKs
         env:
           RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
           RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
@@ -45,4 +45,4 @@ jobs:
       - name: create the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" --generate-notes app/build/outputs/apk/release/*.apk
+        run: gh release create "$GITHUB_REF_NAME" --generate-notes app/build/outputs/apk/*/release/*.apk

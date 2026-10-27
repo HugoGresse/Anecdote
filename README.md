@@ -26,14 +26,19 @@ Build
 -----
 Requires JDK 17+ and the Android SDK (compile SDK 37).
 
+Two flavors share the same code:
+
+- `fdroid`: fully free software, the one F-Droid builds.
+- `play`: also bundles ObjectBox (non-free) to import the favorites saved by versions up to 1.3.0 into Room, once.
+
 ```bash
-./gradlew assembleDebug
+./gradlew assembleFdroidDebug
 ```
 
 Run the unit tests and lint:
 
 ```bash
-./gradlew testDebugUnitTest lintDebug
+./gradlew testFdroidDebugUnitTest lintFdroidDebug
 ```
 
 Release builds are signed with `signing.properties` (see `signing.properties.example`) or the

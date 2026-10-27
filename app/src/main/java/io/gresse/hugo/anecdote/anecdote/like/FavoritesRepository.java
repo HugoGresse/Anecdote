@@ -2,19 +2,13 @@ package io.gresse.hugo.anecdote.anecdote.like;
 
 import android.content.Context;
 import androidx.annotation.Nullable;
-import android.text.TextUtils;
 
 import java.util.List;
 
 import io.gresse.hugo.anecdote.R;
 import io.gresse.hugo.anecdote.anecdote.model.Anecdote;
-import io.gresse.hugo.anecdote.anecdote.model.Anecdote_;
 import io.gresse.hugo.anecdote.api.model.Website;
 import io.gresse.hugo.anecdote.api.model.WebsitePage;
-import io.objectbox.Box;
-import io.objectbox.BoxStore;
-import io.objectbox.query.Query;
-import io.objectbox.query.QueryBuilder;
 
 /**
  * Provide access to the list of favorited anecdote.
@@ -27,22 +21,10 @@ public final class FavoritesRepository {
 
     private static Website sWebsite;
 
-    private final Box<Anecdote>   mAnecdoteBox;
-    private final Query<Anecdote> mAnecdoteManyQuery;
-    private final Query<Anecdote> mAnecdoteSingleQuery;
+    private final FavoritesDao mFavoritesDao;
 
-    public FavoritesRepository(BoxStore boxStore) {
-        mAnecdoteBox = boxStore.boxFor(Anecdote.class);
-        mAnecdoteManyQuery = mAnecdoteBox
-                .query()
-                .orderDesc(Anecdote_.favoritesTimestamp)
-                .build();
-
-        mAnecdoteSingleQuery = mAnecdoteBox
-                .query()
-                .equal(Anecdote_.text, "", QueryBuilder.StringOrder.CASE_SENSITIVE)
-                .equal(Anecdote_.websitePageSlug, "", QueryBuilder.StringOrder.CASE_SENSITIVE)
-                .build();
+    public FavoritesRepository(FavoritesDao favoritesDao) {
+        mFavoritesDao = favoritesDao;
     }
 
 
@@ -53,7 +35,7 @@ public final class FavoritesRepository {
      * @return the lsit of favorited anecdote, may be empty
      */
     public List<Anecdote> getFavorites(int page) {
-        return mAnecdoteManyQuery.find(OFFSET_QUERY * page, OFFSET_QUERY);
+        return mFavoritesDao.getFavorites(OFFSET_QUERY * page, OFFSET_QUERY);
     }
 
     /**
@@ -61,13 +43,7 @@ public final class FavoritesRepository {
      */
     @Nullable
     public Anecdote isFavorite(Anecdote anecdote) {
-        mAnecdoteSingleQuery.setParameter(Anecdote_.websitePageSlug, anecdote.websitePageSlug);
-
-        if(!TextUtils.isEmpty(anecdote.text)){
-            mAnecdoteSingleQuery.setParameter(Anecdote_.text, anecdote.text);
-        }
-        
-        return mAnecdoteSingleQuery.findFirst();
+        return mFavoritesDao.find(anecdote.websitePageSlug, anecdote.text);
     }
 
     /**
@@ -86,7 +62,7 @@ public final class FavoritesRepository {
             modifiedAnecdote = anecdote;
         }
         modifiedAnecdote.favoritesTimestamp = System.currentTimeMillis() / 1000;
-        mAnecdoteBox.put(modifiedAnecdote);
+        modifiedAnecdote.id = mFavoritesDao.insert(modifiedAnecdote);
         return modifiedAnecdote;
     }
 
@@ -99,7 +75,7 @@ public final class FavoritesRepository {
         // Stored Anecdote don't have the same id after app restart.
         Anecdote toRemoveAnecdote = isFavorite(anecdote);
         if(toRemoveAnecdote != null){
-            mAnecdoteBox.remove(toRemoveAnecdote);
+            mFavoritesDao.delete(toRemoveAnecdote);
         }
         // Clone the anecdote and change the timestamp to remove the favorite on it
         Anecdote modifiedAnecdote;
