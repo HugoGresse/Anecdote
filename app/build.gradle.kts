@@ -3,7 +3,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.objectbox)
 }
 
 android {
@@ -18,6 +17,28 @@ android {
         versionName = "2.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions.annotationProcessorOptions.arguments["room.schemaLocation"] =
+            "$projectDir/schemas"
+    }
+
+    flavorDimensions += "store"
+    productFlavors {
+        create("fdroid") {
+            dimension = "store"
+        }
+        create("play") {
+            dimension = "store"
+            // ObjectBox is non-free: it is only kept here to import favorites saved by versions up to 1.3.0.
+            javaCompileOptions.annotationProcessorOptions.arguments["objectbox.modelPath"] =
+                "$projectDir/objectbox-models/default.json"
+        }
+    }
+
+    dependenciesInfo {
+        // Encrypted dependency metadata is unreadable for F-Droid and reproducible builds.
+        includeInApk = false
+        includeInBundle = false
     }
 
     base.archivesName = "Anecdote-${defaultConfig.versionName}"
@@ -89,6 +110,11 @@ dependencies {
     implementation(libs.jsoup)
     implementation(libs.okhttp)
     implementation(libs.photoview)
+    implementation(libs.androidx.room.runtime)
+    annotationProcessor(libs.androidx.room.compiler)
+
+    "playImplementation"(libs.objectbox.android)
+    "playAnnotationProcessor"(libs.objectbox.processor)
 
     testImplementation(libs.junit)
 
