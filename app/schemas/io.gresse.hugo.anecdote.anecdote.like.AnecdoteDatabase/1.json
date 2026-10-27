@@ -1,0 +1,92 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "def2ea80a70ebba8c655ca8fcfc00da2",
+    "entities": [
+      {
+        "tableName": "Anecdote",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `type` TEXT, `text` TEXT, `permalink` TEXT, `media` TEXT, `websitePageSlug` TEXT, `favoritesTimestamp` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "type",
+            "columnName": "type",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "text",
+            "columnName": "text",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "permalink",
+            "columnName": "permalink",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "media",
+            "columnName": "media",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "websitePageSlug",
+            "columnName": "websitePageSlug",
+            "affinity": "TEXT"
+          },
+          {
+            "fieldPath": "favoritesTimestamp",
+            "columnName": "favoritesTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_Anecdote_type",
+            "unique": false,
+            "columnNames": [
+              "type"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Anecdote_type` ON `${TABLE_NAME}` (`type`)"
+          },
+          {
+            "name": "index_Anecdote_permalink",
+            "unique": false,
+            "columnNames": [
+              "permalink"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Anecdote_permalink` ON `${TABLE_NAME}` (`permalink`)"
+          },
+          {
+            "name": "index_Anecdote_websitePageSlug_text",
+            "unique": false,
+            "columnNames": [
+              "websitePageSlug",
+              "text"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_Anecdote_websitePageSlug_text` ON `${TABLE_NAME}` (`websitePageSlug`, `text`)"
+          }
+        ]
+      }
+    ],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'def2ea80a70ebba8c655ca8fcfc00da2')"
+    ]
+  }
+}

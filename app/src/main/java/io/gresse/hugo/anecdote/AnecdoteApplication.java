@@ -3,9 +3,11 @@ package io.gresse.hugo.anecdote;
 import android.app.Application;
 import android.content.Context;
 
+import io.gresse.hugo.anecdote.anecdote.like.AnecdoteDatabase;
+import io.gresse.hugo.anecdote.anecdote.like.FavoritesDao;
 import io.gresse.hugo.anecdote.anecdote.like.FavoritesRepository;
-import io.gresse.hugo.anecdote.anecdote.model.MyObjectBox;
 import io.gresse.hugo.anecdote.anecdote.social.SocialService;
+import io.gresse.hugo.anecdote.legacy.LegacyFavoritesImport;
 import io.gresse.hugo.anecdote.util.chrome.ChromeCustomTabsManager;
 
 /**
@@ -26,7 +28,9 @@ public class AnecdoteApplication extends Application {
     public void onCreate() {
         super.onCreate();
 
-        mFavoritesRepository = new FavoritesRepository(MyObjectBox.builder().androidContext(this).build());
+        FavoritesDao favoritesDao = AnecdoteDatabase.create(this).favoritesDao();
+        mFavoritesRepository = new FavoritesRepository(favoritesDao);
+        new Thread(() -> LegacyFavoritesImport.importInto(this, favoritesDao), "legacy-favorites-import").start();
         SocialService socialService = new SocialService(this, new ChromeCustomTabsManager(this));
         mServiceProvider = new ServiceProvider(socialService, mFavoritesRepository);
     }

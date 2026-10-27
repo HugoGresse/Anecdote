@@ -3,8 +3,8 @@
 app_package_name 'io.gresse.hugo.anecdote'
 # use_tests_in_packages ['your.screenshot.tests.package']
 
-app_apk_path 'app/build/outputs/apk/debug/Anecdote-2.0.0-debug.apk'
-tests_apk_path 'app/build/outputs/apk/androidTest/debug/Anecdote-2.0.0-debug-androidTest.apk'
+app_apk_path 'app/build/outputs/apk/fdroid/debug/Anecdote-2.0.0-fdroid-debug.apk'
+tests_apk_path 'app/build/outputs/apk/androidTest/fdroid/debug/Anecdote-2.0.0-fdroid-debug-androidTest.apk'
 
 locales ['en-US', 'fr-FR']
 
