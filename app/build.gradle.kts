@@ -46,7 +46,8 @@ android {
     signingConfigs {
         create("release") {
             val signingPropFile = rootProject.file("signing.properties")
-            val keystoreBase64 = System.getenv("RELEASE_KEYSTORE_BASE64")
+            // GitHub Actions passes an unset secret as an empty string, not as a missing variable.
+            val keystoreBase64 = System.getenv("RELEASE_KEYSTORE_BASE64")?.takeIf { it.isNotBlank() }
             if (signingPropFile.exists()) {
                 val signingProp = Properties().apply { signingPropFile.inputStream().use(::load) }
                 storeFile = file(signingProp.getProperty("release.storeFile"))

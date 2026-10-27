@@ -45,4 +45,13 @@ jobs:
       - name: create the GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" --generate-notes app/build/outputs/apk/*/release/*.apk
+        run: |
+          shopt -s nullglob
+          signed_apks=()
+          for apk in app/build/outputs/apk/*/release/*.apk; do
+            [[ "$apk" == *-unsigned.apk ]] || signed_apks+=("$apk")
+          done
+          if [ ${#signed_apks[@]} -eq 0 ]; then
+            echo "::warning::RELEASE_KEYSTORE_* secrets are not set: publishing the release without APKs"
+          fi
+          gh release create "$GITHUB_REF_NAME" --generate-notes "${signed_apks[@]}"
